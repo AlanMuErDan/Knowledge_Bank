@@ -1,0 +1,2838 @@
+\documentclass[oneside]{book}
+
+% ------------------------------------------------------------------------------
+% Packages
+% ------------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{mathtools}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems, skins, breakable}
+
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+\usepackage{multicol}
+\setlength{\columnsep}{1.2em}
+
+\usepackage{graphicx}
+
+% ------------------------------------------------------------------------------
+% Page Setup
+% ------------------------------------------------------------------------------
+
+\geometry{
+    top=0.8in,
+    bottom=0.8in,
+    left=0.7in,
+    right=0.7in,
+    headheight=12pt,
+    headsep=20pt,
+    footskip=25pt
+}
+
+\setstretch{1.15}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=MidnightBlue,
+    urlcolor=RoyalBlue,
+    citecolor=ForestGreen
+}
+
+% ------------------------------------------------------------------------------
+% Variables
+% ------------------------------------------------------------------------------
+
+\def\notetitle{Mathematics for the Slightly Rusty but Still Ambitious}
+\def\notesubtitle{A Practical Review for Interviews, Work, and Future Moments of Panic}
+\def\noteauthor{Erdan Mu Alan}
+\def\noteinstitution{University of Pennsylvania}
+
+% ------------------------------------------------------------------------------
+% Theorem System and User Commands
+% ------------------------------------------------------------------------------
+
+\input{theorems.tex}
+\input{commands.tex}
+
+% ------------------------------------------------------------------------------
+% Document
+% ------------------------------------------------------------------------------
+
+\begin{document}
+
+% ------------------------------------------------------------------------------
+% Title Page
+% ------------------------------------------------------------------------------
+
+\begin{titlepage}
+    \centering
+
+    \vspace*{2.2cm}
+
+    {\Huge\bfseries \notetitle \par}
+
+    \vspace{0.9cm}
+
+    \resizebox{0.88\textwidth}{!}{%
+        \itshape \notesubtitle
+    }
+
+    \vspace{2.4cm}
+
+    \vspace{1.2cm}
+
+    {\large \noteauthor \par}
+
+    \vspace{0.25cm}
+
+    {\large \noteinstitution \par}
+
+    \vfill
+\end{titlepage}
+
+% ------------------------------------------------------------------------------
+% Front Matter
+% ------------------------------------------------------------------------------
+
+\frontmatter
+\setcounter{tocdepth}{1}
+\tableofcontents
+\newpage
+
+% ------------------------------------------------------------------------------
+% Main Matter
+% ------------------------------------------------------------------------------
+
+\mainmatter
+
+
+\chapter{Multivariable Calculus}
+
+\section{Limits, Continuity, and Derivatives}
+
+\defn{Function}{
+    A \emph{function} $f:D\to E$ is a rule that assigns to each element $x\in D$ exactly one element $f(x)\in E$. The set $D$ is the \emph{domain}, and the set of all actual output values is the \emph{range}.
+}
+\paragraph{Increasing and Decreasing Functions}{
+    Let $f$ be defined on an interval $I$: 
+    \begin{itemize}
+        \item Whenever $x_1<x_2$ in $I$, $f$ is \emph{increasing} on $I$ if $f(x_1)<f(x_2)$, is \emph{nondecreasing} on $I$ if $f(x_1)\le f(x_2)$.
+        \item Whenever $x_1<x_2$ in $I$, $f$ is \emph{decreasing} on $I$ if $f(x_1)>f(x_2)$, is \emph{nonincreasing} on $I$ if $f(x_1)\ge f(x_2)$.
+    \end{itemize}
+}
+
+\paragraph{Informal Definition of Limit} The statement $\lim_{x\to a} f(x)=L$ means that $f(x)$ can be made arbitrarily close to $L$ by taking $x$ sufficiently close to $a$, from both the left and the right, but with $x\ne a$.
+
+\paragraph{Right- and Left-Hand Limits}{
+    $\lim_{x\to a^+} f(x)=L$ means that $f(x)$ can be made arbitrarily close to $L$ by taking $x$ sufficiently close to $a$ with $x>a$. Similarly. $\lim_{x\to a^-} f(x)=L$ means that $x$ approaches $a$ from the left, so $x<a$.
+}
+
+\paragraph{Two-Sided Limit}{
+    The two-sided limit exists and equals $L$ if and only if:
+    \[
+        \lim_{x\to a} f(x)=L
+        \quad\Longleftrightarrow\quad
+        \lim_{x\to a^-} f(x)=L
+        \text{ and }
+        \lim_{x\to a^+} f(x)=L
+    \]
+}
+
+\paragraph{Vertical Asymptote}{
+    The line $x=a$ is a \emph{vertical asymptote} of the graph of $f$ if at least one of the following is true:
+    \[
+        \lim_{x\to a^-}f(x)=\pm\infty,
+        \qquad
+        \lim_{x\to a^+}f(x)=\pm\infty
+    \]
+}
+
+\thmr{Squeeze Theorem}{squeezetheorem}{
+    Suppose $g(x)\le f(x)\le h(x)$ for all $x$ near $a$. If $\lim_{x\to a}g(x)=L$ and $\lim_{x\to a}h(x)=L$, then $\lim_{x\to a}f(x)=L$.
+}
+
+\defn{Formal Definition of Limit}{
+    Let $f$ be defined near $a$, except possibly at $a$. We say $\lim_{x\to a}f(x)=L$ if for every $\varepsilon>0$, there exists $\delta>0$ such that whenever $0<|x-a|<\delta$, 
+    we have $|f(x)-L|<\varepsilon$. 
+}
+
+\paragraph{Continuity at a Point}{
+    A function $f:D\to \mathbb{R}$ is \emph{continuous at} $a\in D$ if $\lim_{x\to a}f(x)=f(a)$. 
+}
+
+\paragraph{Continuity on an Interval}{
+    A function is \emph{continuous on an interval} if it is continuous at every point of that interval. At endpoints, continuity is understood using the appropriate one-sided limit.
+}
+
+\paragraph{Types of Discontinuity.}
+Typical discontinuities include:
+\begin{itemize}
+    \item \emph{removable discontinuity}: the limit exists but $f(a)$ is missing or has the wrong value;
+    \item \emph{jump discontinuity}: the one-sided limits exist but are not equal;
+    \item \emph{infinite discontinuity}: the function tends to $\pm\infty$;
+    \item \emph{oscillatory discontinuity}: the function oscillates and has no limiting value.
+\end{itemize}
+
+\thmr{Intermediate Value Theorem}{ivt}{
+    Suppose $f$ is continuous on the closed interval $[a,b]$. If $N$ is any number between $f(a)$ and $f(b)$, then there exists at least one $c\in[a,b]$ such that $f(c)=N$. 
+}
+
+\paragraph{Limit at Infinity}{
+    $\lim_{x\to +\infty}f(x)=L$ means that $\forall \varepsilon>0$, there exists $N>0$ such that if $x>N$, then $|f(x)-L|<\varepsilon$. Similarily,
+    $ \lim_{x\to -\infty}f(x)=L$ means that $\forall \varepsilon>0$, there exists $N>0$ such that if $x<-N$, then $|f(x)-L|<\varepsilon$. 
+}
+
+\paragraph{Horizontal Asymptote}{
+    The line $y=L$ is a \emph{horizontal asymptote} if
+    \[
+        \lim_{x\to +\infty}f(x)=L
+        \quad\text{or}\quad
+        \lim_{x\to -\infty}f(x)=L
+    \]
+}
+
+\defn{Tangent Line}{
+    If the limit $m=\lim_{x\to a}\frac{f(x)-f(a)}{x-a}$
+    exists, then the tangent line to the graph of $f$ at $(a,f(a))$ is
+    \[
+        y-f(a)=m(x-a)
+    \]
+}
+
+\defn{Derivative at a Point}{
+    The derivative of $f$ at $a$ is
+    \[
+        f'(a)=\lim_{x\to a}\frac{f(x)-f(a)}{x-a}=\lim_{h\to 0}\frac{f(a+h)-f(a)}{h}
+    \]
+}
+
+\rmk{
+    The derivative is the slope of the tangent line and the instantaneous rate of change of $f$ at $a$.
+}
+
+\paragraph{Derivative Function}{
+    The derivative of $f$ is the function defined at all $x$ where this limit exists: 
+    \[
+        f'(x)=\lim_{h\to 0}\frac{f(x+h)-f(x)}{h}
+    \]
+}
+
+\thmr{Differentiability Implies Continuity}{diffimpliescont}{
+    If $f$ is differentiable at $a$, then $f$ is continuous at $a$.
+}
+
+\rmk{
+    The converse is false. A function can be continuous but not differentiable. $f(x) = |x|$. 
+}
+
+\paragraph{Basic Differentiation Rules}{
+    Let $c\in\mathbb{R}$ and suppose $f,g$ are differentiable. Then
+    \begin{align*}
+        \frac{d}{dx}[c] =0 \qquad 
+        \frac{d}{dx}[x^n] = nx^{n-1} \qquad
+        \frac{d}{dx}[cf(x)] = c f'(x) \qquad
+        \frac{d}{dx}[f(x) \pm g(x)] &= f'(x) \pm g'(x)
+    \end{align*}
+}
+
+\thmr{Product Rule and Quotient Rule}{productrule}{
+    If $f$ and $g$ are differentiable, then $fg$ is differentiable and
+    \[
+        \frac{d}{dx}[f(x)g(x)]
+        =f'(x)g(x)+f(x)g'(x) \qquad
+        \frac{d}{dx}\left[\frac{f(x)}{g(x)}\right]
+        =\frac{f'(x)g(x)-f(x)g'(x)}{[g(x)]^2}
+    \]
+}
+
+\paragraph{Derivative Formulas for Trigonometric Functions}{
+    \[
+        \frac{d}{dx}\sin x = \cos x \qquad
+        \frac{d}{dx}\cos x = -\sin x \qquad
+        \frac{d}{dx}\tan x = \sec^2 x 
+    \]
+    \[
+        \frac{d}{dx}\cot x = -\csc^2 x \qquad
+        \frac{d}{dx}\sec x = \sec x\tan x \qquad
+        \frac{d}{dx}\csc x = -\csc x\cot x 
+    \]
+}
+
+\thmr{Chain Rule}{chainrule}{
+    If $g$ is differentiable at $x$ and $f$ is differentiable at $g(x)$, let $y=f(u)$ and $u=g(x)$, then
+    \[
+        \frac{d}{dx}f(g(x))=f'(g(x))g'(x) \qquad \frac{dy}{dx}=\frac{dy}{du}\frac{du}{dx}
+    \]
+}
+
+\thmr{Inverse Function Derivative}{inversefunctionderivative}{
+    \[
+        (f^{-1})'(x)=\frac{1}{f'(f^{-1}(x))}
+    \]
+}
+
+\paragraph{Exponential and Logarithm Derivatives}{
+    \[
+        \frac{d}{dx}e^x=e^x \qquad \frac{d}{dx}a^x=a^x\ln a
+    \]
+    \[
+        \frac{d}{dx}\ln x=\frac{1}{x} \qquad \frac{d}{dx} \log_a x = \frac{1}{x \ln a}
+    \]
+}
+
+\paragraph{Inverse Trigonometric Derivatives}{
+    \begin{align*}
+        \frac{d}{dx}\arcsin x = \frac{1}{\sqrt{1-x^2}} \qquad
+        \frac{d}{dx}\arccos x = -\frac{1}{\sqrt{1-x^2}} \qquad
+        \frac{d}{dx}\arctan x = \frac{1}{1+x^2} 
+    \end{align*}
+}
+
+\paragraph{Implicit Derivative}{
+    A function may be defined implicitly by a relation between $x$ and $y$; instead of solving for $y$ explicitly, differentiate both sides with respect to $x$, treating $y$ as a function of $x$, and apply the chain rule when differentiating expressions involving $y$, e.g. $\dfrac{d}{dx}[y]=y'$, $\dfrac{d}{dx}[y^2]=2yy'$, $\dfrac{d}{dx}[\sin y]=\cos(y)y'$.    
+}
+
+
+
+\section{Applications of Derivatives}  
+
+\paragraph{Linearization}{
+If $f$ is differentiable at $x=a$, the \textbf{linearization} of $f$ at $a$ is
+$L(x)=f(a)+f'(a)(x-a)$.
+}
+
+\paragraph{Differential}{
+If $y=f(x)$, then $dy=f'(x)\,dx$. The actual change is
+$\Delta y=f(x+\Delta x)-f(x) \approx dy=f'(x)\Delta x, \Delta x \rightarrow 0$. 
+}
+
+\thm{Extreme Value Theorem}{
+If $f$ is continuous on a closed interval $[a,b]$, then $f$ attains both an absolute maximum and minimum on $[a,b]$.
+}
+
+\paragraph{Local and Absolute Extremum}{
+    \begin{itemize}
+        \item $f$ has a \textbf{local maximum} at $c$ if $f(c)\ge f(x)$ for all $x$ sufficiently close to $c$. 
+        \item $f$ has a \textbf{local minimum} at $c$ if $f(c)\le f(x)$ for all $x$ sufficiently close to $c$. 
+        \item $f$ has an \textbf{absolute maximum} at $c$ on a domain $D$ if $f(c)\ge f(x)\qquad \text{for all }x\in D$.
+        \item $f$ has an \textbf{absolute minimum} at $c$ on a domain $D$ if $f(c)\le f(x)\qquad \text{for all }x\in D$. 
+    \end{itemize}
+}
+
+\thm{Fermat's Theorem}{
+If $f$ has a local maximum or local minimum at $c$, and if $f'(c)$ exists, then
+\[
+f'(c)=0
+\]
+}
+
+\rmk{
+This is a necessary condition, not a sufficient condition. $f'(c)=0$ only makes $c$ a candidate. $f(x) = x^3$. 
+}
+
+\paragraph{Critical Number}{
+A number $c$ in the domain of $f$ is a \textbf{critical number} if $f'(c)=0$ or $f'(c)\text{ does not exist}$. 
+}
+
+\paragraph{Closed Interval Method}{
+To find absolute extrema of a continuous function $f$ on $[a,b]$:
+\begin{enumerate}
+    \item Find all critical numbers in $(a,b)$.
+    \item Evaluate $f$ at the critical numbers. Evaluate $f(a)$ and $f(b)$. Compare all values.
+\end{enumerate}
+}
+
+\thm{Rolle's Theorem}{
+Suppose $f$ is continuous on $[a,b]$, $f$ is differentiable on $(a,b)$, and $f(a)=f(b)$, then $\exists c\in(a,b)$ such that 
+    \[f'(c)=0\]
+}
+
+\thm{Mean Value Theorem}{
+Suppose $f$ is continuous on $[a,b]$ and $f$ is differentiable on $(a,b)$ then there exists $c\in(a,b)$ such that
+\[
+f'(c)=\frac{f(b)-f(a)}{b-a}
+\]
+}
+
+\paragraph{First Derivative Test}{
+Let $c$ be a critical number: 
+\begin{enumerate}
+    \item If $f'$ changes from positive to negative at $c$, then $f$ has a local maximum at $c$.
+    \item If $f'$ changes from negative to positive at $c$, then $f$ has a local minimum at $c$.
+    \item If $f'$ does not change sign at $c$, then $f$ has no local extremum at $c$.
+\end{enumerate}
+}
+
+\paragraph{Concavity}{
+    \begin{enumerate}
+        \item $f$ is \textbf{concave up} on an interval if $f''(x)>0$ on that interval.
+        \item $f$ is \textbf{concave down} on an interval if $f''(x)<0$ on that interval.
+    \end{enumerate}
+}
+
+\paragraph{Second Derivative Test}{
+Suppose $f'(c)=0$: 
+\begin{enumerate}
+    \item If $f''(c)>0$, then $f$ has a local minimum at $c$.
+    \item If $f''(c)<0$, then $f$ has a local maximum at $c$.
+    \item If $f''(c)=0$, the test is inconclusive.
+\end{enumerate}
+}
+
+\paragraph{Inflection Point}{
+A point $x=c$ is an \textbf{inflection point} if $f$ is continuous at $c$ and concavity changes at $c$. Possible candidates occur when
+$f''(c)=0$ or $f''(c)\text{ does not exist}$
+}
+
+\thm{L'Hopital's Rule}{
+If $\lim_{x\to a}f(x)=\lim_{x\to a}g(x)=0$ or both limits are infinite, and if
+$\lim_{x\to a}\frac{f'(x)}{g'(x)}$ exists or equals $\pm\infty$, then
+\[
+\lim_{x\to a}\frac{f(x)}{g(x)}=\lim_{x\to a}\frac{f'(x)}{g'(x)}
+\]
+}
+
+\section{Integrations and the Fundamental Theorem of Calculus}
+
+\paragraph{Area Approximation}{
+On $[a,b]$, $\Delta x=\frac{b-a}{n}$.
+Right endpoint: $x_i=a+i\Delta x$. 
+Left endpoint: $x_{i-1}=a+(i-1)\Delta x$.
+Midpoint: $\bar{x}_i=a+\left(i-\frac12\right)\Delta x$.
+The approximate area is $\sum_{i=1}^n f(x_i^*)\Delta x$.
+}
+
+\defn{Definite Integral}{
+If the limit exists, let $\Delta x=\frac{b-a}{n}$: 
+\[
+\int_a^b f(x)\,dx=\lim_{n\to\infty}\sum_{i=1}^n f(x_i^*)\Delta x
+\]
+}
+
+\rmk{
+A definite integral is signed area. Area above the $x$-axis is positive; area below is negative.
+}
+
+\paragraph{Properties}
+\[
+\int_a^a f(x)\,dx=0
+\qquad
+\int_a^b f(x)\,dx=-\int_b^a f(x)\,dx
+\qquad
+\int_a^b cf(x)\,dx=c\int_a^b f(x)\,dx
+\]
+\[
+\int_a^b [f(x)+g(x)]\,dx=\int_a^b f(x)\,dx+\int_a^b g(x)\,dx
+\qquad
+\int_a^b f(x)\,dx=\int_a^c f(x)\,dx+\int_c^b f(x)\,dx
+\]
+
+\paragraph{Antiderivative}{
+$F$ is an antiderivative of $f$ if $F'(x)=f(x)$. All antiderivatives are $F(x)+C$. 
+}
+
+\thm{Fundamental Theorem of Calculus Part 1}{
+If $f$ is continuous and $g(x)=\int_a^x f(t)\,dt$ then $g'(x)=f(x)$. 
+}
+
+\thm{Fundamental Theorem of Calculus Part 2}{
+If $f$ is continuous on $[a,b]$ and $F'(x)=f(x)$, then
+\[
+\int_a^b f(x)\,dx=F(b)-F(a)
+\]
+}
+
+\paragraph{Substitution Rule}
+If $u=g(x), du=g'(x)\,dx$, then 
+\[
+\int f(g(x))g'(x)\,dx=\int f(u)\,du
+\]
+For definite integrals, change the bounds:
+\[
+\int_a^b f(g(x))g'(x)\,dx=\int_{g(a)}^{g(b)} f(u)\,du
+\]
+
+\paragraph{Integration by Parts}{
+\[
+\int u\,dv=uv-\int v\,du
+\]
+For definite integrals,
+\[
+\int_a^b u\,dv=[uv]_a^b-\int_a^b v\,du
+\]
+}
+
+\paragraph{Partial Fractions}
+For a proper rational function $P(x)/Q(x)$ (where $\deg P<\deg Q$):
+\begin{itemize}
+\item \textbf{Distinct linear:} $(x-a)(x-b) \to \frac{A}{x-a}+\frac{B}{x-b}$
+\item \textbf{Repeated linear:} $(x-a)^r \to \frac{A_1}{x-a}+\cdots+\frac{A_r}{(x-a)^r}$
+\item \textbf{Irreducible quadratic:} $ax^2+bx+c \to \frac{Ax+B}{ax^2+bx+c}$
+\end{itemize}
+Key integrals:
+\[
+\int \frac{dx}{ax+b}=\frac1a\ln|ax+b|+C, \quad \int \frac{dx}{x^2+a^2}=\frac1a\arctan\left(\frac xa\right)+C
+\]
+
+\paragraph{Infinite Intervals}
+\[
+\int_a^\infty f(x)\,dx=\lim_{t\to\infty}\int_a^t f(x)\,dx
+\]
+\[
+\int_{-\infty}^b f(x)\,dx=\lim_{t\to-\infty}\int_t^b f(x)\,dx
+\]
+For $\int_{-\infty}^{\infty} f(x)\,dx$ split at any $c$:
+\[
+\int_{-\infty}^{\infty} f(x)\,dx=\int_{-\infty}^{c} f(x)\,dx+\int_c^\infty f(x)\,dx.
+\]
+
+\thm{Comparison Theorem}{
+If $0\le f(x)\le g(x)$ on $[a,\infty)$, then:
+\begin{enumerate}
+    \item If $\int_a^\infty g(x)\,dx$ converges, then $\int_a^\infty f(x)\,dx$ converges.
+    \item If $\int_a^\infty f(x)\,dx$ diverges, then $\int_a^\infty g(x)\,dx$ diverges.
+\end{enumerate}
+}
+
+
+\section{Applications of Integration}
+
+\paragraph{Absolute Area}
+If $f$ crosses the $x$-axis, geometric area is below, split at zeros of $f$ and remove negative signed area:
+\[
+A=\int_a^b |f(x)|\,dx
+\]
+
+\paragraph{Area Between Curves}
+If $f(x)\ge g(x)$ on $[a,b]$, then
+\[
+A=\int_a^b [f(x)-g(x)]\,dx
+\]
+
+\paragraph{Surface Area}
+If $y=f(x)\ge0$ and $f'$ is continuous on $[a,b]$, then rotating the curve around the $x$-axis gives
+\[
+S=2\pi\int_a^b f(x)\sqrt{1+[f'(x)]^2}\,dx
+\]
+
+
+% \section{Sequences, Series, and Power Series}
+
+% \subsection{Lecture 1: Sequences}
+
+% A sequence is a function from the positive integers to the real numbers,
+% \[
+%     n \mapsto a_n, \qquad (a_n)_{n\geq 1}.
+% \]
+% The central question is whether the terms approach a limiting value as the index becomes large.
+
+% \begin{definition}[Limit of a sequence]
+% A sequence $(a_n)$ converges to $L\in\R$ if for every $\varepsilon>0$, there exists $N\in\N$ such that
+% \[
+%     n\geq N \quad \Longrightarrow \quad |a_n-L|<\varepsilon.
+% \]
+% We write $\lim_{n\to\infty}a_n=L$.
+% \end{definition}
+
+% Important elementary facts:
+% \begin{itemize}
+%     \item Convergent sequences have unique limits.
+%     \item Every convergent sequence is bounded.
+%     \item Limits respect algebraic operations whenever the expressions are defined.
+% \end{itemize}
+
+% A sequence is increasing if $a_{n+1}\geq a_n$ for all $n$ and decreasing if $a_{n+1}\leq a_n$ for all $n$. The monotone convergence principle is one of the first major tools.
+
+% \begin{theorem}[Monotone convergence]
+% If $(a_n)$ is increasing and bounded above, then it converges. If $(a_n)$ is decreasing and bounded below, then it converges.
+% \end{theorem}
+
+% Typical strategy: identify monotonicity, prove boundedness, and then conclude convergence even before computing the exact limit.
+
+% \subsection{Lecture 2: Series}
+
+% An infinite series is the formal sum
+% \[
+%     \sum_{n=1}^{\infty} a_n.
+% \]
+% It is defined through its partial sums
+% \[
+%     s_N=\sum_{n=1}^{N}a_n.
+% \]
+% The series converges if the sequence $(s_N)$ converges.
+
+% \begin{definition}[Convergence of a series]
+% The series $\sum_{n=1}^{\infty}a_n$ converges to $S$ if
+% \[
+%     \lim_{N\to\infty}s_N=S.
+% \]
+% Otherwise, it diverges.
+% \end{definition}
+
+% Two basic model series are essential.
+% \begin{itemize}
+%     \item Geometric series:
+%     \[
+%         \sum_{n=0}^{\infty} ar^n=\frac{a}{1-r}, \qquad |r|<1.
+%     \]
+%     It diverges if $|r|\geq 1$, except for trivial cases such as $a=0$.
+%     \item Harmonic series:
+%     \[
+%         \sum_{n=1}^{\infty}\frac1n
+%     \]
+%     diverges, even though its terms tend to zero.
+% \end{itemize}
+
+% A necessary condition for convergence is
+% \[
+%     \sum a_n \text{ converges } \Longrightarrow \lim_{n\to\infty}a_n=0.
+% \]
+% The converse is false, as shown by the harmonic series.
+
+% \subsection{Lecture 3: Integral and Comparison Tests}
+
+% The integral test connects positive decreasing series with improper integrals.
+
+% \begin{theorem}[Integral test]
+% Let $f$ be continuous, positive, and decreasing on $[1,\infty)$, and let $a_n=f(n)$. Then
+% \[
+%     \sum_{n=1}^{\infty} a_n
+% \]
+% converges if and only if
+% \[
+%     \int_1^{\infty} f(x)\dd x
+% \]
+% converges.
+% \end{theorem}
+
+% This gives the standard $p$-series test:
+% \[
+%     \sum_{n=1}^{\infty}\frac1{n^p}
+%     \begin{cases}
+%     \text{converges}, & p>1,\\
+%     \text{diverges}, & p\leq 1.
+%     \end{cases}
+% \]
+
+% Comparison tests are used when a series resembles a known benchmark.
+
+% \begin{theorem}[Direct comparison]
+% Suppose $0\leq a_n\leq b_n$ for all sufficiently large $n$.
+% \begin{itemize}
+%     \item If $\sum b_n$ converges, then $\sum a_n$ converges.
+%     \item If $\sum a_n$ diverges, then $\sum b_n$ diverges.
+% \end{itemize}
+% \end{theorem}
+
+% \begin{theorem}[Limit comparison]
+% Let $a_n,b_n>0$ and suppose
+% \[
+%     \lim_{n\to\infty}\frac{a_n}{b_n}=c,
+% \]
+% where $0<c<\infty$. Then $\sum a_n$ and $\sum b_n$ either both converge or both diverge.
+% \end{theorem}
+
+% \subsection{Lecture 4: Alternating Series and Absolute Convergence}
+
+% An alternating series has the form
+% \[
+%     \sum_{n=1}^{\infty}(-1)^{n-1}b_n, \qquad b_n\geq 0.
+% \]
+
+% \begin{theorem}[Alternating series test]
+% If $b_{n+1}\leq b_n$ for all sufficiently large $n$ and $\lim_{n\to\infty}b_n=0$, then
+% \[
+%     \sum_{n=1}^{\infty}(-1)^{n-1}b_n
+% \]
+% converges.
+% \end{theorem}
+
+% The alternating series estimate says that if $S$ is the true sum and $s_N$ is the $N$th partial sum, then
+% \[
+%     |S-s_N|\leq b_{N+1}.
+% \]
+
+% \begin{definition}[Absolute and conditional convergence]
+% The series $\sum a_n$ converges absolutely if $\sum |a_n|$ converges. It converges conditionally if $\sum a_n$ converges but $\sum |a_n|$ diverges.
+% \end{definition}
+
+% Absolute convergence is stronger than ordinary convergence:
+% \[
+%     \sum |a_n| \text{ converges } \Longrightarrow \sum a_n \text{ converges.}
+% \]
+
+% \subsection{Lecture 5: Ratio Test, Root Test, and Strategy}
+
+% \begin{theorem}[Ratio test]
+% For a series $\sum a_n$, suppose
+% \[
+%     L=\lim_{n\to\infty}\left|\frac{a_{n+1}}{a_n}\right|.
+% \]
+% Then:
+% \[
+%     L<1 \Rightarrow \text{absolute convergence},\qquad
+%     L>1 \Rightarrow \text{divergence},\qquad
+%     L=1 \Rightarrow \text{inconclusive}.
+% \]
+% \end{theorem}
+
+% \begin{theorem}[Root test]
+% For a series $\sum a_n$, suppose
+% \[
+%     L=\lim_{n\to\infty}\sqrt[n]{|a_n|}.
+% \]
+% Then the same three conclusions hold: $L<1$ gives absolute convergence, $L>1$ gives divergence, and $L=1$ is inconclusive.
+% \end{theorem}
+
+% A practical testing strategy:
+% \begin{enumerate}
+%     \item First check whether $a_n\to 0$. If not, the series diverges.
+%     \item For positive terms resembling $1/n^p$, use comparison or limit comparison.
+%     \item For factorials, exponentials, or products, try the ratio test.
+%     \item For powers of $n$ or expressions raised to the $n$th power, try the root test.
+%     \item For alternating signs, test absolute convergence first; if that fails, try the alternating series test.
+% \end{enumerate}
+
+% \subsection{Lecture 6: Power Series}
+
+% A power series centered at $a$ has the form
+% \[
+%     \sum_{n=0}^{\infty} c_n(x-a)^n.
+% \]
+% There exists a radius of convergence $R\in[0,\infty]$ such that the series converges for $|x-a|<R$ and diverges for $|x-a|>R$. Endpoints must be checked separately.
+
+% The interval of convergence is obtained by:
+% \begin{enumerate}
+%     \item applying the ratio or root test to find $R$;
+%     \item checking $x=a-R$ and $x=a+R$ individually.
+% \end{enumerate}
+
+% Within its interval of convergence, a power series may be differentiated and integrated term by term:
+% \[
+%     \frac{\dd}{\dd x}\sum_{n=0}^{\infty}c_n(x-a)^n
+%     =\sum_{n=1}^{\infty} n c_n(x-a)^{n-1},
+% \]
+% \[
+%     \int \sum_{n=0}^{\infty}c_n(x-a)^n\dd x
+%     =C+\sum_{n=0}^{\infty}\frac{c_n}{n+1}(x-a)^{n+1}.
+% \]
+% The radius of convergence stays the same after differentiation or integration, although endpoint behavior may change.
+
+% \subsection{Lecture 7: Taylor and Maclaurin Series}
+
+% If $f$ is infinitely differentiable near $a$, its Taylor series at $a$ is
+% \[
+%     \sum_{n=0}^{\infty}\frac{f^{(n)}(a)}{n!}(x-a)^n.
+% \]
+% When $a=0$, this is called a Maclaurin series.
+
+% The most important standard Maclaurin series are:
+% \[
+%     e^x=\sum_{n=0}^{\infty}\frac{x^n}{n!},\qquad
+%     \sin x=\sum_{n=0}^{\infty}(-1)^n\frac{x^{2n+1}}{(2n+1)!},
+% \]
+% \[
+%     \cos x=\sum_{n=0}^{\infty}(-1)^n\frac{x^{2n}}{(2n)!},\qquad
+%     \frac1{1-x}=\sum_{n=0}^{\infty}x^n,\quad |x|<1.
+% \]
+
+% A function is represented by its Taylor series when the remainder tends to zero:
+% \[
+%     f(x)=T_N(x)+R_N(x),\qquad \lim_{N\to\infty}R_N(x)=0.
+% \]
+% New series can often be obtained from old ones through substitution, multiplication, differentiation, or integration.
+
+% \section{Vectors, Geometry, Lines, Planes, and Surfaces in Space}
+
+% \subsection{Lecture 8: 3D Coordinate Systems and Vectors}
+
+% A point in three-dimensional space is written as $(x,y,z)$. The distance between two points $P_1=(x_1,y_1,z_1)$ and $P_2=(x_2,y_2,z_2)$ is
+% \[
+%     d(P_1,P_2)=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2+(z_2-z_1)^2}.
+% \]
+% A sphere with center $(a,b,c)$ and radius $r$ is
+% \[
+%     (x-a)^2+(y-b)^2+(z-c)^2=r^2.
+% \]
+
+% A vector is a quantity with magnitude and direction. If
+% \[
+%     \vect{v}=\langle v_1,v_2,v_3\rangle,
+% \]
+% then
+% \[
+%     \norm{\vect{v}}=\sqrt{v_1^2+v_2^2+v_3^2}.
+% \]
+% The unit vector in the direction of a nonzero vector $\vect v$ is
+% \[
+%     \frac{\vect v}{\norm{\vect v}}.
+% \]
+
+% \subsection{Lecture 9: Dot and Cross Products}
+
+% The dot product of $\vect a=\langle a_1,a_2,a_3\rangle$ and $\vect b=\langle b_1,b_2,b_3\rangle$ is
+% \[
+%     \vect a\cdot\vect b=a_1b_1+a_2b_2+a_3b_3.
+% \]
+% Geometrically,
+% \[
+%     \vect a\cdot\vect b=\norm{\vect a}\norm{\vect b}\cos\theta.
+% \]
+% Thus $\vect a$ and $\vect b$ are orthogonal exactly when $\vect a\cdot\vect b=0$.
+
+% The projection of $\vect a$ onto $\vect b$ is
+% \[
+%     \operatorname{proj}_{\vect b}\vect a
+%     =\frac{\vect a\cdot\vect b}{\norm{\vect b}^2}\vect b.
+% \]
+
+% The cross product is
+% \[
+%     \vect a\times \vect b
+%     =\begin{vmatrix}
+%     \vect i & \vect j & \vect k\\
+%     a_1 & a_2 & a_3\\
+%     b_1 & b_2 & b_3
+%     \end{vmatrix}.
+% \]
+% It is perpendicular to both $\vect a$ and $\vect b$, and
+% \[
+%     \norm{\vect a\times\vect b}=\norm{\vect a}\norm{\vect b}\sin\theta.
+% \]
+% Therefore, $\norm{\vect a\times\vect b}$ equals the area of the parallelogram spanned by $\vect a$ and $\vect b$.
+
+% \subsection{Lecture 10: Lines, Planes, Cylinders, and Quadric Surfaces}
+
+% A line through a point $\vect r_0=\langle x_0,y_0,z_0\rangle$ in direction $\vect v=\langle a,b,c\rangle$ is
+% \[
+%     \vect r(t)=\vect r_0+t\vect v.
+% \]
+% Equivalently,
+% \[
+%     x=x_0+at,
+%     \qquad y=y_0+bt,
+%     \qquad z=z_0+ct.
+% \]
+
+% A plane through $(x_0,y_0,z_0)$ with normal vector $\vect n=\langle A,B,C\rangle$ is
+% \[
+%     A(x-x_0)+B(y-y_0)+C(z-z_0)=0.
+% \]
+% The normal vector is the key object: it determines the plane's orientation.
+
+% A cylinder is a surface whose equation is independent of one variable, for example
+% \[
+%     x^2+y^2=1
+% \]
+% is a circular cylinder parallel to the $z$-axis.
+
+% Quadric surfaces are second-degree surfaces in $x,y,z$. Common models include:
+% \[
+%     \frac{x^2}{a^2}+\frac{y^2}{b^2}+\frac{z^2}{c^2}=1
+%     \quad \text{(ellipsoid)},
+% \]
+% \[
+%     z=\frac{x^2}{a^2}+\frac{y^2}{b^2}
+%     \quad \text{(elliptic paraboloid)},
+% \]
+% \[
+%     \frac{x^2}{a^2}+\frac{y^2}{b^2}-\frac{z^2}{c^2}=1
+%     \quad \text{(hyperboloid of one sheet)}.
+% \]
+% A useful method for identifying quadric surfaces is to examine traces obtained by fixing one variable.
+
+% \section{Vector-Valued Functions and Motion in Space}
+
+% \subsection{Lecture 11: Vector Functions, Derivatives, and Integrals}
+
+% A vector-valued function has the form
+% \[
+%     \vect r(t)=\langle f(t),g(t),h(t)\rangle.
+% \]
+% It describes a curve in space. Limits and continuity are defined componentwise:
+% \[
+%     \lim_{t\to a}\vect r(t)
+%     =\left\langle \lim_{t\to a}f(t),\lim_{t\to a}g(t),\lim_{t\to a}h(t)\right\rangle.
+% \]
+
+% The derivative is also componentwise:
+% \[
+%     \vect r'(t)=\langle f'(t),g'(t),h'(t)\rangle.
+% \]
+% This derivative is tangent to the curve. Integration is componentwise:
+% \[
+%     \int \vect r(t)\dd t
+%     =\left\langle \int f(t)\dd t,\int g(t)\dd t,\int h(t)\dd t\right\rangle.
+% \]
+
+% Useful rules include
+% \[
+%     \frac{\dd}{\dd t}(\vect u\cdot\vect v)=\vect u'\cdot\vect v+\vect u\cdot\vect v',
+% \]
+% \[
+%     \frac{\dd}{\dd t}(\vect u\times\vect v)=\vect u'\times\vect v+\vect u\times\vect v'.
+% \]
+
+% \subsection{Lecture 12: Arc Length and Curvature}
+
+% The length of a smooth curve $\vect r(t)$ for $a\leq t\leq b$ is
+% \[
+%     L=\int_a^b \norm{\vect r'(t)}\dd t.
+% \]
+% The arc length function starting at $a$ is
+% \[
+%     s(t)=\int_a^t\norm{\vect r'(u)}\dd u.
+% \]
+
+% The unit tangent vector is
+% \[
+%     \vect T(t)=\frac{\vect r'(t)}{\norm{\vect r'(t)}}.
+% \]
+% Curvature measures how fast the tangent direction changes with respect to arc length:
+% \[
+%     \kappa=\left\lVert\frac{\dd \vect T}{\dd s}\right\rVert.
+% \]
+% A practical formula is
+% \[
+%     \kappa(t)=\frac{\norm{\vect r'(t)\times \vect r''(t)}}{\norm{\vect r'(t)}^3}.
+% \]
+% For a plane curve $y=f(x)$,
+% \[
+%     \kappa(x)=\frac{|f''(x)|}{\left(1+[f'(x)]^2\right)^{3/2}}.
+% \]
+
+% \subsection{Lecture 13: Motion in Space, Velocity, and Acceleration}
+
+% If the position of a particle is
+% \[
+%     \vect r(t),
+% \]
+% then velocity and acceleration are
+% \[
+%     \vect v(t)=\vect r'(t),\qquad \vect a(t)=\vect r''(t).
+% \]
+% Speed is the magnitude of velocity:
+% \[
+%     \text{speed}=\norm{\vect v(t)}.
+% \]
+
+% When decomposing acceleration into tangential and normal parts,
+% \[
+%     \vect a=a_T\vect T+a_N\vect N,
+% \]
+% where
+% \[
+%     a_T=\frac{\dd}{\dd t}\norm{\vect v(t)},
+%     \qquad
+%     a_N=\kappa \norm{\vect v(t)}^2.
+% \]
+% This separates change in speed from change in direction.
+
+% In gravitational motion, Kepler's laws describe elliptical planetary orbits, equal areas swept out in equal times, and the relation between orbital period and semi-major axis.
+
+% \section{Functions of Several Variables: Limits, Differentiation, and Optimization}
+
+% \subsection{Lecture 14: Functions of Several Variables, Limits, and Continuity}
+
+% A function of two variables assigns a real number to each point in a domain $D\subseteq\R^2$:
+% \[
+%     f:D\to\R,\qquad (x,y)\mapsto f(x,y).
+% \]
+% Its graph is the surface
+% \[
+%     z=f(x,y).
+% \]
+% A level curve is given by
+% \[
+%     f(x,y)=c.
+% \]
+% For functions of three variables, level surfaces are given by
+% \[
+%     f(x,y,z)=c.
+% \]
+
+% The limit
+% \[
+%     \lim_{(x,y)\to(a,b)} f(x,y)=L
+% \]
+% means that $f(x,y)$ approaches $L$ as $(x,y)$ approaches $(a,b)$ along every possible path. To disprove a limit, it is enough to find two paths giving different limiting values.
+
+% A function is continuous at $(a,b)$ if
+% \[
+%     \lim_{(x,y)\to(a,b)}f(x,y)=f(a,b).
+% \]
+
+% \subsection{Lecture 15: Partial Derivatives}
+
+% The partial derivatives of $f(x,y)$ are
+% \[
+%     f_x(x,y)=\lim_{h\to 0}\frac{f(x+h,y)-f(x,y)}{h},
+% \]
+% \[
+%     f_y(x,y)=\lim_{h\to 0}\frac{f(x,y+h)-f(x,y)}{h}.
+% \]
+% They measure rates of change in coordinate directions. Higher partial derivatives include
+% \[
+%     f_{xx},\qquad f_{yy},\qquad f_{xy},\qquad f_{yx}.
+% \]
+% If the mixed partial derivatives are continuous near a point, then
+% \[
+%     f_{xy}=f_{yx}.
+% \]
+
+% Partial differential equations use partial derivatives to model phenomena such as heat flow and wave propagation. For example, the heat equation has the form
+% \[
+%     u_t=k u_{xx}.
+% \]
+
+% \subsection{Lecture 16: Differentials, Tangent Planes, Linear Approximation, and Chain Rule}
+
+% For $z=f(x,y)$, the tangent plane at $(a,b,f(a,b))$ is
+% \[
+%     z=f(a,b)+f_x(a,b)(x-a)+f_y(a,b)(y-b).
+% \]
+% The corresponding linear approximation is
+% \[
+%     f(x,y)\approx f(a,b)+f_x(a,b)(x-a)+f_y(a,b)(y-b).
+% \]
+% The differential is
+% \[
+%     \dd z=f_x\dd x+f_y\dd y.
+% \]
+
+% For a composition $z=f(x(t),y(t))$, the chain rule is
+% \[
+%     \frac{\dd z}{\dd t}=f_x\frac{\dd x}{\dd t}+f_y\frac{\dd y}{\dd t}.
+% \]
+% For $z=f(x(s,t),y(s,t))$,
+% \[
+%     \pd{z}{s}=f_x\pd{x}{s}+f_y\pd{y}{s},
+%     \qquad
+%     \pd{z}{t}=f_x\pd{x}{t}+f_y\pd{y}{t}.
+% \]
+
+% \subsection{Lecture 17: Directional Derivatives, Gradient, and Unconstrained Extrema}
+
+% The directional derivative of $f$ at $(a,b)$ in the direction of a unit vector $\vect u=\langle u_1,u_2\rangle$ is
+% \[
+%     D_{\vect u}f(a,b)=\lim_{h\to 0}\frac{f(a+hu_1,b+hu_2)-f(a,b)}{h}.
+% \]
+% If $f$ is differentiable, then
+% \[
+%     D_{\vect u}f=\grad f\cdot \vect u,
+% \]
+% where
+% \[
+%     \grad f=\langle f_x,f_y\rangle.
+% \]
+% The gradient points in the direction of steepest increase, and the maximum directional derivative is
+% \[
+%     \norm{\grad f}.
+% \]
+
+% Critical points satisfy
+% \[
+%     \grad f=\vect 0.
+% \]
+% For a function of two variables, define
+% \[
+%     D=f_{xx}f_{yy}-(f_{xy})^2.
+% \]
+% Then the second derivative test says:
+% \begin{itemize}
+%     \item if $D>0$ and $f_{xx}>0$, there is a local minimum;
+%     \item if $D>0$ and $f_{xx}<0$, there is a local maximum;
+%     \item if $D<0$, there is a saddle point;
+%     \item if $D=0$, the test is inconclusive.
+% \end{itemize}
+
+% \subsection{Lecture 18: Lagrange Multipliers}
+
+% Lagrange multipliers solve constrained optimization problems. To optimize $f(x,y)$ subject to
+% \[
+%     g(x,y)=c,
+% \]
+% we solve
+% \[
+%     \grad f=\lambda \grad g,
+%     \qquad
+%     g(x,y)=c.
+% \]
+% Geometrically, at an extremum under a smooth constraint, the level curve of $f$ is tangent to the constraint curve, so their normal vectors are parallel.
+
+% For two constraints in three variables,
+% \[
+%     g(x,y,z)=c,
+%     \qquad h(x,y,z)=d,
+% \]
+% solve
+% \[
+%     \grad f=\lambda \grad g+\mu \grad h,
+%     \qquad g=c,
+%     \qquad h=d.
+% \]
+% Always evaluate $f$ at all candidate points, especially when the constraint set is closed and bounded.
+
+% \section{Multiple Integrals and Coordinate Systems}
+
+% \subsection{Lecture 19: Double Integrals}
+
+% For a function $f(x,y)$ over a rectangle $R=[a,b]\times[c,d]$, the double integral is
+% \[
+%     \iint_R f(x,y)\dd A.
+% \]
+% It represents signed volume under the surface $z=f(x,y)$ above $R$.
+
+% Fubini's theorem allows computation by iterated integrals:
+% \[
+%     \iint_R f(x,y)\dd A
+%     =\int_a^b\int_c^d f(x,y)\dd y\dd x
+%     =\int_c^d\int_a^b f(x,y)\dd x\dd y.
+% \]
+
+% For a general region $D$, one writes the bounds according to the shape of the domain. A Type I region has
+% \[
+%     D=\{(x,y): a\leq x\leq b,\; g_1(x)\leq y\leq g_2(x)\},
+% \]
+% so
+% \[
+%     \iint_D f\dd A=\int_a^b\int_{g_1(x)}^{g_2(x)}f(x,y)\dd y\dd x.
+% \]
+% A Type II region has
+% \[
+%     D=\{(x,y): c\leq y\leq d,\; h_1(y)\leq x\leq h_2(y)\}.
+% \]
+
+% \subsection{Lecture 20: Polar Coordinates and Applications of Double Integrals}
+
+% Polar coordinates are
+% \[
+%     x=r\cos\theta,\qquad y=r\sin\theta,
+% \]
+% with area element
+% \[
+%     \dd A=r\dd r\dd\theta.
+% \]
+% Thus
+% \[
+%     \iint_D f(x,y)\dd A
+%     =\int_{\alpha}^{\beta}\int_{r_1(\theta)}^{r_2(\theta)}
+%     f(r\cos\theta,r\sin\theta)r\dd r\dd\theta.
+% \]
+% Polar coordinates are especially useful for disks, annuli, sectors, and expressions involving $x^2+y^2$.
+
+% Applications include mass, center of mass, and moments. For density $\rho(x,y)$ over a lamina $D$,
+% \[
+%     m=\iint_D \rho(x,y)\dd A,
+% \]
+% \[
+%     \bar x=\frac{1}{m}\iint_D x\rho(x,y)\dd A,
+%     \qquad
+%     \bar y=\frac{1}{m}\iint_D y\rho(x,y)\dd A.
+% \]
+
+% \subsection{Lecture 21: Triple Integrals}
+
+% A triple integral over a solid region $E$ is
+% \[
+%     \iiint_E f(x,y,z)\dd V.
+% \]
+% It can represent mass when $f$ is density. Rectangular coordinates use
+% \[
+%     \dd V=\dd x\dd y\dd z.
+% \]
+
+% Cylindrical coordinates are
+% \[
+%     x=r\cos\theta,
+%     \qquad y=r\sin\theta,
+%     \qquad z=z,
+% \]
+% with
+% \[
+%     \dd V=r\dd z\dd r\dd\theta.
+% \]
+
+% Spherical coordinates are
+% \[
+%     x=\rho\sin\phi\cos\theta,
+%     \qquad
+%     y=\rho\sin\phi\sin\theta,
+%     \qquad
+%     z=\rho\cos\phi,
+% \]
+% with volume element
+% \[
+%     \dd V=\rho^2\sin\phi\dd\rho\dd\phi\dd\theta.
+% \]
+% Cylindrical coordinates fit cylinders and rotational symmetry around the $z$-axis. Spherical coordinates fit balls, cones, and radial symmetry.
+
+% \section{Vector Fields, Line Integrals, Surface Integrals, and Integral Theorems}
+
+% \subsection{Lecture 22: Vector Fields, Line Integrals, and the Fundamental Theorem for Line Integrals}
+
+% A vector field assigns a vector to each point:
+% \[
+%     \vect F(x,y)=P(x,y)\vect i+Q(x,y)\vect j
+% \]
+% or in space,
+% \[
+%     \vect F(x,y,z)=P\vect i+Q\vect j+R\vect k.
+% \]
+
+% For a scalar function $f$ along a curve $C$ parametrized by $\vect r(t)$, $a\leq t\leq b$,
+% \[
+%     \int_C f\dd s=\int_a^b f(\vect r(t))\norm{\vect r'(t)}\dd t.
+% \]
+% For a vector field, the line integral is
+% \[
+%     \int_C \vect F\cdot \dd \vect r
+%     =\int_a^b \vect F(\vect r(t))\cdot \vect r'(t)\dd t.
+% \]
+
+% If $\vect F=\grad f$ is conservative, then
+% \[
+%     \int_C \vect F\cdot \dd\vect r=f(\vect r(b))-f(\vect r(a)).
+% \]
+% This is the fundamental theorem for line integrals. It implies path independence for conservative fields.
+
+% \subsection{Lecture 23: Conservative Fields and Green's Theorem}
+
+% A vector field $\vect F=P\vect i+Q\vect j$ is conservative on a suitable simply connected domain if
+% \[
+%     P_y=Q_x.
+% \]
+% In that case, there exists a potential function $f$ such that
+% \[
+%     \grad f=\vect F.
+% \]
+
+% Green's theorem relates circulation around a closed curve to a double integral over the region it encloses.
+
+% \begin{theorem}[Green's theorem]
+% Let $C$ be a positively oriented, piecewise smooth, simple closed curve enclosing a region $D$. If $P$ and $Q$ have continuous partial derivatives on an open region containing $D$, then
+% \[
+%     \oint_C P\dd x+Q\dd y
+%     =\iint_D\left(\pd{Q}{x}-\pd{P}{y}\right)\dd A.
+% \]
+% \end{theorem}
+
+% The theorem converts difficult boundary integrals into area integrals, or area integrals into boundary integrals.
+
+% \subsection{Lecture 24: Parametric Surfaces}
+
+% A parametric surface is described by
+% \[
+%     \vect r(u,v)=\langle x(u,v),y(u,v),z(u,v)\rangle,
+%     \qquad (u,v)\in D.
+% \]
+% For fixed $u$ or fixed $v$, one obtains parameter curves on the surface.
+
+% The tangent vectors are
+% \[
+%     \vect r_u=\pd{\vect r}{u},
+%     \qquad
+%     \vect r_v=\pd{\vect r}{v}.
+% \]
+% A normal vector is
+% \[
+%     \vect r_u\times \vect r_v.
+% \]
+% The tangent plane at $(u_0,v_0)$ is determined by the point $\vect r(u_0,v_0)$ and the normal vector
+% \[
+%     \vect r_u(u_0,v_0)\times \vect r_v(u_0,v_0).
+% \]
+
+% The surface area is
+% \[
+%     A(S)=\iint_D \norm{\vect r_u\times \vect r_v}\dd A.
+% \]
+% For a graph $z=f(x,y)$, this becomes
+% \[
+%     A(S)=\iint_D \sqrt{1+f_x^2+f_y^2}\dd A.
+% \]
+
+% \subsection{Lecture 25: Surface Integrals and the Divergence Theorem}
+
+% For a scalar function $f$ over a parametric surface $S$ given by $\vect r(u,v)$,
+% \[
+%     \iint_S f\dd S
+%     =\iint_D f(\vect r(u,v))\norm{\vect r_u\times\vect r_v}\dd A.
+% \]
+
+% For a vector field $\vect F$, the flux across an oriented surface $S$ is
+% \[
+%     \iint_S \vect F\cdot \dd\vect S
+%     =\iint_D \vect F(\vect r(u,v))\cdot(\vect r_u\times\vect r_v)\dd A,
+% \]
+% where the orientation is determined by the chosen normal direction. If the opposite orientation is required, use $\vect r_v\times\vect r_u$ instead.
+
+% The divergence of
+% \[
+%     \vect F=P\vect i+Q\vect j+R\vect k
+% \]
+% is
+% \[
+%     \diver \vect F=P_x+Q_y+R_z.
+% \]
+
+% \begin{theorem}[Divergence theorem]
+% Let $E$ be a solid region with positively oriented closed boundary surface $S=\partial E$. Then
+% \[
+%     \iint_S \vect F\cdot\dd\vect S
+%     =\iiint_E \diver \vect F\dd V.
+% \]
+% \end{theorem}
+
+% This theorem says that the outward flux through the boundary equals the total divergence inside the solid. It is the three-dimensional analogue of the idea that local sources and sinks determine net outward flow.
+
+% \section{Big-Picture Roadmap}
+
+% The course moves through four connected layers.
+% \begin{enumerate}
+%     \item \textbf{Infinite processes:} sequences, series, power series, and Taylor series provide tools for approximation and limiting arguments.
+%     \item \textbf{Geometry of space:} vectors, dot products, cross products, lines, planes, and surfaces provide the language for three-dimensional calculus.
+%     \item \textbf{Differentiation in several variables:} partial derivatives, gradients, tangent planes, directional derivatives, and Lagrange multipliers generalize one-variable differentiation.
+%     \item \textbf{Integration and vector calculus:} double/triple integrals, line integrals, surface integrals, Green's theorem, and the divergence theorem connect local rates with global accumulation.
+% \end{enumerate}
+
+% A useful way to remember the final part is:
+% \[
+%     \text{local derivative information}
+%     \quad \Longleftrightarrow \quad
+%     \text{global integral information}.
+% \]
+% Green's theorem and the divergence theorem are the clearest examples of this principle.
+
+
+
+
+
+\chapter{Ordinary Differential Equations}
+
+\section{Introduction to Differential Equations}
+
+\subsection{Definitions and Terminology}
+
+\defn{Differential Equation}{
+    A \emph{differential equation} is an equation that contains derivatives of one
+    or more unknown functions with respect to one or more independent variables.
+    The unknown function is usually called the \emph{dependent variable}, and the
+    variable with respect to which differentiation is taken is called the
+    \emph{independent variable}.
+}
+
+\paragraph{Ordinary and Partial Differential Equations}{
+    A DE is called an \emph{ordinary differential equation}
+    (ODE) if it contains only ordinary derivatives with respect to a single
+    independent variable. It is called a \emph{partial differential equation}
+    (PDE) if it contains partial derivatives of one or more unknown functions of
+    two or more independent variables.
+}
+
+\ex{
+    The equations $\frac{dy}{dx}+5y=e^x$ and $\frac{d^2y}{dx^2}-6y=0$ are ordinary differential equations.  \\
+    By contrast, $\frac{\partial u}{\partial x} + \frac{\partial u}{\partial y} = 0$ is a partial differential equation.
+}
+
+\paragraph{Order.}
+The \emph{order} of a differential equation is the order of the highest derivative
+appearing in the equation. In one dependent variable, the general form of an
+$n$th-order ODE is
+\[
+    F(x,y,y',\ldots,y^{(n)})=0
+\]
+If the equation can be solved for the highest derivative, it can be written in
+\emph{normal form}:
+\[
+    \frac{d^n y}{dx^n} = f(x,y,y',\ldots,y^{(n-1)})
+\]
+
+\paragraph{Linear Ordinary Differential Equation}{
+    An $n$th-order ODE is \emph{linear} if it's linear in the dependent
+    variable and all of its derivatives. Its general form is
+    \[
+        a_n(x)y^{(n)}
+        +a_{n-1}(x)y^{(n-1)}
+        +\cdots
+        +a_1(x)y'
+        +a_0(x)y
+        =
+        g(x)
+    \]
+    The coefficients may depend on the independent variable $x$, but not on
+    $y$ or its derivatives.
+}
+
+\ex{
+    The equation $y''-2y'+y=e^x$ is linear. \\
+    The equations $yy'+x=0$, $y''+\sin y=0$ and $(y')^2+y=0$ are nonlinear. 
+}
+
+\paragraph{Solution of an ODE}{
+    A function $\phi$, defined on an interval $I$ and possessing the required
+    derivatives on $I$, is called a \emph{solution} of an $n$th-order ODE if
+    substituting $y=\phi(x)$ into the equation reduces it to an identity on $I$.
+}
+
+\paragraph{Interval of Definition}{
+    The interval on which a solution is defined is called the \emph{interval of
+    definition}, \emph{interval of existence}, \emph{interval of validity}, or
+    \emph{domain of the solution}.
+}
+
+\paragraph{Explicit and Implicit Solutions}{
+    An \emph{explicit solution} expresses the dependent variable directly as a
+    function of the independent variable: $y=\phi(x)$. An \emph{implicit solution} is a relation $ G(x,y)=0$ that defines at least one differentiable function $y=\phi(x)$ satisfying the differential equation on an interval.
+}
+
+\ex{
+    The relation $x^2+y^2=25$ is an implicit solution of $\frac{dy}{dx}=-\frac{x}{y}$. On the interval $(-5,5)$, it gives two explicit branches: $y=\sqrt{25-x^2}$ and $y=-\sqrt{25-x^2}$. 
+}
+
+\paragraph{Families, Particular Solutions, and Singular Solutions}{
+    A solution containing one or more constants is called a
+    \emph{family of solutions}. A solution obtained by assigning values
+    to these constants is called a \emph{particular solution}. A \emph{singular solution} is a solution that can't be obtained from the family of solutions by any choice of the arbitrary constants.
+}
+
+\ex{
+    The equation $ y'=y$ has the one-parameter family of solutions $ y=ce^x$. If the condition $y(0)=3$ is imposed, then $c=3$, so the particular solution is $y=3e^x$. 
+}
+
+\paragraph{System of ODEs}{
+    A \emph{system of ordinary differential equations} consists of two or more
+    equations involving derivatives of two or more unknown functions of a single
+    independent variable. 
+}
+
+\subsection{Initial-Value Problems}
+
+\defn{Initial-Value Problem}{
+    An $n$th-order \emph{initial-value problem} consists of an $n$th-order
+    differential equation together with $n$ side conditions imposed at the same
+    point $x_0$:
+    \[
+        \frac{d^n y}{dx^n}
+        =
+        f(x,y,y',\ldots,y^{(n-1)})
+    \]
+    subject to
+    \[
+        y(x_0)=y_0,\qquad
+        y'(x_0)=y_1,\qquad
+        \ldots,\qquad
+        y^{(n-1)}(x_0)=y_{n-1}
+    \]
+}
+
+\thmr{Existence and Uniqueness for a First-Order IVP}{existenceuniqueness}{
+    Let $R$ be a rectangular region in the $xy$-plane containing the point
+    $(x_0,y_0)$. If $f(x,y)$ and $\dfrac{\partial f}{\partial y}(x,y)$ are
+    continuous on $R$, then there exists an interval $I_0=(x_0-h,x_0+h)$ for some $h>0$ on which the initial-value problem
+    \[
+        \frac{dy}{dx}=f(x,y),
+        \qquad
+        y(x_0)=y_0
+    \]
+    has a unique solution.
+}
+
+\rmk{
+    This theorem is local: it guarantees a unique solution only near \(x_0\), not
+necessarily on the largest possible interval. It gives sufficient, not necessary,
+conditions. Roughly, \(f\) continuous gives existence, and \(f_y\) continuous gives
+uniqueness.
+}
+
+\ex{
+    The initial-value problem $\frac{dy}{dx}=x\sqrt{y}, y(0)=0$ has more than one solution. For example, $y=0$ and $y=\frac{x^4}{16}$ both satisfy the differential equation and the initial condition. This does not contradict the existence--uniqueness theorem, because $\frac{\partial}{\partial y}\bigl(x\sqrt{y}\bigr) = \frac{x}{2\sqrt{y}}$ is not continuous at $y=0$.
+}
+
+\section{First-Order Differential Equations}
+
+\subsection{Solution Curves Without an Explicit Solution}
+
+\paragraph{Direction Field}{
+    Consider a first-order differential equation in normal form $\frac{dy}{dx}=f(x,y)$
+    At each point $(x,y)$ where $f$ is defined, the value $f(x,y)$ gives the slope
+    of a small line segment, called a \emph{lineal element}. A collection of such
+    lineal elements drawn on a grid in the $xy$-plane is called a
+    \emph{direction field}.
+}
+
+\defn{Autonomous First-Order Differential Equation}{
+    A first-order differential equation is called \emph{autonomous} if the
+    independent variable does not appear explicitly. In normal form, it can be
+    written as
+    \[
+        \frac{dy}{dx}=f(y)
+    \]
+}
+
+\paragraph{Critical Point and Equilibrium Solution}{
+    A real number $c$ is called a \emph{critical point}, \emph{equilibrium point}, or
+    \emph{stationary point} of $\frac{dy}{dx}=f(y)$ if $f(c)=0$. In this case, the constant function $y(x)=c$ is a solution, called an \emph{equilibrium solution}.
+}
+
+\paragraph{Phase Line and Phase Portrait}{
+    For an autonomous equation $\frac{dy}{dx}=f(y)$ a \emph{phase line} is a vertical line on which the critical points are marked. The sign of $f(y)$ on each interval between critical points determines whether solutions are increasing or decreasing. The resulting diagram is called a \emph{one-dimensional phase portrait}.
+}
+
+\paragraph{Attractors, Repellers, and Semi-Stable Points}{
+    Let $c$ be a critical point of $\frac{dy}{dx}=f(y)$
+    \begin{itemize}
+        \item If nearby solutions approach $c$ as $x\to\infty$, then $c$ is an
+        \emph{attractor} or \emph{asymptotically stable equilibrium}.
+        \item If nearby solutions move away from $c$, then $c$ is a \emph{repeller}
+        or \emph{unstable equilibrium}.
+        \item If solutions approach $c$ from one side and move away from $c$ from
+        the other side, then $c$ is \emph{semi-stable}.
+    \end{itemize}
+}
+
+\prop{
+    If $y(x)$ is a solution of the autonomous equation $\frac{dy}{dx}=f(y)$ then for any constant $k$, $y_1(x)=y(x-k)$ is also a solution. This is called the \emph{translation property.}
+}
+
+
+\subsection{Separable Equations}
+
+\defn{Separable Equation}{
+    A first-order differential equation of the form
+    \[
+        \frac{dy}{dx}=g(x)h(y)
+    \]
+    is called a \emph{separable differential equation}.
+}
+
+\paragraph{Procedure.}
+To solve a separable differential equation:
+\begin{enumerate}
+    \item Write the equation in separable form $\frac{dy}{dx}=g(x)h(y)$.
+    \item Assuming $h(y)\neq 0$, separate the variables $\frac{1}{h(y)}\,dy=g(x)\,dx$. 
+     \item Integrate both sides $\int \frac{1}{h(y)}\,dy=\int g(x)\,dx$. 
+    \item Write the solution implicitly as $ H(y)=G(x)+C$.
+\end{enumerate}
+
+\rmk{
+    When solving a separable equation, any value $r$ such that $h(r)=0$ should be
+    checked separately. The constant function $y=r$ may be a solution, but it may
+    be lost after division by $h(y)$.
+}
+
+
+\subsection{Linear Equations}
+
+\defn{First-Order Linear Equation}{
+    A first-order differential equation of the form $ a_1(x)\frac{dy}{dx}+a_0(x)y=g(x)$ is called a \emph{linear differential equation} in the dependent variable $y$.
+    If $a_1(x)\neq 0$, division by $a_1(x)$ gives the standard form
+    \[
+        \frac{dy}{dx}+P(x)y=f(x)
+    \]
+}
+
+\paragraph{Procedure.}
+To solve a first-order linear equation:
+\begin{enumerate}
+    \item Put the equation in standard form $\frac{dy}{dx}+P(x)y=f(x)$. 
+    \item Compute the integrating factor $\mu(x)=e^{\int P(x)\,dx}$. 
+    \item Multiply both sides by $\mu(x)$ and rewrite the left-hand side as $\frac{d}{dx}\bigl(\mu(x)y\bigr)$. 
+    \item Integrate both sides and solve for $y$.
+    \[
+    y=e^{-\int P(x)\,dx}
+    \left(
+        \int e^{\int P(x)\,dx}f(x)\,dx+C
+    \right)
+    \]
+\end{enumerate}
+
+
+
+\subsection{Exact Differential Equations}
+
+\defn{Exact Differential Equation}{
+    A first-order differential equation written in differential form
+    \[
+        M(x,y)\,dx+N(x,y)\,dy=0
+    \]
+    is called an \emph{exact equation} if there exists a function $\Phi(x,y)$ such
+    that
+    \[
+        \frac{\partial \Phi}{\partial x}=M(x,y),
+        \qquad
+        \frac{\partial \Phi}{\partial y}=N(x,y)
+    \]
+    In that case, $d\Phi=M\,dx+N\,dy$ and the solution is given implicitly by $\Phi(x,y)=C$.
+}
+
+\thmr{Criterion for Exactness}{exactnesscriterion}{
+    Suppose $M(x,y)$ and $N(x,y)$ have continuous first partial derivatives in a
+    rectangular region $R$. Then $M(x,y)\,dx+N(x,y)\,dy$
+    is an exact differential in $R$ if and only if
+    \[
+        \frac{\partial M}{\partial y}
+        =
+        \frac{\partial N}{\partial x}
+    \]
+}
+
+\paragraph{Procedure.}
+
+\begin{enumerate}
+    \item Integrate $M$ with respect to $x$: $ \Phi(x,y)=\int M(x,y)\,dx+g(y)$.
+    \item Differentiate this expression with respect to $y$: $\Phi_y=\frac{\partial}{\partial y}
+        \left(\int M(x,y)\,dx\right)+g'(y)$. 
+    \item Set $\Phi_y=N(x,y)$ and solve for $g'(y)$. Integrate to find $g(y)$.
+    \item Write the solution as $\Phi(x,y)=C$.
+\end{enumerate}
+
+\paragraph{Integrating Factors for Nonexact Equations.}
+If $M(x,y)\,dx+N(x,y)\,dy=0$ is not exact, it may become exact after multiplication by a nonzero function $\mu(x,y)$: $\mu M\,dx+\mu N\,dy=$. Two useful special cases are:
+\[
+\begin{cases}
+    \mu(x) =\exp\left( \int \frac{M_y-N_x}{N}\,dx \right), \qquad \text{if } \frac{M_y-N_x}{N} \text{ depends only on }x \\
+    \mu(y)
+    =
+    \exp\left(
+        \int \frac{N_x-M_y}{M}\,dy
+    \right),
+    \qquad
+    \text{if }
+    \frac{N_x-M_y}{M}
+    \text{ depends only on }y
+\end{cases}
+\]
+
+
+\subsection{Solutions by Substitutions}
+
+\defn{Substitution Method}{
+    For a first-order equation $\frac{dy}{dx}=f(x,y)$ introduce a substitution $y=g(x,u), u=u(x)$. By the chain rule,
+    \[
+        \frac{dy}{dx}
+        =
+        \frac{\partial g}{\partial x}(x,u)
+        +
+        \frac{\partial g}{\partial u}(x,u)\frac{du}{dx}
+    \]
+    After substitution, the original equation may become a simpler equation $\frac{du}{dx}=F(x,u)$. If this new equation is separable or linear, it can be solved by earlier methods. Finally, substitute back to obtain $y$.
+}
+
+\paragraph{Solving a Homogeneous Equation.}
+If the equation is homogeneous, use the substitution
+\[
+    y=ux,
+    \qquad
+    \frac{dy}{dx}=u+x\frac{du}{dx}
+\]
+
+\paragraph{Solving a Bernoulli Equation.}{
+    A differential equation of the form $\frac{dy}{dx}+P(x)y=f(x)y^n$ is called a \emph{Bernoulli equation}. For $n\neq 0,1$, it can be reduced to a linear equation by the substitution
+    \[
+        u=y^{1-n}, \qquad  \frac{du}{dx}
+    =
+    (1-n)y^{-n}\frac{dy}{dx}
+    \]
+}
+
+\paragraph{Reduction to Separation of Variables}{
+    A differential equation of the form $\frac{dy}{dx}=f(Ax+By+C),B\neq 0$ can be reduced to a separable equation by the substitution
+    \[
+        u=Ax+By+C,\qquad \frac{du}{dx}=A+B\frac{dy}{dx}
+    \]
+}
+
+
+\subsection{A Numerical Method}
+
+\defn{Euler's Method}{
+    Consider the initial-value problem $y'=f(x,y), y(x_0)=y_0$, Euler's method approximates the solution by repeatedly following tangent lines: 
+    \[
+    x_n=x_0+nh,
+    \qquad
+    y_{n+1}=y_n+h f(x_n,y_n),
+    \qquad
+    n=0,1,2,\ldots
+    \]
+}
+
+\section{Higher-Order Differential Equations}
+
+\subsection{Theory of Linear Equations}
+
+\paragraph{Linear $n$th-Order Differential Equation}{
+    A linear $n$th-order differential equation has the form
+    \[
+        a_n(x)y^{(n)}+a_{n-1}(x)y^{(n-1)}+\cdots+a_1(x)y'+a_0(x)y=g(x)
+    \]
+    where $a_n(x)\neq 0$ on an interval $I$. If $g(x)=0$, the equation is
+    \emph{homogeneous}; otherwise it is \emph{nonhomogeneous}. An $n$th-order initial-value problem specifies the value of $y$ and its first
+    $n-1$ derivatives at the same point $x_0$:
+    \[
+        y(x_0)=y_0,\qquad
+        y'(x_0)=y_1,\qquad
+        \ldots,\qquad
+        y^{(n-1)}(x_0)=y_{n-1}
+    \]
+}
+
+\thmr{Existence and Uniqueness for Linear IVPs}{higherorderexistence}{
+    Suppose $a_n,a_{n-1},\ldots,a_0$ and $g$ are continuous on an interval $I$, and
+    $a_n(x)\neq 0$ for every $x\in I$. Then for any $x_0\in I$, the corresponding
+    $n$th-order linear initial-value problem has a unique solution on $I$.
+}
+
+\rmk{
+    This theorem is much stronger than the first-order local theorem: for linear
+    equations, the solution exists on the whole interval on which the coefficient
+    functions are continuous and the leading coefficient is nonzero.
+}
+
+\paragraph{Boundary-Value Problems.}
+A boundary-value problem imposes conditions at different points, for example $y(a)=y_0, y(b)=y_1$. Unlike initial-value problems, a boundary-value problem may have infinitely many
+solutions, exactly one solution, or no solution.
+
+\paragraph{Differential Operator Notation.}
+Let $D=\frac{d}{dx}$. Then $D^n y=\frac{d^n y}{dx^n}$. The linear differential operator is
+\[
+    L=a_n(x)D^n+a_{n-1}(x)D^{n-1}+\cdots+a_1(x)D+a_0(x)
+\]
+so the differential equation can be written compactly as $L[y]=g(x)$. 
+
+\prop{
+    The operator $L$ is linear, where $\alpha$ and $\beta$ are constants:
+    \[
+        L[\alpha f+\beta g]=\alpha L[f]+\beta L[g],
+    \]
+}
+
+\thmr{Superposition Principle for Homogeneous Equations}{homogeneoussuperposition}{
+    If $y_1,\ldots,y_k$ are solutions of the homogeneous equation $L[y]=0$ on an
+    interval $I$, then every linear combination $y=c_1y_1+\cdots+c_ky_k$ is also a solution on $I$.
+}
+
+\defn{Linear Independence and the Wronskian}{
+    Functions $f_1,\ldots,f_n$ are linearly dependent on $I$ if there exist
+    constants $c_1,\ldots,c_n$, not all zero, such that
+    \[
+        c_1f_1(x)+\cdots+c_nf_n(x)=0
+    \]
+    for every $x\in I$. Otherwise they are linearly independent. The \emph{Wronskian} of $f_1,\ldots,f_n$ is
+    \[
+        W(f_1,\ldots,f_n)=
+        \begin{vmatrix}
+            f_1 & f_2 & \cdots & f_n\\
+            f_1' & f_2' & \cdots & f_n'\\
+            \vdots & \vdots & & \vdots\\
+            f_1^{(n-1)} & f_2^{(n-1)} & \cdots & f_n^{(n-1)}
+        \end{vmatrix}
+    \]
+}
+
+\paragraph{Wronskian Criterion for Solutions}{wronskiancriterion}{
+    Let $y_1,\ldots,y_n$ be $n$ solutions of a homogeneous linear $n$th-order
+    differential equation on $I$. Then they are linearly independent on $I$ if and
+    only if for every $x\in I$: 
+    \[
+        W(y_1,\ldots,y_n)(x)\neq 0
+    \]
+}
+
+\paragraph{Fundamental Set of Solutions}{
+    A set of $n$ linearly independent solutions of a homogeneous linear
+    $n$th-order differential equation is called a \emph{fundamental set of
+    solutions}.
+}
+
+\thmr{General Solution of a Homogeneous Linear Equation}{homogeneousgeneralsolution}{
+    If $y_1,\ldots,y_n$ form a fundamental set of solutions for $L[y]=0$ on $I$,
+    then the general solution is
+    \[
+        y=c_1y_1+\cdots+c_ny_n
+    \]
+}
+
+\thmr{General Solution of a Nonhomogeneous Linear Equation}{nonhomogeneousgeneralsolution}{
+    If $y_p$ is one particular solution of $L[y]=g(x)$ and
+    $y_c=c_1y_1+\cdots+c_ny_n$ is the general solution of the associated
+    homogeneous equation $L[y]=0$, then the general solution of the
+    nonhomogeneous equation is
+    \[
+        y=y_c+y_p
+    \]
+}
+
+\prop{
+    If $y_{p1},\ldots,y_{pk}$ are particular solutions of
+    \[
+        L[y]=g_1(x),\qquad \ldots,\qquad L[y]=g_k(x)
+    \]
+    then $y_p=y_{p1}+\cdots+y_{pk}$ is a particular solution of
+    \[
+        L[y]=g_1(x)+\cdots+g_k(x)
+    \]
+}
+
+\subsection{Reduction of Order}
+
+\thmr{Reduction of Order Formula}{reductionoforder}{
+    Let $y_1(x)$ be a nonzero solution of
+    \[
+        y''+P(x)y'+Q(x)y=0
+    \]
+    on an interval $I$. Then a second solution is
+    \[
+        y_2(x)=y_1(x)\int
+        \frac{e^{-\int P(x)\,dx}}{[y_1(x)]^2}\,dx
+    \]
+}
+
+\paragraph{Procedure.}
+\begin{enumerate}
+    \item Put the equation in standard form $y''+P(x)y'+Q(x)y=0$.
+    \item Identify a known nonzero solution $y_1$.
+    \item Use $y_2=y_1\int \frac{e^{-\int P(x)\,dx}}{y_1^2}\,dx$. 
+    \item Write the general solution as $y=c_1y_1+c_2y_2$.
+\end{enumerate}
+
+
+\subsection{Homogeneous Linear Equations with Constant Coefficients}
+
+\paragraph{Auxiliary Equation.}
+For $a_ny^{(n)}+a_{n-1}y^{(n-1)}+\cdots+a_1y'+a_0y=0$, try $y=e^{mx}$. Substitution gives the \emph{auxiliary equation} $a_nm^n+a_{n-1}m^{n-1}+\cdots+a_1m+a_0=0$. The roots of this polynomial determine the solution.
+
+\paragraph{Second-Order Case.}
+For $ay''+by'+cy=0$ the auxiliary equation is $am^2+bm+c=0$.
+
+\begin{center}
+\begin{tabular}{c|c}
+Root type & General solution\\
+\hline
+$m_1\neq m_2$ real & $y=c_1e^{m_1x}+c_2e^{m_2x}$\\[0.3em]
+$m_1=m_2=m$ & $y=c_1e^{mx}+c_2xe^{mx}$\\[0.3em]
+$m=\alpha\pm i\beta$ & $y=e^{\alpha x}\bigl(c_1\cos \beta x+c_2\sin \beta x\bigr)$
+\end{tabular}
+\end{center}
+
+\paragraph{Higher-Order Roots.}
+If $m$ is a real root of multiplicity $k$, then the corresponding solutions are
+\[
+    e^{mx},\quad xe^{mx},\quad x^2e^{mx},\quad \ldots,\quad x^{k-1}e^{mx}
+\]
+If $\alpha\pm i\beta$ is a complex conjugate pair of multiplicity $k$, then the
+real solutions are
+\[
+    e^{\alpha x}\cos \beta x,\quad xe^{\alpha x}\cos \beta x,
+    \quad \ldots,\quad x^{k-1}e^{\alpha x}\cos \beta x
+\]
+\[
+    e^{\alpha x}\sin \beta x,\quad xe^{\alpha x}\sin \beta x,
+    \quad \ldots,\quad x^{k-1}e^{\alpha x}\sin \beta x
+\]
+
+\subsection{Undetermined Coefficients: Superposition Approach}
+
+\paragraph{When the Method Applies.}
+The method of undetermined coefficients applies to nonhomogeneous linear
+differential equations with constant coefficients, $a_ny^{(n)}+a_{n-1}y^{(n-1)}+\cdots+a_1y'+a_0y=g(x)$, when $g(x)$ is a finite sum of constants, polynomials, exponentials, sines, cosines, or products of these functions.
+
+\paragraph{Procedure.}
+\begin{enumerate}
+    \item Solve the associated homogeneous equation to find $y_c$.
+    \item Guess the form of a particular solution $y_p$ based on $g(x)$.
+    \item Substitute $y_p$ into the original equation and solve for the unknown coefficients.
+    \item Write the general solution as $y=y_c+y_p$.
+\end{enumerate}
+
+\paragraph{Common Trial Forms.}
+\begin{center}
+\begin{tabular}{c|c}
+$g(x)$ & Trial form for $y_p$\\
+\hline
+$k$ & $A$\\[0.2em]
+$a_mx^m+\cdots+a_0$ & $A_mx^m+\cdots+A_0$\\[0.2em]
+$e^{\alpha x}$ & $Ae^{\alpha x}$\\[0.2em]
+$x^me^{\alpha x}$ & $(A_mx^m+\cdots+A_0)e^{\alpha x}$\\[0.2em]
+$\cos \beta x$ or $\sin \beta x$ & $A\cos \beta x+B\sin \beta x$\\[0.2em]
+$e^{\alpha x}\cos \beta x$ or $e^{\alpha x}\sin \beta x$ &
+$e^{\alpha x}(A\cos \beta x+B\sin \beta x)$
+\end{tabular}
+\end{center}
+
+\rmk{If any term in the guessed $y_p$ is already contained in $y_c$, multiply the whole
+guess by the smallest power $x^s$ that removes the duplication: $y_p=x^s(\text{original guess})$.}
+
+\subsection{Undetermined Coefficients: Annihilator Approach}
+
+\defn{Annihilator}{
+    A differential operator $L$ with constant coefficients is called an
+    \emph{annihilator} of $f(x)$ if
+    \[
+        L[f(x)]=0
+    \]
+}
+
+\paragraph{Basic Annihilators.}
+\[
+    D^n \text{ annihilates } 1,x,x^2,\ldots,x^{n-1}.
+\]
+\[
+    (D-\alpha)^n \text{ annihilates }
+    e^{\alpha x},xe^{\alpha x},\ldots,x^{n-1}e^{\alpha x}.
+\]
+\[
+    \bigl[(D-\alpha)^2+\beta^2\bigr]^n
+    \text{ annihilates }
+    x^ke^{\alpha x}\cos\beta x
+    \text{ and }
+    x^ke^{\alpha x}\sin\beta x, k=0,1,\ldots,n-1.
+\]
+
+\paragraph{Procedure.}
+To solve $L[y]=g(x)$ by annihilators:
+\begin{enumerate}
+    \item Solve $L[y]=0$ to find the complementary function $y_c$.
+    \item Find an operator $L_1$ such that $L_1[g]=0$.
+    \item Apply $L_1$ to obtain the homogeneous equation $L_1L[y]=0$. 
+    \item Solve the higher-order homogeneous equation.
+    \item Remove the terms already in $y_c$; the remaining terms give the form of $y_p$.
+    \item Substitute into the original equation to determine the coefficients.
+\end{enumerate}
+
+\rmk{
+    The annihilator method justifies the guessing method. It is often more useful
+    for finding the correct form of $y_p$ than for doing the final coefficient
+    calculation.
+}
+
+\subsection{Variation of Parameters}
+
+\paragraph{Procedure.}
+\begin{enumerate}
+    \item Put the equation in standard form $y''+P(x)y'+Q(x)y=f(x)$.
+    \item Solve the homogeneous equation to find $y_1,y_2$.
+    \item Compute $W=y_1y_2'-y_2y_1'$. Compute $u_1'$ and $u_2'$ using $u_1'=-\frac{y_2f}{W}, u_2'=\frac{y_1f}{W}$
+    \item Integrate to find $u_1,u_2$, then write $y_p=u_1y_1+u_2y_2$.
+    \item The general solution is $y=y_c+y_p$.
+\end{enumerate}
+
+\subsection{Cauchy--Euler Equations}
+
+\defn{Cauchy--Euler Equation}{
+    A second-order Cauchy--Euler equation has the form where $a,b,c$ are constants:
+    \[
+        ax^2y''+bxy'+cy=g(x)
+    \]
+    More generally, an $n$th-order Cauchy--Euler
+    equation has powers of $x$ matched to the order of the derivative:
+    \[
+        a_nx^ny^{(n)}+a_{n-1}x^{n-1}y^{(n-1)}+
+        \cdots+a_1xy'+a_0y=g(x)
+    \]
+}
+
+\paragraph{Root Cases.}
+On an interval where $x>0$:
+\begin{center}
+\begin{tabular}{c|c}
+Root type & General solution\\
+\hline
+$m_1\neq m_2$ real & $y=c_1x^{m_1}+c_2x^{m_2}$\\[0.3em]
+$m_1=m_2=m$ & $y=c_1x^m+c_2x^m\ln x$\\[0.3em]
+$m=\alpha\pm i\beta$ &
+$y=x^\alpha\bigl(c_1\cos(\beta\ln x)+c_2\sin(\beta\ln x)\bigr)$
+\end{tabular}
+\end{center}
+
+\paragraph{Nonhomogeneous Case.}
+\begin{enumerate}
+    \item Solve the associated homogeneous Cauchy--Euler equation.
+    \item Divide by the leading coefficient to put the equation in standard form.
+    \item Use variation of parameters to find $y_p$.
+\end{enumerate}
+
+\subsection{Solving Systems of Linear Differential Equations by Elimination}
+
+\defn{Solution of a System}{
+    A solution of a system of differential equations is a set of sufficiently
+    differentiable functions, such as
+    \[
+        x=\Phi_1(t),\qquad y=\Phi_2(t),\qquad z=\Phi_3(t)
+    \]
+    that satisfies every equation in the system on a common interval $I$.
+}
+
+\paragraph{Procedure.}
+\begin{enumerate}
+    \item Rewrite the system using the differential operator $D$.
+    \item Apply operators to the equations so that one unknown can be eliminated.
+    \item Solve the resulting higher-order equation for one dependent variable.
+    \item Substitute back into one original equation to find the other variables.
+    \item Use the original system to relate the arbitrary constants.
+\end{enumerate}
+
+\section{Series Solutions of Linear Equations}
+
+\subsection{Review of Power Series}
+
+\defn{Power Series}{
+    A \emph{power series centered at $a$} is an infinite series of the form
+    \[
+        \sum_{n=0}^{\infty} c_n(x-a)^n
+        =
+        c_0+c_1(x-a)+c_2(x-a)^2+\cdots
+    \]
+}
+
+\paragraph{Convergence and Radius of Convergence.}
+A power series may converge for some values of $x$ and diverge for others. The set
+of all real numbers $x$ for which the series converges is called its
+\emph{interval of convergence}. There is a number $R$, called the
+\emph{radius of convergence}, such that
+$
+    \sum_{n=0}^{\infty} c_n(x-a)^n
+    \text{converges for } |x-a|<R
+$
+and diverges for $|x-a|>R$. At the endpoints $x=a\pm R$, convergence must be
+checked separately.
+
+\paragraph{Ratio Test.}
+For a power series, the ratio test often gives the radius of convergence. If
+$
+    L
+    =
+    \lim_{n\to\infty}
+    \left|
+        \frac{c_{n+1}(x-a)^{n+1}}{c_n(x-a)^n}
+    \right|
+$
+then the series converges absolutely when $L<1$ and diverges when $L>1$.
+The test is inconclusive when $L=1$, which usually corresponds to the endpoints.
+
+\defn{Analytic Function}{
+    A function $f$ is \emph{analytic at $a$} if it can be represented by a power
+    series centered at $a$ with $R>0$:
+    \[
+        f(x)=\sum_{n=0}^{\infty} c_n(x-a)^n
+    \]
+}
+
+\prop{
+    If $\sum_{n=0}^{\infty} c_n(x-a)^n=0$ for all $x$ in some open interval around $a$, then every coefficient must be
+    zero: $c_n=0, n=0,1,2,\ldots$. This is called the \emph{identity property} of power series.
+}
+
+
+\subsection{Solutions About Ordinary Points}
+
+\defn{Ordinary and Singular Points}{
+    Consider the homogeneous linear second-order equation $a_2(x)y''+a_1(x)y'+a_0(x)y=0$. After division by $a_2(x)$, write it in standard form $y''+P(x)y'+Q(x)y=0$. A point $x=x_0$ is an \emph{ordinary point} if both $P(x)$ and $Q(x)$ are
+    analytic at $x_0$. Otherwise, $x=x_0$ is a \emph{singular point}.
+}
+
+\thmr{Existence of Power Series Solutions}{powerseriesordinary}{
+    If $x=x_0$ is an ordinary point of $a_2(x)y''+a_1(x)y'+a_0(x)y=0$ then the equation has two linearly independent solutions of the form $y=\sum_{n=0}^{\infty} c_n(x-x_0)^n$. Each power series solution converges at least for $|x-x_0|<R$ where $R$ is the distance from $x_0$ to the nearest singular point.
+}
+
+\paragraph{Procedure.}
+To find a power series solution about an ordinary point:
+\begin{enumerate}
+    \item Assume $ y=\sum_{n=0}^{\infty} c_n(x-x_0)^n$.
+    \item Differentiate term by term to find $y'$ and $y''$. Substitute $y,y',y''$ into the differential equation. Make all series use the same power of $x-x_0$. Set each coefficient equal to zero. Solve the resulting recurrence relation. 
+    \item Write the solution in terms of the arbitrary constants, usually $c_0$ and $c_1$.
+\end{enumerate}
+
+
+\subsection{Solutions About Singular Points}
+
+\defn{Regular and Irregular Singular Points}{
+    Suppose $x=x_0$ is a singular point of $y''+P(x)y'+Q(x)y=0$. Then $x=x_0$ is a \emph{regular singular point} if
+    \[
+        p(x)=(x-x_0)P(x),
+        \qquad
+        q(x)=(x-x_0)^2Q(x)
+    \]
+    are both analytic at $x_0$. A singular point that is not regular is called an
+    \emph{irregular singular point}.
+}
+
+\thmr{Frobenius' Theorem}{frobeniustheorem}{
+    If $x=x_0$ is a regular singular point of $a_2(x)y''+a_1(x)y'+a_0(x)y=0$, then there exists at least one solution of the following form  where $r$ is a constant determined by the differential equation
+    \[
+        y
+        =
+        \sum_{n=0}^{\infty} c_n(x-x_0)^{n+r}
+        =
+        (x-x_0)^r
+        \sum_{n=0}^{\infty} c_n(x-x_0)^n,
+        \qquad c_0\neq 0
+    \]
+}
+
+\paragraph{Indicial Equation.}
+For a regular singular point at $x=0$, write $ y''+P(x)y'+Q(x)y=0$, and define
+\[
+    p(x)=xP(x)=a_0+a_1x+a_2x^2+\cdots,
+    \qquad
+    q(x)=x^2Q(x)=b_0+b_1x+b_2x^2+\cdots
+\]
+Then the \emph{indicial equation} is $r(r-1)+a_0r+b_0=0$. Its roots are called the \emph{indicial roots}.
+
+\paragraph{Procedure.}
+To solve near a regular singular point $x=0$:
+\begin{enumerate}
+    \item Assume a Frobenius solution $y=\sum_{n=0}^{\infty} c_nx^{n+r},
+        c_0\neq 0$.
+    \item Compute $y'$ and $y''$. Substitute into the differential equation. Set the coefficient of the lowest power of $x$ equal to zero. This gives the indicial equation. Solve the recurrence relation for each indicial root.
+    \item Determine whether one or two linearly independent Frobenius series are obtained.
+\end{enumerate}
+
+\paragraph{Three Cases for Indicial Roots.}
+Assume $r_1$ and $r_2$ are real indicial roots with $r_1\ge r_2$.
+
+\begin{center}
+\begin{tabular}{c|c}
+Case & Form of solutions\\
+\hline
+$r_1-r_2\notin \mathbb{Z}_{>0}$ &
+Two Frobenius series usually exist\\[0.4em]
+$r_1-r_2\in \mathbb{Z}_{>0}$ &
+One Frobenius series always exists; the second may contain $\ln x$\\[0.4em]
+$r_1=r_2$ &
+Second solution contains $\ln x$
+\end{tabular}
+\end{center}
+More explicitly $ y_1=\sum_{n=0}^{\infty} c_nx^{n+r_1}, c_0\neq 0$. The second solution may have the form
+\[
+    y_2=C y_1\ln x+\sum_{n=0}^{\infty} b_nx^{n+r_2},
+    \qquad b_0\neq 0,
+\]
+where $C$ may be zero in the second case, but is nonzero in the repeated-root case.
+
+
+\section{The Laplace Transform}
+
+\subsection{Definition of the Laplace Transform}
+
+\defn{Laplace Transform}{
+    Let $f$ be defined for $t\ge 0$. The \emph{Laplace transform} of $f$ is
+    \[
+        \mathcal{L}\{f(t)\}=F(s)=\int_0^\infty e^{-st}f(t)\,dt 
+        =
+        \lim_{b\to\infty}\int_0^b e^{-st}f(t)\,dt
+    \]
+    The variable $t$ is the original variable, while $s$ is the transform variable.
+}
+
+\paragraph{Basic Transform Table.}
+For suitable values of $s$,
+\[
+\begin{array}{c|c}
+    f(t) & \mathcal{L}\{f(t)\}=F(s)\\
+    \hline
+    1 & \dfrac{1}{s}\\[0.7em]
+    t^n & \dfrac{n!}{s^{n+1}},\quad n=1,2,3,\ldots\\[0.7em]
+    e^{at} & \dfrac{1}{s-a}\\[0.7em]
+    \sin kt & \dfrac{k}{s^2+k^2}\\[0.7em]
+    \cos kt & \dfrac{s}{s^2+k^2}\\[0.7em]
+    \sinh kt & \dfrac{k}{s^2-k^2}\\[0.7em]
+    \cosh kt & \dfrac{s}{s^2-k^2}
+\end{array}
+\]
+
+\prop{
+    The Laplace transform is linear. If $\mathcal{L}\{f\}=F$ and
+    $\mathcal{L}\{g\}=G$, then
+    \[
+        \mathcal{L}\{\alpha f(t)+\beta g(t)\}
+        =
+        \alpha F(s)+\beta G(s)
+    \]
+}
+
+\defn{Piecewise Continuity and Exponential Order}{
+    A function $f$ is \emph{piecewise continuous} on $[0,\infty)$ if, on every finite
+    interval, it is continuous except possibly at finitely many points, and each
+    discontinuity is finite. A function $f$ is of \emph{exponential order} $c$ as $t\to\infty$ if there exist
+    constants $M>0$, $c>0$, and $T>0$ such that
+    \[
+        |f(t)|\le Me^{ct},\qquad t>T
+    \]
+}
+
+\thmr{Existence of the Laplace Transform}{laplaceexistence}{
+    If $f$ is piecewise continuous on $[0,\infty)$ and is of exponential order $c$,
+    then $\mathcal{L}\{f(t)\}$ exists for $s>c$.
+}
+
+\subsection{Inverse Transforms and Transforms of Derivatives}
+
+\defn{Inverse Laplace Transform}{
+    If $\mathcal{L}\{f(t)\}=F(s)$, then $f(t)$ is called the \emph{inverse Laplace
+    transform} of $F(s)$, written
+    \[
+        f(t)=\mathcal{L}^{-1}\{F(s)\}
+    \]
+}
+
+\paragraph{Partial Fractions.}
+For rational functions, first decompose into simpler fractions. Typical patterns are
+\[
+    \frac{P(s)}{(s-a)(s-b)}
+    =
+    \frac{A}{s-a}+\frac{B}{s-b}
+\]
+\[
+    \frac{P(s)}{(s-a)^m}
+    =
+    \frac{A_1}{s-a}+\frac{A_2}{(s-a)^2}+\cdots+
+    \frac{A_m}{(s-a)^m}
+\]
+
+
+\thmr{Transform of a Derivative}{transformderivative}{
+    Suppose the needed derivatives of $f$ are continuous or piecewise continuous
+    and of exponential order. If $\mathcal{L}\{f(t)\}=F(s)$, then
+    \[
+        \mathcal{L}\{f^{(n)}(t)\}
+        =
+        s^nF(s)-s^{n-1}f(0)-s^{n-2}f'(0)-\cdots-f^{(n-1)}(0)
+    \]
+    \[
+        \mathcal{L}\{f'(t)\}=sF(s)-f(0),
+        \qquad
+        \mathcal{L}\{f''(t)\}=s^2F(s)-sf(0)-f'(0)
+    \]
+}
+
+\paragraph{Solving Linear IVPs by Laplace Transform.}
+For a constant-coefficient linear initial-value problem:
+\begin{enumerate}
+    \item Take the Laplace transform of both sides. Use initial conditions through the derivative formulas.
+    \item Solve the algebraic equation for $Y(s)$. Decompose $Y(s)$ into recognizable pieces. Apply $\mathcal{L}^{-1}$ to obtain $y(t)$.
+\end{enumerate}
+
+\subsection{Operational Properties}
+
+\thmr{First Translation Theorem}{firsttranslation}{
+    If $\mathcal{L}\{f(t)\}=F(s)$, then
+    \[
+        \mathcal{L}\{e^{at}f(t)\}=F(s-a) \Leftrightarrow \mathcal{L}^{-1}\{F(s-a)\}=e^{at}f(t)
+    \]
+}
+
+\defn{Unit Step Function}{
+    The \emph{unit step function} at $a$ is
+    \[
+        U(t-a)=
+        \begin{cases}
+            0, & 0\le t<a,\\
+            1, & t\ge a
+        \end{cases}
+    \]
+}
+
+\thmr{Second Translation Theorem}{secondtranslation}{
+    If $\mathcal{L}\{f(t)\}=F(s)$ and $a>0$, then
+    \[
+        \mathcal{L}\{U(t-a)f(t-a)\}=e^{-as}F(s) \Leftrightarrow  \mathcal{L}^{-1}\{e^{-as}F(s)\}=U(t-a)f(t-a)
+    \]
+}
+
+\paragraph{Alternative Form.}
+For a term of the form $g(t)U(t-a)$, it is often easier to use
+\[
+    \mathcal{L}\{g(t)U(t-a)\}
+    =
+    e^{-as}\mathcal{L}\{g(t+a)\}
+\]
+
+\thmr{Derivatives of Transforms}{derivativesoftransforms}{
+    If $\mathcal{L}\{f(t)\}=F(s)$, then for $n=1,2,3,\ldots$,
+    \[
+        \mathcal{L}\{t^n f(t)\}
+        =
+        (-1)^n\frac{d^n}{ds^n}F(s)
+    \]
+    \[
+        \mathcal{L}\{t f(t)\}=-F'(s)
+    \]
+}
+
+\defn{Convolution}{
+    If $f$ and $g$ are piecewise continuous on $[0,\infty)$, their \emph{convolution}
+    is
+    \[
+        (f*g)(t)=\int_0^t f(\tau)g(t-\tau)\,d\tau
+    \]
+}
+
+\paragraph{Basic Properties of Convolution.}
+Convolution behaves like a generalized product:
+\[
+    f*g=g*f,
+    \qquad
+    (f*g)*h=f*(g*h),
+    \qquad
+    f*(g+h)=f*g+f*h
+\]
+
+\thmr{Convolution Theorem}{convolutiontheorem}{
+    If $\mathcal{L}\{f(t)\}=F(s)$ and $\mathcal{L}\{g(t)\}=G(s)$, then
+    \[
+        \mathcal{L}\{(f*g)(t)\}=F(s)G(s) \Leftrightarrow \mathcal{L}^{-1}\{F(s)G(s)\}=f*g
+    \]
+}
+
+\paragraph{Transform of an Integral.}
+Taking $g(t)=1$ in the convolution theorem gives
+\[
+    \mathcal{L}\left\{\int_0^t f(\tau)\,d\tau\right\}
+    =
+    \frac{F(s)}{s},
+    \qquad
+    F(s)=\mathcal{L}\{f(t)\}
+\]
+
+\defn{Volterra Integral Equation}{
+    An equation of the following form  is a \emph{Volterra integral equation}. The integral term is a convolution,
+    so Laplace transforms turn the equation into an algebraic equation for
+    $F(s)=\mathcal{L}\{f(t)\}$
+    \[
+        f(t)=g(t)+\int_0^t f(\tau)h(t-\tau)\,d\tau
+    \]
+}
+
+\thmr{Transform of a Periodic Function}{periodiclaplace}{
+    If $f$ is piecewise continuous on $[0,\infty)$ and periodic with period $T$, then
+    \[
+        \mathcal{L}\{f(t)\}
+        =
+        \frac{\displaystyle\int_0^T e^{-st}f(t)\,dt}{1-e^{-sT}}
+    \]
+}
+
+\subsection{The Dirac Delta Function}
+
+\paragraph{Unit Impulse.}
+A unit impulse models a force of very large magnitude acting over a very short time.
+A rectangular impulse centered near $t_0$ has total area $1$, and as its width tends
+to zero, it is idealized by the Dirac delta.
+
+\defn{Dirac Delta}{
+    The \emph{Dirac delta} $\delta(t-t_0)$ is not an ordinary function. It is a
+    generalized function characterized formally by
+    \[
+        \delta(t-t_0)=0\quad (t\ne t_0),
+        \qquad
+        \int_0^\infty \delta(t-t_0)\,dt=1
+    \]
+}
+
+\thmr{Transform of the Dirac Delta Function}{deltatransform}{
+    For $t_0>0$,
+    \[
+        \mathcal{L}\{\delta(t-t_0)\}=e^{-st_0}
+    \]
+}
+
+
+\section{Systems of Linear Differential Equations}
+
+\subsection{Theory of Linear Systems}
+
+\defn{First-Order System}{
+    A system of $n$ first-order differential equations has normal form
+    \[
+        \frac{dx_i}{dt}=g_i(t,x_1,x_2,\ldots,x_n),
+        \qquad i=1,2,\ldots,n
+    \]
+    If each $g_i$ is linear in the dependent variables, the system is linear.
+}
+
+\paragraph{Matrix Form.} If $\mathbf{F}(t)=\mathbf{0}$, the system is \emph{homogeneous}; otherwise it's \emph{nonhomogeneous}.
+\[
+    \mathbf{X}'=A(t)\mathbf{X}+\mathbf{F}(t), \qquad \mathbf{X}=\begin{pmatrix}x_1\\x_2\\\vdots\\x_n\end{pmatrix},
+    \qquad
+    \mathbf{F}(t)=\begin{pmatrix}f_1(t)\\f_2(t)\\\vdots\\f_n(t)\end{pmatrix}
+\]
+
+\rmk{
+    Any $n$th-order equation $ y^{(n)}=f(t,y,y',\ldots,y^{(n-1)})$ can be rewritten as a first-order system by setting $x_1=y, x_2=y',\ldots, x_n=y^{(n-1)}$. Then $ x_1'=x_2, x_2'=x_3,\ldots,x_{n-1}'=x_n,x_n'=f(t,x_1,x_2,\ldots,x_n)$
+}
+
+\defn{Solution Vector}{
+    A \emph{solution vector} on an interval $I$ is a column vector whose entries are differentiable and satisfy the system on $I$.
+    \[
+        \mathbf{X}(t)=
+        \begin{pmatrix}
+            x_1(t)\\x_2(t)\\\vdots\\x_n(t)
+        \end{pmatrix}
+    \]
+}
+
+\thmr{Existence and Uniqueness for Linear Systems}{linearsystemexistence}{
+    Suppose the entries of $A(t)$ and $\mathbf{F}(t)$ are continuous on an interval
+    $I$ containing $t_0$. Then the initial-value problem $\mathbf{X}'=A(t)\mathbf{X}+\mathbf{F}(t), \mathbf{X}(t_0)=\mathbf{X}_0$ has a unique solution on $I$. 
+}
+
+\thmr{Superposition for Homogeneous Systems}{systemsuperposition}{
+    If $\mathbf{X}_1,\ldots,\mathbf{X}_k$ are solution vectors of
+    $\mathbf{X}'=A(t)\mathbf{X}$ on $I$, then $ \mathbf{X}=c_1\mathbf{X}_1+\cdots+c_k\mathbf{X}_k$ is also a solution. 
+}
+
+\defn{Linear Independence of Solution Vectors}{
+    Solution vectors $\mathbf{X}_1,\ldots,\mathbf{X}_k$ are linearly dependent on
+    $I$ if there exist constants $c_1,
+    \ldots,c_k$, not all zero, such that
+    \[
+        c_1\mathbf{X}_1(t)+\cdots+c_k\mathbf{X}_k(t)=\mathbf{0}
+    \]
+    for every $t\in I$. Otherwise, they are linearly independent.
+}
+
+\paragraph{Fundamental Matrix.}
+For $n$ linearly independent solutions $\mathbf{X}_1,\ldots,\mathbf{X}_n$ (fundamental set of solutions), the matrix
+\[
+    \Phi(t)=
+    \begin{pmatrix}
+        | & | & & |\\
+        \mathbf{X}_1 & \mathbf{X}_2 & \cdots & \mathbf{X}_n\\
+        | & | & & |
+    \end{pmatrix}
+\]
+is called a \emph{fundamental matrix}. Its determinant is the Wronskian of the
+solution vectors. the set of solution vectors is linearly independent on I if and only if the Wronskian $W(X_1,X_2,\cdots,X_n)=|\Phi(t)| \neq 0 $ for every $t$ in the interval.
+
+\thmr{General Solution of a Homogeneous Linear System}{systemgeneralsolution}{
+    If $\Phi(t)$ is a fundamental matrix for $\mathbf{X}'=A(t)\mathbf{X}$, then the
+    general solution is $\mathbf{X}(t)=\Phi(t)\mathbf{C}$ where $\mathbf{C}$ is a constant column vector.
+}
+
+\thmr{General Solution of a Nonhomogeneous System}{nonhomog}{
+    Let $\mathbf{X}_p$ be a particular solution of $\mathbf{X}'=A(t)\mathbf{X}+\mathbf{F}(t)$, and let $\mathbf{X}_c=\Phi(t)\mathbf{C}$ be the general solution of the
+    associated homogeneous system $\mathbf{X}'=A(t)\mathbf{X}$. Then the general solution is $\mathbf{X}(t)=\mathbf{X}_c(t)+\mathbf{X}_p(t)$. 
+}
+
+\subsection{Homogeneous Linear Systems}
+
+\paragraph{Procedure} To solve $\mathbf{X}'=A\mathbf{X}$ use the following steps:
+\begin{enumerate}
+    \item Find the eigenvalues by solving $\det(A-\lambda I)=0$. 
+    \item For each eigenvalue $\lambda$, find eigenvectors by solving $ (A-\lambda I)\mathbf{K}=\mathbf{0}$.
+    \item If $A$ has $n$ linearly independent eigenvectors, form $n$ solutions $\mathbf{K}_i e^{\lambda_i t}$.
+    \item If an eigenvalue is repeated but has too few eigenvectors, find
+    generalized eigenvectors. If eigenvalues are complex, use the real and imaginary parts of
+    $\mathbf{K}e^{\lambda t}$ to form real-valued solutions.
+\end{enumerate}
+
+\paragraph{Distinct Real Eigenvalues}{distinctrealeigenvalues}{
+    If $A$ has $n$ distinct real eigenvalues $\lambda_1,\lambda_2,\ldots,\lambda_n$ with corresponding eigenvectors $\mathbf{K}_1,\mathbf{K}_2,\ldots,\mathbf{K}_n$, then the general solution of $ \mathbf{X}'=A\mathbf{X}$ is
+    \[
+        \mathbf{X}(t)
+        =
+        c_1\mathbf{K}_1e^{\lambda_1 t}
+        +
+        c_2\mathbf{K}_2e^{\lambda_2 t}
+        +\cdots+
+        c_n\mathbf{K}_ne^{\lambda_n t}
+    \]
+}
+
+\paragraph{Repeated Eigenvalues: Enough Eigenvectors.}
+Suppose $\lambda$ is an eigenvalue with algebraic multiplicity $m$. If there are
+$m$ linearly independent eigenvectors $\mathbf{K}_1,\mathbf{K}_2,\ldots,\mathbf{K}_m$, then the corresponding part of the general solution is
+\[
+    c_1\mathbf{K}_1e^{\lambda t}
+    +
+    c_2\mathbf{K}_2e^{\lambda t}
+    +\cdots+
+    c_m\mathbf{K}_me^{\lambda t}
+\]
+
+
+\paragraph{Multiplicity Two with One Eigenvector.}
+Suppose $\lambda$ has algebraic multiplicity $2$ but only one eigenvector
+$\mathbf{K}$. The first solution is $\mathbf{X}_1=\mathbf{K}e^{\lambda t}$. To find a second solution, solve for a generalized eigenvector $\mathbf{P}$: $ (A-\lambda I)\mathbf{P}=\mathbf{K}$. Then a second linearly independent solution is $\mathbf{X}_2=(t\mathbf{K}+\mathbf{P})e^{\lambda t}$. 
+
+\paragraph{Multiplicity Three with One Eigenvector.}
+Suppose $\lambda$ has algebraic multiplicity $3$ but only one eigenvector
+$\mathbf{K}$. First solve $(A-\lambda I)\mathbf{K}=\mathbf{0}$. Then find generalized eigenvectors $\mathbf{P}$ and $\mathbf{Q}$ satisfying $(A-\lambda I)\mathbf{P}=\mathbf{K},  (A-\lambda I)\mathbf{Q}=\mathbf{P}$. The three linearly independent solutions are
+\[
+\begin{cases}
+    \mathbf{X}_1=\mathbf{K}e^{\lambda t} \\
+    \mathbf{X}_2=(t\mathbf{K}+\mathbf{P})e^{\lambda t} \\
+    \mathbf{X}_3=
+    \left(
+        \frac{t^2}{2}\mathbf{K}
+        +
+        t\mathbf{P}
+        +
+        \mathbf{Q}
+    \right)e^{\lambda t} 
+\end{cases}
+\]
+
+\paragraph{General Repeated Eigenvalue with One Eigenvector}
+Suppose $\lambda$ has algebraic multiplicity $m$ but only one eigenvector. We first
+find a generalized eigenvector chain $(A-\lambda I)\mathbf{K}_1=\mathbf{0}, (A-\lambda I)\mathbf{K}_2=\mathbf{K}_1,(A-\lambda I)\mathbf{K}_3=\mathbf{K}_2,\cdots  (A-\lambda I)\mathbf{K}_m=\mathbf{K}_{m-1}$. Here $\mathbf{K}_1$ is the ordinary eigenvector, while
+$\mathbf{K}_2,\ldots,\mathbf{K}_m$ are generalized eigenvectors. Then $m$ linearly independent solutions are
+\[
+\begin{cases}
+    \mathbf{X}_1
+    =
+    \mathbf{K}_1 e^{\lambda t} \\
+    \mathbf{X}_2
+    =
+    \left(
+        t\mathbf{K}_1+\mathbf{K}_2
+    \right)e^{\lambda t} \\
+     \mathbf{X}_3
+    =
+    \left(
+        \frac{t^2}{2!}\mathbf{K}_1
+        +
+        t\mathbf{K}_2
+        +
+        \mathbf{K}_3
+    \right)e^{\lambda t} \\
+    \cdots \\
+     \mathbf{X}_j
+    =
+    \left(
+        \frac{t^{j-1}}{(j-1)!}\mathbf{K}_1
+        +
+        \frac{t^{j-2}}{(j-2)!}\mathbf{K}_2
+        +
+        \cdots
+        +
+        t\mathbf{K}_{j-1}
+        +
+        \mathbf{K}_j
+    \right)e^{\lambda t},
+    \qquad
+    j=1,2,\ldots,m
+\end{cases}
+\]
+
+
+
+
+
+\paragraph{Complex Eigenvalues.}
+Suppose $A$ has real entries and has a complex eigenvalue $ \lambda=\alpha+i\beta, \beta>0$. The conjugate $\overline{\lambda}=\alpha-i\beta$ is also an eigenvalue. Let the eigenvector corresponding to $\lambda=\alpha+i\beta$ be $\mathbf{K}=\mathbf{B}+i\mathbf{C}$, where $\mathbf{B}$ is the real part of $\mathbf{K}$ and $\mathbf{C}$ is the imaginary part of $\mathbf{K}$. Then two real linearly independent solutions are
+\[
+\begin{cases}
+     \mathbf{X}_1
+    =
+    e^{\alpha t}
+    \left(
+        \mathbf{B}\cos\beta t
+        -
+        \mathbf{C}\sin\beta t
+    \right) \\
+    \mathbf{X}_2
+    =
+    e^{\alpha t}
+    \left(
+        \mathbf{B}\sin\beta t
+        +
+        \mathbf{C}\cos\beta t
+    \right)
+\end{cases}
+\]
+
+\paragraph{Summary of Cases.}
+For $\mathbf{X}'=A\mathbf{X}$ the form of the general solution:
+\[
+\begin{array}{c|c}
+\text{Case} & \text{Solution Form}\\
+\hline
+\text{Distinct real eigenvalues}
+&
+\mathbf{K}_i e^{\lambda_i t}
+\\[6pt]
+\text{Repeated eigenvalue with enough eigenvectors}
+&
+\mathbf{K}_1e^{\lambda t},\ldots,\mathbf{K}_me^{\lambda t}
+\\[6pt]
+\text{Multiplicity two with one eigenvector}
+&
+\mathbf{K}e^{\lambda t},\quad
+(t\mathbf{K}+\mathbf{P})e^{\lambda t}
+\\[6pt]
+\text{Multiplicity three with one eigenvector}
+&
+\mathbf{K}e^{\lambda t},\quad
+(t\mathbf{K}+\mathbf{P})e^{\lambda t},\quad
+\left(\frac{t^2}{2}\mathbf{K}+t\mathbf{P}+\mathbf{Q}\right)e^{\lambda t}
+\\[6pt]
+\text{General repeated eigenvalue with one eigenvector}
+&
+\mathbf{X}_j
+=
+\left(
+    \frac{t^{j-1}}{(j-1)!}\mathbf{K}_1
+    +
+    \frac{t^{j-2}}{(j-2)!}\mathbf{K}_2
+    +
+    \cdots
+    +
+    t\mathbf{K}_{j-1}
+    +
+    \mathbf{K}_j
+\right)e^{\lambda t}
+\\[10pt]
+\text{Complex eigenvalues } \alpha\pm i\beta
+&
+e^{\alpha t}(\mathbf{B}\cos\beta t-\mathbf{C}\sin\beta t),\quad
+e^{\alpha t}(\mathbf{B}\sin\beta t+\mathbf{C}\cos\beta t)
+\end{array}
+\]
+
+
+
+\subsection{Nonhomogeneous Linear Systems}
+
+\paragraph{General Form.}
+A nonhomogeneous linear system has the form $\mathbf{X}'=A\mathbf{X}+\mathbf{F}(t)$. Its general solution is $\mathbf{X}=\mathbf{X}_c+\mathbf{X}_p$ where $\mathbf{X}_c$ solves the associated homogeneous system and
+$\mathbf{X}_p$ is one particular solution.
+
+\paragraph{Undetermined Coefficients.}
+For constant $A$, the method of undetermined coefficients applies when the entries
+of $\mathbf{F}(t)$ are finite combinations of constants, polynomials,
+exponentials, sines, and cosines.
+
+\paragraph{Procedure.}
+\begin{enumerate}
+    \item Solve the associated homogeneous system $\mathbf{X}'=A\mathbf{X}$.
+    \item Guess the form of $\mathbf{X}_p$ from the form of $\mathbf{F}(t)$.
+    \item Substitute $\mathbf{X}_p$ into $\mathbf{X}'=A\mathbf{X}+\mathbf{F}(t)$.
+    \item Solve the resulting algebraic equations for the unknown coefficients.
+    \item Write $\mathbf{X}=\mathbf{X}_c+\mathbf{X}_p$.
+\end{enumerate}
+
+\paragraph{Variation of Parameters for Systems.}
+Let $\Phi(t)$ be a fundamental matrix for the homogeneous system
+$\mathbf{X}'=A(t)\mathbf{X}$.
+\[
+    \mathbf{X}(t)=\Phi(t)\mathbf{C}
+    +
+    \Phi(t)\int \Phi^{-1}(t)\mathbf{F}(t)\,dt
+\]
+
+\subsection{Matrix Exponential}
+
+\defn{Matrix Exponential}{
+    For an $n\times n$ matrix $A$, the \emph{matrix exponential} is defined by
+    \[
+        e^{At}
+        =
+        I+At+\frac{A^2t^2}{2!}+\frac{A^3t^3}{3!}+\cdots
+        =
+        \sum_{k=0}^{\infty}\frac{A^kt^k}{k!}
+    \]
+}
+
+\paragraph{Derivative and Initial Value.}
+The matrix exponential behaves like the scalar exponential:
+\[
+    \frac{d}{dt}e^{At}=Ae^{At}=e^{At}A,
+    \qquad
+    e^{A\cdot 0}=I
+\]
+
+\thmr{Homogeneous Solution Using the Matrix Exponential}{matrixexphomogeneous}{
+    The solution of $\mathbf{X}'=A\mathbf{X},
+        \mathbf{X}(0)=\mathbf{X}_0$
+    is
+    \[
+        \mathbf{X}(t)=e^{At}\mathbf{X}_0
+    \]
+    More generally, the general solution is
+    \[
+        \mathbf{X}(t)=e^{At}\mathbf{C}
+    \]
+}
+
+\paragraph{Nonhomogeneous Solution.}
+For constant $A$,$
+    \mathbf{X}'=A\mathbf{X}+\mathbf{F}(t),
+    \mathbf{X}(t_0)=\mathbf{X}_0,
+$
+we have
+\[
+    \mathbf{X}(t)
+    =
+    e^{A(t-t_0)}\mathbf{X}_0
+    +
+    \int_{t_0}^{t}e^{A(t-s)}\mathbf{F}(s)\,ds
+\]
+
+\paragraph{Computing $e^{At}$ by Diagonalization.}
+If $A=PDP^{-1}$, where $ D=\operatorname{diag}(\lambda_1,\ldots,\lambda_n)$ then
+\[
+    e^{At}=Pe^{Dt}P^{-1},
+    \qquad
+    e^{Dt}=\operatorname{diag}(e^{\lambda_1t},\ldots,e^{\lambda_nt})
+\]
+
+\paragraph{Computing $e^{At}$ by Laplace Transform.}
+
+\[
+    \mathcal{L}\{e^{At}\}=(sI-A)^{-1},
+    \qquad
+    e^{At}=\mathcal{L}^{-1}\{(sI-A)^{-1}\}
+\]
+
+\section{Practice Questions}
+
+\subsection{First-Order Differential Equations}
+
+\paragraph{Q1} Solve the given differential equation by separation of variables: $e^x y \frac{dy}{dx} = e^{-y} + e^{-7x-y}$ 
+\paragraph{Q2} Find the general solution of the given differential equation: $x^2y^\prime + x(x+2)y = e^x$
+\paragraph{Q3} Solve the given IVP: $(6y+2t-3)dt + (8y+6t-1)dy = 0,\quad y(-1)=2$
+\paragraph{Q4} Solve the given differential equation by finding an appropriate integrating factor: $6xy dx+(4y+9x^2)dy=0$
+\paragraph{Q5} Solve the given differential equation by using an appropriate substitution: $ydx=2(x+y)dy$
+\paragraph{Q6} Solve the given differential equation by using an appropriate substitution: $x \frac{dy}{dx} - (1+x)y = xy^2$
+\paragraph{Q7} Solve the given differential equation by using an appropriate substitution: $\frac{dy}{dx} = 4 + \sqrt{y-4x+2}$
+
+\subsection{Higher-Order Differential Equations}
+
+\paragraph{Q1} The indicated function $y_1(x)$ is a solution of the following differential equation, find $y_2(x)$: 
+$$ y^{\prime \prime}+2y^{\prime}+36y=0, \quad y_1(x)=xe^{-x}$$
+\paragraph{Q2} The indicated function $y_1(x)$ is a solution of the following differential equation, find $y_2(x)$: 
+$$  x^2 y^{\prime \prime} - 11xy^{\prime} +36y = 0, \quad y_1(x) = x^6 $$
+\paragraph{Q3} Find the general solution of the given equation: $\frac{d^3 u}{dt^3} + \frac{d^2 u}{dt^2} - 2u = 0$ 
+\paragraph{Q4} Find the general solution of the given equation: $16 \frac{d^4 y}{dx^4} + 48 \frac{d^2y}{dx^2} + 36y = 0$ 
+\paragraph{Q5} Find the general solution of the given equation: $ y^{\prime \prime} - 2y^\prime +50y = e^x \cos(7x)$ 
+\paragraph{Q6} Find the general solution of the given equation: $y^{\prime \prime} + 3y^\prime + 2y = \frac{1}{2+e^x}$ 
+\paragraph{Q6} Find the general solution of the given equation: $y^{\prime\prime} - y =e^{\frac{x}{2}} + 8 $
+\paragraph{Q7} Find the general solution of the given equation: $y^{\prime\prime} + 3y^\prime + 2y = \cos(e^x)  $
+\paragraph{Q8} Find the general solution of the given equation: $x^2y^{\prime\prime} - xy^\prime + y = 14x  $
+\paragraph{Q9} Find the general solution of the given equation: $16x^2y^{\prime\prime} + 16xy^\prime + y = 0  $
+\paragraph{Q10} Solve the given system of differential equations: $\frac{dx}{dt} = 12x + 19y, \quad \frac{dy}{dt} = x = 6y$
+\paragraph{Q11} Find the general solution of the given equation: 
+$ y^{\prime \prime} + y = \sec (x)$
+
+\subsection{Series Solutions of Linear Equations}
+\paragraph{Q1} Find two power series solutions of the given differential equation about the ordinary point $x=0$: 
+$$ y^{\prime \prime} -4xy^{\prime} + y = 0 $$
+\paragraph{Q2} Find the general solution of the given equation:  $y^{\prime \prime} - xy^{\prime} - y = 0$
+\paragraph{Q3} Find the general solution of the given equation: $ x^2 y^{\prime \prime} + x(x-2)y^\prime +(2-x)y = 0$
+
+\subsection{The Laplace Transform}
+\paragraph{Q1} Find the general solution of the given equation: $y^{\prime \prime} + 2y^\prime = \delta (t-\pi) -u(t-2\pi)$
+
+\subsection{Systems of Linear Differential Equations}
+\paragraph{Q1} Solve the given initial-value problem: \[
+\mathbf{X}'=
+\begin{pmatrix}
+\frac{1}{2} & 0 \\
+1 & -\frac{1}{2}
+\end{pmatrix}
+\mathbf{X},
+\qquad
+\mathbf{X}(0)=
+\begin{pmatrix}
+5 \\
+8
+\end{pmatrix}
+\]
+\paragraph{Q2} Find the general solution of the given system: 
+\[
+\mathbf{X}'=
+\begin{pmatrix}
+9 & -4 & 0 \\
+1 & 0 & 2 \\
+0 & 2 & 9
+\end{pmatrix}
+\mathbf{X}
+\]
+\paragraph{Q3} Find the general solution of the given system: $\frac{dx}{dt} =5x - y, \frac{dy}{dt} = 25x - 5y$
+\paragraph{Q4} Find the general solution of the given system: $\frac{dx}{dt} =8x - y, \frac{dy}{dt} = 5x + 4y$
+\paragraph{Q5} Find the general solution of the given system:
+\[
+\mathbf{x}'=
+\begin{pmatrix}
+0 & 5\\
+-1 & 6
+\end{pmatrix}\mathbf{x}
++
+\begin{pmatrix}
+16\\
+-16
+\end{pmatrix}e^t
+\]
+
+\end{document}
+
+% \chapter{Examples}
+
+% \section{Theorem System}
+
+% \defn{Definition Name}{
+%     A defintion.
+% }
+
+% \thmr{Theorem Name}{mybigthm}{
+%     A theorem.
+% }
+
+% \lem{Lemma Name}{
+%     A lemma.
+% }
+
+% \fact{
+%     A fact.
+% }
+
+% \cor{
+%     A corollary.
+% }
+
+% \prop{
+%     A proposition.
+% }
+
+% \clmp{}{
+%     A claim.
+% }{
+%     A reference to Theorem~\ref{thm:mybigthm}
+% }
+
+% \pf{
+%     Veniam velit incididunt deserunt est proident consectetur non velit ipsum voluptate nulla quis. Ea ullamco consequat non ad amet cupidatat cupidatat aliquip tempor sint ea nisi elit dolore dolore. 
+
+%     Laboris labore magna dolore eiusmod ea ex et eiusmod laboris. Et aliquip cupidatat reprehenderit id officia pariatur. 
+% }
+
+% \ex{
+%     Nostrud esse occaecat Lorem dolore laborum exercitation adipisicing eu sint sunt et. Excepteur voluptate consectetur qui ex amet esse sunt ut nostrud qui proident non. Ipsum nostrud ut elit dolor. Incididunt voluptate esse et est labore cillum proident duis.
+% }
+
+% \rmk{
+%     Some remark.
+% }
+
+% \rmkb{
+%     Some more remark.
+% }
+
+% \section{Pictures}
+
+% \begin{figure}[H]
+%     \center
+%     \includegraphics[scale=0.1]{img/loo.jpg}
+%     \caption{Waterloo, ON}
+% \end{figure}
