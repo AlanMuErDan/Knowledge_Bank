@@ -2,4 +2,4 @@
 
 A compact set of notes for rebuilding mathematical fluency.
 
-[Read the PDF](./main.pdf)
+[Read the PDF](./math.pdf)
