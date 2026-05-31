@@ -2,4 +2,7 @@
 
 A compact set of notes for rebuilding mathematical fluency.
 
-[Read the PDF](./math.pdf)
+Compiled PDFs are stored in [`build/`](./build/).
+
+- [Read the math notes](./build/math.pdf)
+- [Read the machine learning notes](./build/ml.pdf)

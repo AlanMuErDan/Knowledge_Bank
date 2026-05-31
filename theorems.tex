@@ -17,6 +17,57 @@
 %   p:              Add a short proof block for Lemma, Corollary, Proposition or Claim, e.g. lemp
 %                   For theorems, use \pf for proof blocks
 
+\tcbset{
+    kb/common block/.style={
+        enhanced,
+        breakable,
+        frame hidden,
+        boxrule=0pt,
+        sharp corners,
+        boxsep=0pt,
+        left=6mm,
+        right=5mm,
+        top=4mm,
+        bottom=4mm,
+        before skip=10pt,
+        after skip=12pt,
+        before upper={\parindent15pt\relax},
+    },
+    kb/proof block/.style={
+        kb/common block,
+        colback=black!1!white,
+        borderline west={0.9mm}{0pt}{black!55},
+    },
+    kb/accent proof/.style n args={2}{
+        kb/common block,
+        colback=#1!4!white,
+        borderline west={1mm}{0pt}{#1},
+        before upper={
+            \parindent15pt\relax
+            {\noindent\bfseries #2}\par\smallskip
+        },
+    },
+    kb/example block/.style={
+        kb/common block,
+        colback=MidnightBlue!3!white,
+        borderline west={1.2mm}{0pt}{MidnightBlue!70!black},
+        borderline north={0.3mm}{0pt}{MidnightBlue!18!white},
+    },
+    kb/example title/.style={
+        colback=MidnightBlue!75!black,
+        colframe=MidnightBlue!75!black,
+        boxrule=0pt,
+        sharp corners,
+        left=3mm,
+        right=3mm,
+        top=1.2mm,
+        bottom=1.2mm,
+    },
+}
+
+\newcounter{example}[section]
+\renewcommand{\theexample}{\thesection.\arabic{example}}
+
 % Definition
 \newtcbtheorem[number within=section]{mydefinition}{Definition}
 {
@@ -110,14 +161,10 @@
 }
 
 \newenvironment{lempf}{
-	{\noindent{\it \textbf{Proof for Lemma}}}
-	\tcolorbox[blanker,breakable,left=5mm,parbox=false,
-    before upper={\parindent15pt},
-    after skip=10pt,
-	borderline west={1mm}{0pt}{violet!20!white}]
+    \begin{tcolorbox}[kb/accent proof={violet!65!black}{Proof for Lemma.}]
 }{
-    \textcolor{violet!20!white}{\hbox{}\nobreak\hfill$\blacksquare$} 
-    \endtcolorbox
+    \hfill\textcolor{violet!65!black}{$\blacksquare$}
+    \end{tcolorbox}
 }
 
 \NewDocumentCommand{\lemp}{m+m+m}{
@@ -151,14 +198,10 @@
 }
 
 \newenvironment{corpf}{
-	{\noindent{\it \textbf{Proof for Corollary.}}}
-	\tcolorbox[blanker,breakable,left=5mm,parbox=false,
-    before upper={\parindent15pt},
-    after skip=10pt,
-	borderline west={1mm}{0pt}{orange!20!white}]
+    \begin{tcolorbox}[kb/accent proof={orange!80!black}{Proof for Corollary.}]
 }{
-    \textcolor{orange!20!white}{\hbox{}\nobreak\hfill$\blacksquare$} 
-    \endtcolorbox
+    \hfill\textcolor{orange!80!black}{$\blacksquare$}
+    \end{tcolorbox}
 }
 
 \NewDocumentCommand{\corp}{m+m+m}{
@@ -192,14 +235,10 @@
 }
 
 \newenvironment{proppf}{
-	{\noindent{\it \textbf{Proof for Proposition.}}}
-	\tcolorbox[blanker,breakable,left=5mm,parbox=false,
-    before upper={\parindent15pt},
-    after skip=10pt,
-	borderline west={1mm}{0pt}{yellow!30!white}]
+    \begin{tcolorbox}[kb/accent proof={Goldenrod!85!black}{Proof for Proposition.}]
 }{
-    \textcolor{yellow!30!white}{\hbox{}\nobreak\hfill$\blacksquare$} 
-    \endtcolorbox
+    \hfill\textcolor{Goldenrod!85!black}{$\blacksquare$}
+    \end{tcolorbox}
 }
 
 \NewDocumentCommand{\propp}{+m+m}{
@@ -234,14 +273,10 @@
 }
 
 \newenvironment{clmpf}{
-	{\noindent{\it \textbf{Proof for Claim.}}}
-	\tcolorbox[blanker,breakable,left=5mm,parbox=false,
-    before upper={\parindent15pt},
-    after skip=10pt,
-	borderline west={1mm}{0pt}{pink!30!white}]
+    \begin{tcolorbox}[kb/accent proof={Magenta!70!black}{Proof for Claim.}]
 }{
-    \textcolor{pink!30!white}{\hbox{}\nobreak\hfill$\blacksquare$} 
-    \endtcolorbox
+    \hfill\textcolor{Magenta!70!black}{$\blacksquare$}
+    \end{tcolorbox}
 }
 
 \NewDocumentCommand{\clmp}{m+m+m}{
@@ -276,28 +311,65 @@
 
 
 % Proof
-\NewDocumentCommand{\pf}{+m}{
-    \begin{proof}
-        [\noindent\textbf{Proof.}]
+\RenewDocumentEnvironment{proof}{O{\proofname}}{
+    \par
+    \pushQED{\qed}
+    \begin{tcolorbox}[kb/proof block]
+        {\noindent\bfseries #1}\par\smallskip
+        \ignorespaces
+}{
+    \popQED
+    \end{tcolorbox}
+    \par
+}
+
+\let\proofenvironment\proof
+\let\endproofenvironment\endproof
+
+\makeatletter
+\renewcommand{\proof}{
+    \@ifnextchar\bgroup{\proofcommand}{\proofenvironment}
+}
+\makeatother
+
+\NewDocumentCommand{\proofcommand}{+m}{
+    \proofenvironment
         #1
-    \end{proof}
+    \endproofenvironment
+}
+
+\NewDocumentCommand{\pf}{o+m}{
+    \IfNoValueTF{#1}{
+        \begin{proof}
+            #2
+        \end{proof}
+    }{
+        \begin{proof}[#1]
+            #2
+        \end{proof}
+    }
 }
 
 % Example
-\newenvironment{example}{%
-    \par
-    \vspace{5pt}
-	\begin{minipage}{\textwidth}
-		\noindent\textbf{Example.}
-		\tcolorbox[blanker,breakable,left=5mm,parbox=false,
-	    before upper={\parindent15pt},
-	    after skip=10pt,
-		borderline west={1mm}{0pt}{cyan!10!white}]
-}{%
-		\endtcolorbox
-	\end{minipage}
-    \vspace{5pt}
-}
+\NewDocumentEnvironment{example}{o+b}{
+    \refstepcounter{example}
+    \IfNoValueTF{#1}{
+        \def\exampletitle{Example \theexample}
+    }{
+        \def\exampletitle{Example \theexample \textbar\ #1}
+    }
+    \begin{tcolorbox}[
+        kb/example block,
+        title={\exampletitle},
+        fonttitle=\bfseries\small,
+        coltitle=white,
+        boxed title style={kb/example title},
+        attach boxed title to top left={xshift=4mm,yshift*=-\tcboxedtitleheight/2},
+        top=7mm,
+    ]
+        #2
+    \end{tcolorbox}
+}{}
 
 \NewDocumentCommand{\ex}{+m}{
     \begin{example}
