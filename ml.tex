@@ -1,0 +1,179 @@
+\documentclass[oneside]{book}
+
+% ------------------------------------------------------------------------------
+% Packages
+% ------------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{mathtools}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems, skins, breakable}
+
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+\usepackage{multicol}
+\setlength{\columnsep}{1.2em}
+
+\usepackage{graphicx}
+
+% ------------------------------------------------------------------------------
+% Page Setup
+% ------------------------------------------------------------------------------
+
+\geometry{
+    top=0.8in,
+    bottom=0.8in,
+    left=0.7in,
+    right=0.7in,
+    headheight=12pt,
+    headsep=20pt,
+    footskip=25pt
+}
+
+\setstretch{1.15}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=MidnightBlue,
+    urlcolor=RoyalBlue,
+    citecolor=ForestGreen
+}
+
+% ------------------------------------------------------------------------------
+% Variables
+% ------------------------------------------------------------------------------
+
+\def\notetitle{Machine Learning Notes}
+\def\notesubtitle{Theory, Practice, and Interview Review}
+\def\noteauthor{Erdan Mu Alan}
+\def\noteinstitution{University of Pennsylvania}
+
+% ------------------------------------------------------------------------------
+% Theorem System and User Commands
+% ------------------------------------------------------------------------------
+
+\input{theorems.tex}
+\input{commands.tex}
+
+% ------------------------------------------------------------------------------
+% Document
+% ------------------------------------------------------------------------------
+
+\begin{document}
+
+% ------------------------------------------------------------------------------
+% Title Page
+% ------------------------------------------------------------------------------
+
+\begin{titlepage}
+    \centering
+
+    \vspace*{2.2cm}
+
+    {\Huge\bfseries \notetitle \par}
+
+    \vspace{0.9cm}
+
+    \resizebox{0.88\textwidth}{!}{%
+        \itshape \notesubtitle
+    }
+
+    \vspace{2.4cm}
+
+    \vspace{1.2cm}
+
+    {\large \noteauthor \par}
+
+    \vspace{0.25cm}
+
+    {\large \noteinstitution \par}
+
+    \vfill
+\end{titlepage}
+
+% ------------------------------------------------------------------------------
+% Front Matter
+% ------------------------------------------------------------------------------
+
+\frontmatter
+\setcounter{tocdepth}{1}
+\tableofcontents
+\newpage
+
+% ------------------------------------------------------------------------------
+% Main Matter
+% ------------------------------------------------------------------------------
+
+\mainmatter
+
+% ==============================================================================
+% Part I: Foundations
+%
+% The learning problem: what ML is actually doing.
+% Covers problem formulation, generalization theory,
+% evaluation methodology, and the optimization machinery
+% that underlies every algorithm in the rest of the book.
+% ==============================================================================
+\part{Foundations}
+
+% ==============================================================================
+% Part II: Supervised Learning
+%
+% Classical algorithms for labeled data.
+% Linear models, kernel methods, tree-based models, and
+% nearest neighbors -- the workhorses of applied ML.
+% ==============================================================================
+\part{Supervised Learning}
+
+% ==============================================================================
+% Part III: Unsupervised Learning
+%
+% Learning from unlabeled data.
+% Clustering, dimensionality reduction, and density estimation.
+% ==============================================================================
+\part{Unsupervised Learning}
+
+% ==============================================================================
+% Part IV: Deep Learning
+%
+% Neural networks from first principles through modern architectures.
+% Backpropagation, training dynamics, CNNs, RNNs,
+% Transformers, and GNNs.
+% ==============================================================================
+\part{Deep Learning}
+
+% ==============================================================================
+% Part V: Generative Models
+%
+% Models that learn the data distribution.
+% VAEs, GANs, Normalizing Flows, and Diffusion Models.
+% ==============================================================================
+\part{Generative Models}
+
+% ==============================================================================
+% Part VI: Large Language Models
+%
+% The modern LLM stack end-to-end:
+% pretraining, post-training alignment, inference efficiency,
+% retrieval-augmented generation, and agentic systems.
+% ==============================================================================
+\part{Large Language Models}
+
+% ==============================================================================
+% Part VII: ML Engineering
+%
+% Turning models into products.
+% Data pipelines, experimentation, MLOps, system design,
+% and the interview questions that test all of the above.
+% ==============================================================================
+\part{ML Engineering}
+
+\end{document}

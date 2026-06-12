@@ -15,3 +15,4 @@ build/*
 *.run.xml
 *.synctex.gz
 *.toc
+/math_imgs 

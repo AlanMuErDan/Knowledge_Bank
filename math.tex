@@ -114,6 +114,944 @@
 
 \mainmatter
 
+\chapter{Linear Algebra}
+
+\section{Systems of Linear Equations}
+
+
+\defn{Linear Equation}{
+    For $n \geq 1$, a \emph{linear equation} in the variables $x_1, \ldots, x_n$ is an equation of the form
+    \[
+        a_1 x_1 + a_2 x_2 + \cdots + a_n x_n = b
+    \]
+    where $b$ and the coefficients $a_1, \ldots, a_n$ are real (or complex) numbers. A \emph{system of linear equations} (or \emph{linear system}) is a collection of one or more linear equations involving the same variables.
+}
+
+\rmk{
+    Equations involving products, powers, or nonlinear functions of variables are \emph{not} linear. For example, $x_1 x_2 + 3x_2 = 4$ and $\sqrt{x_1} + x_2 = 1$ are not linear equations.
+}
+
+\defn{Solution and Solution Set}{
+    A \emph{solution} of a linear system is an ordered list $(s_1, s_2, \ldots, s_n)$ of numbers that makes each equation a true statement when substituted for $x_1, \ldots, x_n$. The set of all solutions is called the \emph{solution set}. Two linear systems are \emph{equivalent} if they have the same solution set.
+}
+
+\paragraph{Consistency.}
+A linear system is \emph{consistent} if it has at least one solution (either exactly one or infinitely many). It is \emph{inconsistent} if it has no solution. A consistent system has either exactly one solution or infinitely many solutions.
+
+\defn{Matrix Notation}{
+    Given a linear system with $m$ equations and $n$ unknowns, the \emph{coefficient matrix} is the $m \times n$ matrix of coefficients. The \emph{augmented matrix} appends the column of constants to the right of the coefficient matrix, separated by a vertical bar.
+
+    For the system
+    \[
+    \begin{cases}
+        a_{11}x_1 + \cdots + a_{1n}x_n = b_1 \\
+        \vdots \\
+        a_{m1}x_1 + \cdots + a_{mn}x_n = b_m
+    \end{cases}
+    \]
+    the augmented matrix is
+    \[
+        \begin{bmatrix} a_{11} & \cdots & a_{1n} & b_1 \\ \vdots & \ddots & \vdots & \vdots \\ a_{m1} & \cdots & a_{mn} & b_m \end{bmatrix}
+    \]
+}
+
+\paragraph{Elementary Row Operations.}
+Three operations produce equivalent systems:
+\begin{enumerate}
+    \item \emph{(Interchange)} Swap two rows: $R_i \leftrightarrow R_j$.
+    \item \emph{(Scaling)} Multiply a row by a nonzero constant: $cR_i \to R_i$.
+    \item \emph{(Replacement)} Replace one row by the sum of itself and a scalar multiple of another row: $R_i + cR_j \to R_i$.
+\end{enumerate}
+Two matrices are \emph{row equivalent} if one can be obtained from the other by a sequence of elementary row operations.
+
+\defn{Echelon Forms}{
+    A matrix is in \emph{(row) echelon form} (REF) if:
+    \begin{enumerate}
+        \item All nonzero rows are above any all-zero rows.
+        \item Each leading entry (leftmost nonzero entry) of a row lies strictly to the right of the leading entry of the row above it.
+        \item All entries below a leading entry in a column are zeros.
+    \end{enumerate}
+    A matrix is in \emph{reduced (row) echelon form} (RREF) if additionally:
+    \begin{enumerate}
+        \setcounter{enumi}{3}
+        \item Each leading entry is 1.
+        \item Each leading 1 is the only nonzero entry in its column.
+    \end{enumerate}
+}
+
+\thmr{Uniqueness of RREF}{rref-unique}{
+    Each matrix is row equivalent to one and only one reduced echelon matrix.
+}
+
+\defn{Pivot Positions}{
+    A \emph{pivot position} in a matrix $A$ is a location that corresponds to a leading 1 in the RREF of $A$. A \emph{pivot column} is a column containing a pivot position. The nonzero number used to create zeros via row operations is called a \emph{pivot}.
+}
+
+\paragraph{The Row Reduction Algorithm.}
+\begin{enumerate}
+    \item \emph{(Forward phase)} Find the leftmost nonzero column; select a nonzero entry as pivot (interchange rows if needed); create zeros below the pivot using replacement; cover the pivot row and repeat on the remaining submatrix.
+    \item \emph{(Backward phase)} Working from the rightmost pivot upward, scale each pivot row to make the pivot 1; use replacement to create zeros above each pivot.
+\end{enumerate}
+The result is the RREF.
+
+\paragraph{Basic and Free Variables.}
+After row reducing the augmented matrix, variables corresponding to pivot columns are \emph{basic variables}; all other variables are \emph{free variables}. Free variables may take any value; basic variables are then determined uniquely.
+
+\thmr{Existence and Uniqueness Theorem}{lin-exist-unique}{
+    A linear system is consistent if and only if the rightmost column of the augmented matrix is \emph{not} a pivot column, i.e., no row of the form $[\,0 \; \cdots \; 0 \mid c\,]$ with $c \neq 0$ appears in the echelon form. If the system is consistent, it has:
+    \begin{itemize}
+        \item a \emph{unique} solution if there are no free variables, or
+        \item \emph{infinitely many} solutions if there is at least one free variable.
+    \end{itemize}
+}
+
+\ex{
+    Solve the system
+    \[
+    \begin{cases}
+        x_1 - 2x_2 + x_3 = 0 \\
+        2x_2 - 8x_3 = 8 \\
+        5x_1 - 5x_3 = 10
+    \end{cases}
+    \]
+    Row reducing the augmented matrix yields
+    \[
+    \begin{bmatrix} 1 & -2 & 1 & 0 \\ 0 & 2 & -8 & 8 \\ 5 & 0 & -5 & 10 \end{bmatrix}
+    \longrightarrow
+    \begin{bmatrix} 1 & 0 & 0 & 1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & -1 \end{bmatrix}
+    \]
+    The unique solution is $x_1 = 1$, $x_2 = 0$, $x_3 = -1$.
+}
+
+\section{Vector Equations and Matrix Equations}
+
+\subsection{Vectors in $\R^n$}
+
+\defn{Vectors in $\R^n$}{
+    A vector in $\R^n$ is an $n \times 1$ column matrix
+    \[
+        \vect{v} = \begin{bmatrix} v_1 \\ v_2 \\ \vdots \\ v_n \end{bmatrix}
+    \]
+    The set $\R^n$ consists of all such $n$-dimensional column vectors. The \emph{zero vector} $\vect{0}$ has all entries equal to zero.
+}
+
+\paragraph{Vector Operations.}
+\begin{itemize}
+    \item \emph{Addition:} $\vect{u} + \vect{v} = \begin{bmatrix} u_1 + v_1 \\ \vdots \\ u_n + v_n \end{bmatrix}$
+    \item \emph{Scalar multiplication:} $c\vect{u} = \begin{bmatrix} cu_1 \\ \vdots \\ cu_n \end{bmatrix}$
+\end{itemize}
+
+\prop{
+    \textbf{(Algebraic properties of $\R^n$)} For all $\vect{u}, \vect{v}, \vect{w} \in \R^n$ and scalars $c, d$:
+    \begin{align*}
+        & \vect{u} + \vect{v} = \vect{v} + \vect{u} & & (\vect{u} + \vect{v}) + \vect{w} = \vect{u} + (\vect{v} + \vect{w}) \\
+        & \vect{u} + \vect{0} = \vect{u} & & \vect{u} + (-\vect{u}) = \vect{0} \\
+        & c(\vect{u} + \vect{v}) = c\vect{u} + c\vect{v} & & (c+d)\vect{u} = c\vect{u} + d\vect{u} \\
+        & c(d\vect{u}) = (cd)\vect{u} & & 1\vect{u} = \vect{u}
+    \end{align*}
+}
+
+\subsection{Linear Combinations and Span}
+
+\defn{Linear Combination}{
+    Given vectors $\vect{v}_1, \ldots, \vect{v}_p \in \R^n$ and scalars $c_1, \ldots, c_p$, the vector
+    \[
+        \vect{y} = c_1\vect{v}_1 + c_2\vect{v}_2 + \cdots + c_p\vect{v}_p
+    \]
+    is called a \emph{linear combination} of $\vect{v}_1, \ldots, \vect{v}_p$ with \emph{weights} $c_1, \ldots, c_p$. The set of all linear combinations of $\vect{v}_1, \ldots, \vect{v}_p$ is denoted $\mathrm{Span}\{\vect{v}_1, \ldots, \vect{v}_p\}$ and called the \emph{subset of $\R^n$ spanned by} $\vect{v}_1, \ldots, \vect{v}_p$.
+}
+
+\rmkb{
+    Asking whether $\vect{b}$ is in $\mathrm{Span}\{\vect{v}_1, \ldots, \vect{v}_p\}$ is equivalent to asking whether the system with augmented matrix $[\vect{v}_1 \; \cdots \; \vect{v}_p \mid \vect{b}]$ is consistent.
+}
+
+\subsection{The Matrix Equation $A\vect{x} = \vect{b}$}
+
+\defn{Matrix--Vector Product}{
+    If $A$ is an $m \times n$ matrix with columns $\vect{a}_1, \ldots, \vect{a}_n$, and $\vect{x} \in \R^n$, then
+    \[
+        A\vect{x} = x_1\vect{a}_1 + x_2\vect{a}_2 + \cdots + x_n\vect{a}_n = \sum_{i=1}^n x_i\vect{a}_i
+    \]
+    That is, $A\vect{x}$ is a linear combination of the columns of $A$ using the entries of $\vect{x}$ as weights. The product $A\vect{x}$ is defined only when the number of columns of $A$ equals the number of entries in $\vect{x}$.
+}
+
+\prop{
+    The vector equation $x_1\vect{v}_1 + \cdots + x_p\vect{v}_p = \vect{b}$ has the same solution set as $A\vect{x} = \vect{b}$, where $A = [\vect{v}_1 \; \cdots \; \vect{v}_p]$.
+}
+
+\thmr{Spanning Criterion}{spanning-criterion}{
+    Let $A$ be an $m \times n$ matrix. The following are logically equivalent:
+    \begin{enumerate}
+        \item[(a)] For each $\vect{b} \in \R^m$, $A\vect{x} = \vect{b}$ has a solution.
+        \item[(b)] Each $\vect{b} \in \R^m$ is a linear combination of the columns of $A$.
+        \item[(c)] The columns of $A$ span $\R^m$.
+        \item[(d)] $A$ has a pivot position in every row.
+    \end{enumerate}
+}
+
+\paragraph{Dot Product.}
+For vectors $\vect{u}, \vect{v} \in \R^n$, the \emph{dot product} (inner product) is
+\[
+    \vect{u} \cdot \vect{v} = \vect{u}^T\vect{v} = u_1v_1 + u_2v_2 + \cdots + u_nv_n
+\]
+If $A$ is $m \times n$ with rows $\vect{r}_1^T, \ldots, \vect{r}_m^T$, then the $i$th entry of $A\vect{x}$ equals $\vect{r}_i \cdot \vect{x}$.
+
+\section{Solution Sets of Linear Systems}
+
+\subsection{Homogeneous Systems}
+
+\defn{Homogeneous Linear System}{
+    A linear system is \emph{homogeneous} if it can be written as $A\vect{x} = \vect{0}$. Such a system always has the \emph{trivial solution} $\vect{x} = \vect{0}$. A \emph{nontrivial solution} is a nonzero vector satisfying $A\vect{x} = \vect{0}$.
+}
+
+\thm{Nontrivial Solutions of Homogeneous Systems}{
+    The homogeneous equation $A\vect{x} = \vect{0}$ has a nontrivial solution if and only if the equation has at least one free variable.
+}
+
+\paragraph{Parametric Vector Form.}
+When a homogeneous system $A\vect{x} = \vect{0}$ has free variables $x_{j_1}, \ldots, x_{j_k}$, the solution set can be written as
+\[
+    \vect{x} = x_{j_1}\vect{v}_1 + x_{j_2}\vect{v}_2 + \cdots + x_{j_k}\vect{v}_k
+\]
+This is the \emph{parametric vector form} of the solution. The solution set $\mathrm{Span}\{\vect{v}_1, \ldots, \vect{v}_k\}$ is a subspace of $\R^n$.
+
+\ex{
+    Describe the solution set of $3x_1 + 5x_2 - 4x_3 = 0$, $-3x_1 - 2x_2 + 4x_3 = 0$, $6x_1 + x_2 - 8x_3 = 0$. Row reduction gives
+    \[
+        \begin{bmatrix} 3 & 5 & -4 \\ -3 & -2 & 4 \\ 6 & 1 & -8 \end{bmatrix} \longrightarrow \begin{bmatrix} 1 & 0 & -4/3 \\ 0 & 1 & 0 \\ 0 & 0 & 0 \end{bmatrix}
+    \]
+    With $x_3$ free, $x_1 = \frac{4}{3}x_3$ and $x_2 = 0$. The solution set is $\mathrm{Span}\!\left\{\begin{bmatrix}4/3\\0\\1\end{bmatrix}\right\}$, a line through the origin.
+}
+
+\subsection{Nonhomogeneous Systems}
+
+\paragraph{Solution Structure.}
+Suppose $A\vect{x} = \vect{b}$ is consistent and $\vect{p}$ is a particular solution. Then the solution set of $A\vect{x} = \vect{b}$ equals
+\[
+    \{\vect{p} + \vect{v}_h : \vect{v}_h \in \text{Nul}\,A\}
+\]
+where $\text{Nul}\,A$ is the solution set of the associated homogeneous equation $A\vect{x} = \vect{0}$. Geometrically, the solution set is a translate of $\text{Nul}\,A$ by $\vect{p}$.
+
+\subsection{Linear Independence}
+
+\defn{Linear Independence}{
+    An indexed set $\{\vect{v}_1, \ldots, \vect{v}_p\}$ in $\R^n$ is \emph{linearly independent} if the vector equation
+    \[
+        x_1\vect{v}_1 + x_2\vect{v}_2 + \cdots + x_p\vect{v}_p = \vect{0}
+    \]
+    has only the trivial solution $x_1 = x_2 = \cdots = x_p = 0$. The set is \emph{linearly dependent} if there exist weights $c_1, \ldots, c_p$, not all zero, such that $c_1\vect{v}_1 + \cdots + c_p\vect{v}_p = \vect{0}$.
+}
+
+\prop{
+    The columns of a matrix $A$ are linearly independent if and only if $A\vect{x} = \vect{0}$ has only the trivial solution.
+}
+
+\thm{Linear Dependence Characterization}{
+    An indexed set $S = \{\vect{v}_1, \ldots, \vect{v}_p\}$ of two or more vectors is linearly dependent if and only if at least one of the vectors in $S$ is a linear combination of the others. In particular, if $S$ is linearly dependent and $\vect{v}_1 \neq \vect{0}$, then some $\vect{v}_j$ (with $j > 1$) is a linear combination of $\vect{v}_1, \ldots, \vect{v}_{j-1}$.
+}
+
+\thm{Too Many Vectors}{
+    If a set $\{\vect{v}_1, \ldots, \vect{v}_p\} \subset \R^n$ has more vectors than entries ($p > n$), then the set is linearly dependent.
+}
+
+\begin{proof}
+Let $A = [\vect{v}_1 \; \cdots \; \vect{v}_p]$. Since $A$ is $n \times p$ with $p > n$, the equation $A\vect{x} = \vect{0}$ has more unknowns than equations, so there must be a free variable. Therefore $A\vect{x} = \vect{0}$ has a nontrivial solution and the columns are linearly dependent.
+\end{proof}
+
+\section{Linear Transformations}
+
+\defn{Transformation}{
+    A \emph{transformation} (or \emph{function} or \emph{mapping}) $T : \R^n \to \R^m$ is a rule that assigns to each vector $\vect{x} \in \R^n$ a vector $T(\vect{x}) \in \R^m$. The set $\R^n$ is the \emph{domain} and $\R^m$ is the \emph{codomain}. The vector $T(\vect{x})$ is the \emph{image} of $\vect{x}$, and the set of all images is the \emph{range} of $T$.
+}
+
+\defn{Linear Transformation}{
+    A transformation $T : \R^n \to \R^m$ is \emph{linear} if for all $\vect{u}, \vect{v} \in \R^n$ and all scalars $c$:
+    \begin{enumerate}
+        \item $T(\vect{u} + \vect{v}) = T(\vect{u}) + T(\vect{v})$
+        \item $T(c\vect{u}) = cT(\vect{u})$
+    \end{enumerate}
+    Equivalently, $T(c\vect{u} + d\vect{v}) = cT(\vect{u}) + dT(\vect{v})$ for all $\vect{u}, \vect{v}$ and scalars $c, d$.
+}
+
+\rmk{
+    Every matrix transformation $\vect{x} \mapsto A\vect{x}$ is linear. Conversely, every linear transformation $T : \R^n \to \R^m$ is a matrix transformation.
+}
+
+\defn{Standard Matrix}{
+    Let $T : \R^n \to \R^m$ be a linear transformation. The \emph{standard matrix} of $T$ is the $m \times n$ matrix
+    \[
+        A = [T(\vect{e}_1) \; T(\vect{e}_2) \; \cdots \; T(\vect{e}_n)]
+    \]
+    where $\vect{e}_1, \ldots, \vect{e}_n$ are the standard basis vectors of $\R^n$. Then $T(\vect{x}) = A\vect{x}$ for all $\vect{x} \in \R^n$.
+}
+
+\paragraph{Geometric Transformations of $\R^2$.}
+Common linear transformations with their standard matrices:
+\begin{itemize}
+    \item \emph{Reflection over the $x_1$-axis:} $A = \begin{bmatrix}1 & 0 \\ 0 & -1\end{bmatrix}$
+    \item \emph{Rotation by angle $\theta$:} $A = \begin{bmatrix}\cos\theta & -\sin\theta \\ \sin\theta & \cos\theta\end{bmatrix}$
+    \item \emph{Projection onto $x_1$-axis:} $A = \begin{bmatrix}1 & 0 \\ 0 & 0\end{bmatrix}$
+    \item \emph{Scaling by $c$:} $A = \begin{bmatrix}c & 0 \\ 0 & c\end{bmatrix}$
+\end{itemize}
+
+\thmr{One-to-One and Onto}{lin-trans-onto}{
+    Let $T : \R^n \to \R^m$ be a linear transformation with standard matrix $A$. Then:
+    \begin{enumerate}
+        \item $T$ is \emph{one-to-one} if and only if $A\vect{x} = \vect{0}$ has only the trivial solution (equivalently, the columns of $A$ are linearly independent).
+        \item $T$ maps $\R^n$ \emph{onto} $\R^m$ if and only if the columns of $A$ span $\R^m$ (equivalently, $A$ has a pivot in every row).
+    \end{enumerate}
+}
+
+\section{Matrix Operations and Invertibility}
+
+\subsection{Matrix Operations}
+
+\defn{Matrix Addition and Scalar Multiplication}{
+    If $A$ and $B$ are $m \times n$ matrices and $r$ is a scalar, the \emph{sum} $A + B$ is the $m \times n$ matrix with entries $(A+B)_{ij} = a_{ij} + b_{ij}$, and the \emph{scalar multiple} $rA$ has entries $(rA)_{ij} = ra_{ij}$.
+}
+
+\defn{Matrix Multiplication}{
+    If $A$ is $m \times n$ and $B$ is $n \times p$ with columns $\vect{b}_1, \ldots, \vect{b}_p$, the product $AB$ is the $m \times p$ matrix
+    \[
+        AB = [A\vect{b}_1 \; A\vect{b}_2 \; \cdots \; A\vect{b}_p]
+    \]
+    The $(i,j)$-entry of $AB$ is $\sum_{k=1}^n a_{ik}b_{kj}$ (dot product of the $i$th row of $A$ with the $j$th column of $B$).
+}
+
+\rmkb{
+    Matrix multiplication corresponds to the composition of linear transformations: if $T(\vect{x}) = A\vect{x}$ and $S(\vect{x}) = B\vect{x}$, then $(T \circ S)(\vect{x}) = A(B\vect{x}) = (AB)\vect{x}$.
+}
+
+\prop{
+    \textbf{(Properties of matrix operations)} Let $A, B, C$ be matrices of compatible sizes and $r, s$ scalars:
+    \begin{align*}
+        &A(BC) = (AB)C & &A(B+C) = AB + AC \\
+        &(B+C)A = BA + CA & &r(AB) = (rA)B = A(rB) \\
+        &(AB)^T = B^T A^T
+    \end{align*}
+    In general, $AB \neq BA$; matrix multiplication is \emph{not} commutative.
+}
+
+\defn{Transpose}{
+    The \emph{transpose} of an $m \times n$ matrix $A$ is the $n \times m$ matrix $A^T$ whose $(i,j)$-entry is the $(j,i)$-entry of $A$. The rows of $A$ become the columns of $A^T$.
+}
+
+\defn{Identity Matrix}{
+    The $n \times n$ \emph{identity matrix} $I_n$ has 1s on the main diagonal and 0s elsewhere: $(I_n)_{ij} = 1$ if $i = j$ and $0$ otherwise. It satisfies $A I_n = A$ and $I_m A = A$ for any $m \times n$ matrix $A$.
+}
+
+\subsection{The Inverse of a Matrix}
+
+\defn{Invertible Matrix}{
+    An $n \times n$ matrix $A$ is \emph{invertible} (or \emph{nonsingular}) if there exists an $n \times n$ matrix $A^{-1}$ such that
+    \[
+        A^{-1}A = I_n \quad \text{and} \quad AA^{-1} = I_n
+    \]
+    A matrix that is not invertible is called \emph{singular}.
+}
+
+\thmr{$2 \times 2$ Inverse Formula}{twobytwo-inverse}{
+    Let $A = \begin{bmatrix}a & b \\ c & d\end{bmatrix}$. If $ad - bc \neq 0$, then $A$ is invertible and
+    \[
+        A^{-1} = \frac{1}{ad-bc}\begin{bmatrix}d & -b \\ -c & a\end{bmatrix}
+    \]
+    If $ad - bc = 0$, then $A$ is not invertible. The quantity $\det A = ad - bc$ is called the \emph{determinant} of $A$.
+}
+
+\thm{Properties of Invertible Matrices}{
+    \begin{enumerate}
+        \item[(a)] If $A$ is invertible, so is $A^{-1}$, and $(A^{-1})^{-1} = A$.
+        \item[(b)] If $A$ and $B$ are invertible $n \times n$ matrices, so is $AB$, and $(AB)^{-1} = B^{-1}A^{-1}$.
+        \item[(c)] If $A$ is invertible, so is $A^T$, and $(A^T)^{-1} = (A^{-1})^T$.
+    \end{enumerate}
+}
+
+\begin{proof}
+(b): Compute $(AB)(B^{-1}A^{-1}) = A(BB^{-1})A^{-1} = AIA^{-1} = AA^{-1} = I$. Similarly $(B^{-1}A^{-1})(AB) = I$.
+
+\noindent(c): $(A^{-1})^T A^T = (AA^{-1})^T = I^T = I$, and $A^T(A^{-1})^T = (A^{-1}A)^T = I$.
+\end{proof}
+
+\paragraph{Algorithm for Finding $A^{-1}$.}
+Row reduce the augmented matrix $[A \mid I]$. If $A$ is row equivalent to $I$, then $[A \mid I]$ is row equivalent to $[I \mid A^{-1}]$. Otherwise $A$ is not invertible.
+
+\thmr{The Invertible Matrix Theorem}{invertible-matrix-theorem}{
+    Let $A$ be an $n \times n$ matrix. The following statements are all equivalent:
+    \begin{enumerate}
+        \item[(a)] $A$ is invertible.
+        \item[(b)] $A$ is row equivalent to $I_n$.
+        \item[(c)] $A$ has $n$ pivot positions.
+        \item[(d)] $A\vect{x} = \vect{0}$ has only the trivial solution.
+        \item[(e)] The columns of $A$ form a linearly independent set.
+        \item[(f)] The linear transformation $\vect{x} \mapsto A\vect{x}$ is one-to-one.
+        \item[(g)] $A\vect{x} = \vect{b}$ has exactly one solution for each $\vect{b} \in \R^n$.
+        \item[(h)] The columns of $A$ span $\R^n$.
+        \item[(i)] $\vect{x} \mapsto A\vect{x}$ maps $\R^n$ onto $\R^n$.
+        \item[(j)] There is an $n \times n$ matrix $C$ with $CA = I$.
+        \item[(k)] There is an $n \times n$ matrix $D$ with $AD = I$.
+        \item[(l)] $A^T$ is invertible.
+    \end{enumerate}
+}
+
+\section{Determinants}
+
+\subsection{Definition via Cofactor Expansion}
+
+\defn{Cofactor Expansion}{
+    For an $n \times n$ matrix $A$, the \emph{$(i,j)$-cofactor} is
+    \[
+        C_{ij} = (-1)^{i+j} \det A_{ij}
+    \]
+    where $A_{ij}$ is the $(n-1) \times (n-1)$ submatrix obtained by deleting row $i$ and column $j$ from $A$. The \emph{determinant} of $A$ is defined recursively by expansion along any row or column:
+    \[
+        \det A = a_{i1}C_{i1} + a_{i2}C_{i2} + \cdots + a_{in}C_{in} \quad \text{(expansion along row }i\text{)}
+    \]
+    For a $1 \times 1$ matrix, $\det[a] = a$. For a $2 \times 2$ matrix, $\det\begin{bmatrix}a&b\\c&d\end{bmatrix} = ad-bc$.
+}
+
+\ex{
+    \textbf{Rule of Sarrus} for $3\times 3$ matrices: given $A = [a_{ij}]$,
+    \[
+        \det A = a_{11}a_{22}a_{33} + a_{12}a_{23}a_{31} + a_{13}a_{21}a_{32}
+                 - a_{11}a_{23}a_{32} - a_{12}a_{21}a_{33} - a_{13}a_{22}a_{31}
+    \]
+    which equals $a_{11}(a_{22}a_{33}-a_{23}a_{32}) - a_{12}(a_{21}a_{33}-a_{23}a_{31}) + a_{13}(a_{21}a_{32}-a_{22}a_{31})$.
+}
+
+\subsection{Properties of Determinants}
+
+\thmr{Row Operations and Determinants}{det-row-ops}{
+    Let $A$ be an $n \times n$ matrix.
+    \begin{enumerate}
+        \item[(a)] \emph{(Replacement)} If a multiple of one row is added to another row, the determinant is unchanged.
+        \item[(b)] \emph{(Interchange)} Swapping two rows multiplies the determinant by $-1$.
+        \item[(c)] \emph{(Scaling)} Multiplying a row by a scalar $k$ multiplies the determinant by $k$.
+    \end{enumerate}
+}
+
+\prop{
+    $\det A = 0$ if and only if $A$ is not invertible (singular). Equivalently, $A$ is invertible if and only if $\det A \neq 0$.
+}
+
+\thm{Multiplicative Property}{
+    If $A$ and $B$ are $n \times n$ matrices, then $\det(AB) = (\det A)(\det B)$.
+}
+
+\prop{
+    $\det A^T = \det A$.
+}
+
+\subsection{Cramer's Rule and the Adjugate}
+
+\thmr{Cramer's Rule}{cramers-rule}{
+    Let $A$ be an invertible $n \times n$ matrix. For any $\vect{b} \in \R^n$, the unique solution $\vect{x}$ of $A\vect{x} = \vect{b}$ has entries
+    \[
+        x_i = \frac{\det A_i(\vect{b})}{\det A}, \quad i = 1, 2, \ldots, n
+    \]
+    where $A_i(\vect{b})$ is the matrix obtained from $A$ by replacing the $i$th column by $\vect{b}$.
+}
+
+\defn{Adjugate}{
+    The \emph{adjugate} (or \emph{classical adjoint}) of $A$ is the transpose of the cofactor matrix:
+    \[
+        \mathrm{adj}\, A = (C_{ij})^T, \quad \text{so } (\mathrm{adj}\, A)_{ij} = C_{ji}
+    \]
+}
+
+\thm{Adjugate Formula for the Inverse}{
+    If $A$ is invertible, then $A^{-1} = \dfrac{1}{\det A}\,\mathrm{adj}\,A$.
+}
+
+\subsection{Geometric Interpretation}
+
+\thm{Determinant as Area and Volume}{
+    If $A$ is a $2 \times 2$ matrix, the area of the parallelogram determined by the columns of $A$ is $|\det A|$. If $A$ is a $3 \times 3$ matrix, the volume of the parallelepiped determined by the columns of $A$ is $|\det A|$.
+
+    More generally, if $T : \R^2 \to \R^2$ is determined by a $2\times 2$ matrix $A$ and $S$ is a region in $\R^2$, then $\{\text{area of }T(S)\} = |\det A| \cdot \{\text{area of }S\}$.
+}
+
+\section{Vector Spaces and Subspaces}
+
+\subsection{Vector Spaces}
+
+\defn{Vector Space}{
+    A \emph{vector space} is a nonempty set $V$ together with two operations—addition $+: V \times V \to V$ and scalar multiplication $\cdot : \R \times V \to V$—satisfying the following ten axioms for all $\vect{u}, \vect{v}, \vect{w} \in V$ and all scalars $c, d$:
+    \begin{enumerate}
+        \item $\vect{u} + \vect{v} \in V$
+        \item $\vect{u} + \vect{v} = \vect{v} + \vect{u}$
+        \item $(\vect{u}+\vect{v})+\vect{w} = \vect{u}+(\vect{v}+\vect{w})$
+        \item There exists $\vect{0} \in V$ such that $\vect{u}+\vect{0} = \vect{u}$
+        \item For each $\vect{u}$ there exists $-\vect{u}$ with $\vect{u}+(-\vect{u}) = \vect{0}$
+        \item $c\vect{u} \in V$
+        \item $c(\vect{u}+\vect{v}) = c\vect{u}+c\vect{v}$
+        \item $(c+d)\vect{u} = c\vect{u}+d\vect{u}$
+        \item $c(d\vect{u}) = (cd)\vect{u}$
+        \item $1\vect{u} = \vect{u}$
+    \end{enumerate}
+}
+
+\ex{
+    Examples of vector spaces:
+    \begin{itemize}
+        \item $\R^n$ with standard addition and scalar multiplication.
+        \item $\mathcal{P}_n$: polynomials of degree at most $n$, with pointwise addition and scalar multiplication.
+        \item $\mathcal{P}$: all polynomials (infinite-dimensional).
+        \item $M_{m \times n}$: all $m \times n$ real matrices.
+        \item The space of all real-valued continuous functions on an interval.
+    \end{itemize}
+}
+
+\prop{
+    For each $\vect{u} \in V$ and scalar $c$: \quad $0\vect{u} = \vect{0}$, \quad $c\vect{0} = \vect{0}$, \quad $(-1)\vect{u} = -\vect{u}$.
+}
+
+\subsection{Subspaces}
+
+\defn{Subspace}{
+    A \emph{subspace} of a vector space $V$ is a subset $H \subseteq V$ satisfying:
+    \begin{enumerate}
+        \item[(a)] $\vect{0} \in H$.
+        \item[(b)] For all $\vect{u}, \vect{v} \in H$: $\vect{u}+\vect{v} \in H$ (closed under addition).
+        \item[(c)] For all $\vect{u} \in H$ and scalars $c$: $c\vect{u} \in H$ (closed under scalar multiplication).
+    \end{enumerate}
+    A subspace is itself a vector space under the same operations.
+}
+
+\thm{Span is a Subspace}{
+    If $\vect{v}_1, \ldots, \vect{v}_p$ are in a vector space $V$, then $\mathrm{Span}\{\vect{v}_1, \ldots, \vect{v}_p\}$ is a subspace of $V$.
+}
+
+\subsection{Null Space, Column Space, and Row Space}
+
+\defn{Null Space}{
+    The \emph{null space} of an $m \times n$ matrix $A$, written $\mathrm{Nul}\, A$, is the set of all solutions of $A\vect{x} = \vect{0}$:
+    \[
+        \mathrm{Nul}\, A = \{\vect{x} \in \R^n : A\vect{x} = \vect{0}\}
+    \]
+}
+
+\thm{Null Space is a Subspace}{
+    $\mathrm{Nul}\, A$ is a subspace of $\R^n$.
+}
+
+\begin{proof}
+$A\vect{0} = \vect{0}$, so $\vect{0} \in \mathrm{Nul}\, A$. If $\vect{u}, \vect{v} \in \mathrm{Nul}\, A$ then $A(\vect{u}+\vect{v}) = A\vect{u}+A\vect{v} = \vect{0}$, so $\vect{u}+\vect{v} \in \mathrm{Nul}\, A$. If $\vect{u} \in \mathrm{Nul}\, A$ then $A(c\vect{u}) = cA\vect{u} = \vect{0}$, so $c\vect{u} \in \mathrm{Nul}\, A$.
+\end{proof}
+
+\defn{Column Space}{
+    The \emph{column space} of an $m \times n$ matrix $A$, written $\mathrm{Col}\, A$, is the set of all linear combinations of the columns of $A$:
+    \[
+        \mathrm{Col}\, A = \mathrm{Span}\{\vect{a}_1, \ldots, \vect{a}_n\} = \{A\vect{x} : \vect{x} \in \R^n\}
+    \]
+    This is a subspace of $\R^m$. The equation $A\vect{x} = \vect{b}$ is consistent if and only if $\vect{b} \in \mathrm{Col}\, A$.
+}
+
+\defn{Row Space}{
+    The \emph{row space} of an $m \times n$ matrix $A$, written $\mathrm{Row}\, A$, is the subspace of $\R^n$ spanned by the rows of $A$. Note that $\mathrm{Row}\, A = \mathrm{Col}\, A^T$.
+}
+
+\paragraph{Contrast Between Nul $A$ and Col $A$.}
+For an $m \times n$ matrix $A$: $\mathrm{Nul}\, A$ is a subspace of $\R^n$ (involving columns), while $\mathrm{Col}\, A$ is a subspace of $\R^m$ (involving rows in the range).
+
+\subsection{Bases}
+
+\defn{Basis}{
+    A \emph{basis} for a vector space $V$ is a linearly independent set $\mathcal{B} = \{\vect{b}_1, \ldots, \vect{b}_n\}$ that spans $V$.
+}
+
+\ex{
+    The \emph{standard basis} for $\R^n$ is $\{\vect{e}_1, \ldots, \vect{e}_n\}$, the columns of $I_n$. The standard basis for $\mathcal{P}_n$ is $\{1, t, t^2, \ldots, t^n\}$.
+}
+
+\paragraph{Bases for Nul $A$ and Col $A$.}
+\begin{itemize}
+    \item A basis for $\mathrm{Nul}\, A$: solve $A\vect{x} = \vect{0}$ in parametric vector form; the spanning vectors form a basis.
+    \item A basis for $\mathrm{Col}\, A$: the pivot columns of $A$ form a basis for $\mathrm{Col}\, A$.
+    \item A basis for $\mathrm{Row}\, A$: the nonzero rows of any echelon form of $A$ form a basis for $\mathrm{Row}\, A$.
+\end{itemize}
+
+\thm{Spanning Set Theorem}{
+    Let $S = \{\vect{v}_1, \ldots, \vect{v}_p\}$ be a set in a vector space $V$ with $H = \mathrm{Span}\,S$.
+    \begin{enumerate}
+        \item[(a)] If one vector in $S$, say $\vect{v}_k$, is a linear combination of the others, then $\mathrm{Span}\{S \setminus \{\vect{v}_k\}\} = H$.
+        \item[(b)] If $H \neq \{\vect{0}\}$, some subset of $S$ is a basis for $H$.
+    \end{enumerate}
+}
+
+\section{Coordinate Systems and Dimension}
+
+\subsection{Coordinate Vectors}
+
+\thmr{Unique Representation Theorem}{unique-rep}{
+    Let $\mathcal{B} = \{\vect{b}_1, \ldots, \vect{b}_n\}$ be a basis for a vector space $V$. Then for each $\vect{x} \in V$, there exists a unique set of scalars $c_1, \ldots, c_n$ such that
+    \[
+        \vect{x} = c_1\vect{b}_1 + c_2\vect{b}_2 + \cdots + c_n\vect{b}_n
+    \]
+}
+
+\defn{Coordinate Vector}{
+    Suppose $\mathcal{B} = \{\vect{b}_1, \ldots, \vect{b}_n\}$ is a basis for $V$ and $\vect{x} = c_1\vect{b}_1 + \cdots + c_n\vect{b}_n$. The \emph{$\mathcal{B}$-coordinate vector} of $\vect{x}$ is
+    \[
+        [\vect{x}]_{\mathcal{B}} = \begin{bmatrix}c_1\\\vdots\\c_n\end{bmatrix} \in \R^n
+    \]
+    The \emph{change-of-coordinates matrix} from $\mathcal{B}$ to the standard basis is $P_{\mathcal{B}} = [\vect{b}_1 \; \cdots \; \vect{b}_n]$, and $\vect{x} = P_{\mathcal{B}}[\vect{x}]_{\mathcal{B}}$ (for $V = \R^n$).
+}
+
+\thm{Coordinate Mapping is an Isomorphism}{
+    If $\mathcal{B} = \{\vect{b}_1, \ldots, \vect{b}_n\}$ is a basis for $V$, then the coordinate mapping $\vect{x} \mapsto [\vect{x}]_{\mathcal{B}}$ is a one-to-one linear transformation from $V$ onto $\R^n$.
+}
+
+\subsection{Dimension}
+
+\thmr{Basis Size is Unique}{basis-size}{
+    If a vector space $V$ has a basis of $n$ vectors, then every basis of $V$ has exactly $n$ vectors.
+}
+
+\begin{proof}
+Let $\mathcal{B}_1$ be a basis with $n$ vectors and $\mathcal{B}_2$ any other basis. Since $\mathcal{B}_1$ is a basis and $\mathcal{B}_2$ is linearly independent, $|\mathcal{B}_2| \leq n$. By symmetry $|\mathcal{B}_2| \geq n$. Hence $|\mathcal{B}_2| = n$.
+\end{proof}
+
+\defn{Dimension}{
+    The \emph{dimension} of a nonzero finite-dimensional vector space $V$, written $\dim V$, is the number of vectors in any basis for $V$. The dimension of $\{\vect{0}\}$ is defined to be $0$. If $V$ cannot be spanned by a finite set, it is \emph{infinite-dimensional}.
+}
+
+\ex{
+    $\dim \R^n = n$. $\dim \mathcal{P}_n = n+1$. $\dim M_{m \times n} = mn$. $\dim \mathcal{P} = \infty$.
+}
+
+\thm{The Basis Theorem}{
+    Let $V$ be an $n$-dimensional vector space, $n \geq 1$. Any linearly independent set of exactly $n$ elements in $V$ is automatically a basis for $V$. Any set of exactly $n$ elements that spans $V$ is automatically a basis for $V$.
+}
+
+\subsection{Rank and Nullity}
+
+\defn{Rank and Nullity}{
+    The \emph{rank} of a matrix $A$, written $\mathrm{rank}\,A$, is the dimension of $\mathrm{Col}\,A$ (equal to the number of pivot columns). The \emph{nullity} of $A$ is $\dim \mathrm{Nul}\,A$ (equal to the number of free variables in $A\vect{x} = \vect{0}$).
+}
+
+\thmr{The Rank Theorem}{rank-theorem}{
+    If $A$ is an $m \times n$ matrix, then
+    \[
+        \mathrm{rank}\,A + \mathrm{nullity}\,A = n
+    \]
+}
+
+\thmr{The Rank-Nullity Theorem}{rank-nullity}{
+    Let $V, W$ be finite-dimensional vector spaces and $T : V \to W$ a linear transformation. Then
+    \[
+        \dim(\ker T) + \dim(\mathrm{Im}\,T) = \dim V
+    \]
+    where $\ker T = \{\vect{x} \in V : T(\vect{x}) = \vect{0}\}$ is the kernel and $\mathrm{Im}\,T = \{T(\vect{x}) : \vect{x} \in V\}$ is the image of $T$.
+}
+
+\paragraph{Extended Invertible Matrix Theorem.}
+For an $n \times n$ matrix $A$, the following are also equivalent to the statements in the Invertible Matrix Theorem (\ref{thm:invertible-matrix-theorem}):
+\begin{itemize}
+    \item The columns of $A$ form a basis of $\R^n$.
+    \item $\mathrm{Col}\,A = \R^n$.
+    \item $\mathrm{rank}\,A = n$.
+    \item $\mathrm{nullity}\,A = 0$.
+    \item $\mathrm{Nul}\,A = \{\vect{0}\}$.
+\end{itemize}
+
+\section{Eigenvalues and Eigenvectors}
+
+\subsection{Definitions and the Characteristic Equation}
+
+\defn{Eigenvalue and Eigenvector}{
+    An \emph{eigenvector} of an $n \times n$ matrix $A$ is a \emph{nonzero} vector $\vect{x}$ such that $A\vect{x} = \lambda\vect{x}$ for some scalar $\lambda$. Such a scalar $\lambda$ is called an \emph{eigenvalue} of $A$. The set of all solutions to $A\vect{x} = \lambda\vect{x}$, including $\vect{0}$, is the \emph{eigenspace} $E_\lambda = \mathrm{Nul}(A - \lambda I)$.
+}
+
+\rmkb{
+    $\lambda$ is an eigenvalue of $A$ if and only if $(A - \lambda I)\vect{x} = \vect{0}$ has a nontrivial solution, i.e., if and only if $\det(A - \lambda I) = 0$.
+}
+
+\defn{Characteristic Equation}{
+    The \emph{characteristic polynomial} of $A$ is $p(\lambda) = \det(A - \lambda I)$. The equation
+    \[
+        \det(A - \lambda I) = 0
+    \]
+    is the \emph{characteristic equation} of $A$. Its roots are the eigenvalues of $A$.
+}
+
+\ex{
+    Find the eigenvalues of $A = \begin{bmatrix}3 & -2\\ 1 & 0\end{bmatrix}$.
+    \[
+        \det(A - \lambda I) = \begin{vmatrix}3-\lambda & -2\\ 1 & -\lambda\end{vmatrix} = -\lambda(3-\lambda)+2 = \lambda^2 - 3\lambda + 2 = (\lambda-1)(\lambda-2) = 0
+    \]
+    The eigenvalues are $\lambda_1 = 1$ and $\lambda_2 = 2$.
+}
+
+\thm{Eigenvectors from Distinct Eigenvalues are Independent}{
+    If $\vect{v}_1, \ldots, \vect{v}_r$ are eigenvectors corresponding to distinct eigenvalues $\lambda_1, \ldots, \lambda_r$ of a matrix $A$, then $\{\vect{v}_1, \ldots, \vect{v}_r\}$ is linearly independent.
+}
+
+\paragraph{Eigenvalues of Triangular Matrices.}
+The eigenvalues of a triangular matrix are its diagonal entries.
+
+\subsection{Diagonalization}
+
+\defn{Diagonalizable Matrix}{
+    An $n \times n$ matrix $A$ is \emph{diagonalizable} if $A = PDP^{-1}$ for some invertible matrix $P$ and diagonal matrix $D$. The diagonal entries of $D$ are eigenvalues of $A$ and the columns of $P$ are corresponding eigenvectors.
+}
+
+\thmr{The Diagonalization Theorem}{diag-theorem}{
+    An $n \times n$ matrix $A$ is diagonalizable if and only if $A$ has $n$ linearly independent eigenvectors. In fact, $A = PDP^{-1}$ with $D$ diagonal if and only if the columns of $P$ are $n$ linearly independent eigenvectors of $A$, and the diagonal entries of $D$ are the corresponding eigenvalues.
+}
+
+\begin{proof}
+($\Rightarrow$) If $A = PDP^{-1}$ then $AP = PD$. Writing $P = [\vect{v}_1 \cdots \vect{v}_n]$ and $D = \mathrm{diag}(\lambda_1, \ldots, \lambda_n)$, the $j$th column of $AP = PD$ gives $A\vect{v}_j = \lambda_j\vect{v}_j$. Since $P$ is invertible, the $\vect{v}_j$ are nonzero and linearly independent.
+
+\noindent($\Leftarrow$) If $A$ has $n$ linearly independent eigenvectors $\vect{v}_j$ with eigenvalues $\lambda_j$, set $P = [\vect{v}_1\cdots\vect{v}_n]$ and $D = \mathrm{diag}(\lambda_1,\ldots,\lambda_n)$. Then $AP = PD$ and $P$ is invertible, giving $A = PDP^{-1}$.
+\end{proof}
+
+\paragraph{Algorithm: Diagonalizing $A$.}
+\begin{enumerate}
+    \item Find all eigenvalues by solving $\det(A - \lambda I) = 0$.
+    \item For each eigenvalue, find a basis for the eigenspace $\mathrm{Nul}(A - \lambda I)$.
+    \item $A$ is diagonalizable if and only if the total number of basis vectors equals $n$.
+    \item Form $P$ with eigenvectors as columns, and $D$ with corresponding eigenvalues on the diagonal.
+\end{enumerate}
+
+\cor{
+    If an $n \times n$ matrix $A$ has $n$ distinct eigenvalues, then $A$ is diagonalizable.
+}
+
+\subsection{Complex Eigenvalues}
+
+\rmkb{
+    The characteristic polynomial may have complex roots. A real $2 \times 2$ matrix with no real eigenvalues has a characteristic polynomial $\lambda^2 - (\mathrm{tr}\,A)\lambda + \det A = 0$ with complex roots $\lambda = a \pm bi$ (with $b \neq 0$).
+
+    For a real matrix with eigenvalue $\lambda = a + bi$ and complex eigenvector $\vect{v} = \vect{p} + i\vect{q}$ (with $\vect{p}, \vect{q} \in \R^n$), the real canonical form provides a block diagonal decomposition with $2 \times 2$ blocks $\begin{bmatrix}a & -b\\ b & a\end{bmatrix}$ representing rotation-scaling.
+}
+
+\section{Inner Products and Orthogonality}
+
+\subsection{The Inner Product in $\R^n$}
+
+\defn{Inner Product (Dot Product) in $\R^n$}{
+    For $\vect{u}, \vect{v} \in \R^n$, the \emph{inner product} (or \emph{dot product}) is
+    \[
+        \vect{u} \cdot \vect{v} = \vect{u}^T\vect{v} = u_1v_1 + u_2v_2 + \cdots + u_nv_n
+    \]
+}
+
+\prop{
+    For $\vect{u}, \vect{v}, \vect{w} \in \R^n$ and scalar $c$:
+    \begin{enumerate}
+        \item[(a)] $\vect{u} \cdot \vect{v} = \vect{v} \cdot \vect{u}$
+        \item[(b)] $(\vect{u} + \vect{v}) \cdot \vect{w} = \vect{u} \cdot \vect{w} + \vect{v} \cdot \vect{w}$
+        \item[(c)] $(c\vect{u}) \cdot \vect{v} = c(\vect{u} \cdot \vect{v}) = \vect{u} \cdot (c\vect{v})$
+        \item[(d)] $\vect{u} \cdot \vect{u} \geq 0$, and $\vect{u} \cdot \vect{u} = 0$ if and only if $\vect{u} = \vect{0}$.
+    \end{enumerate}
+}
+
+\defn{Norm and Unit Vector}{
+    The \emph{norm} (length) of $\vect{v} \in \R^n$ is $\norm{\vect{v}} = \sqrt{\vect{v} \cdot \vect{v}} = \sqrt{v_1^2 + \cdots + v_n^2}$. A \emph{unit vector} has norm 1. To \emph{normalize} $\vect{v} \neq \vect{0}$, compute $\vect{u} = \vect{v}/\norm{\vect{v}}$.
+}
+
+\defn{Orthogonality}{
+    Two vectors $\vect{u}, \vect{v} \in \R^n$ are \emph{orthogonal} if $\vect{u} \cdot \vect{v} = 0$. The \emph{orthogonal complement} of a subspace $W$ is
+    \[
+        W^\perp = \{\vect{z} \in \R^n : \vect{z} \cdot \vect{w} = 0 \text{ for all } \vect{w} \in W\}
+    \]
+}
+
+\thm{Fundamental Subspace Relationship}{
+    For any $m \times n$ matrix $A$:
+    \[
+        (\mathrm{Col}\,A)^\perp = \mathrm{Nul}\,A^T \quad \text{and} \quad (\mathrm{Row}\,A)^\perp = \mathrm{Nul}\,A
+    \]
+}
+
+\subsection{Orthogonal Sets and Projections}
+
+\defn{Orthogonal Set and Orthogonal Basis}{
+    A set $\{\vect{u}_1, \ldots, \vect{u}_p\}$ in $\R^n$ is an \emph{orthogonal set} if $\vect{u}_i \cdot \vect{u}_j = 0$ for all $i \neq j$. If each $\vect{u}_i$ also satisfies $\norm{\vect{u}_i} = 1$, the set is \emph{orthonormal}. An orthogonal (respectively orthonormal) set that is a basis for a subspace $W$ is an \emph{orthogonal} (resp. \emph{orthonormal}) \emph{basis} for $W$.
+}
+
+\thm{Orthogonal Sets are Linearly Independent}{
+    If $\{\vect{u}_1, \ldots, \vect{u}_p\}$ is an orthogonal set of nonzero vectors, then it is linearly independent.
+}
+
+\begin{proof}
+Suppose $\sum_{i=1}^p c_i\vect{u}_i = \vect{0}$. For fixed $j$, take the dot product with $\vect{u}_j$: $c_j\norm{\vect{u}_j}^2 = 0$. Since $\vect{u}_j \neq \vect{0}$, $c_j = 0$.
+\end{proof}
+
+\thm{Coordinates from an Orthogonal Basis}{
+    If $\{\vect{u}_1, \ldots, \vect{u}_p\}$ is an orthogonal basis for a subspace $W$, then for each $\vect{y} \in W$:
+    \[
+        \vect{y} = \frac{\vect{y}\cdot\vect{u}_1}{\vect{u}_1\cdot\vect{u}_1}\,\vect{u}_1 + \frac{\vect{y}\cdot\vect{u}_2}{\vect{u}_2\cdot\vect{u}_2}\,\vect{u}_2 + \cdots + \frac{\vect{y}\cdot\vect{u}_p}{\vect{u}_p\cdot\vect{u}_p}\,\vect{u}_p
+    \]
+}
+
+\thmr{Orthogonal Decomposition Theorem}{orth-decomp}{
+    Let $W$ be a subspace of $\R^n$. Every $\vect{y} \in \R^n$ can be written uniquely as
+    \[
+        \vect{y} = \hat{\vect{y}} + \vect{z}
+    \]
+    where $\hat{\vect{y}} \in W$ and $\vect{z} \in W^\perp$. If $\{\vect{u}_1, \ldots, \vect{u}_p\}$ is any orthogonal basis for $W$, then
+    \[
+        \hat{\vect{y}} = \mathrm{proj}_W\,\vect{y} = \frac{\vect{y}\cdot\vect{u}_1}{\vect{u}_1\cdot\vect{u}_1}\,\vect{u}_1 + \cdots + \frac{\vect{y}\cdot\vect{u}_p}{\vect{u}_p\cdot\vect{u}_p}\,\vect{u}_p
+    \]
+    and $\vect{z} = \vect{y} - \hat{\vect{y}}$.
+}
+
+\thmr{The Best Approximation Theorem}{best-approx}{
+    Let $W$ be a subspace of $\R^n$, $\vect{y} \in \R^n$, and $\hat{\vect{y}} = \mathrm{proj}_W\,\vect{y}$. Then $\hat{\vect{y}}$ is the closest point in $W$ to $\vect{y}$:
+    \[
+        \norm{\vect{y} - \hat{\vect{y}}} < \norm{\vect{y} - \vect{v}} \quad \text{for all } \vect{v} \in W, \; \vect{v} \neq \hat{\vect{y}}
+    \]
+}
+
+\subsection{Orthonormal Matrices}
+
+\thm{Orthonormal Columns}{
+    An $m \times n$ matrix $U$ has orthonormal columns if and only if $U^T U = I_n$. If $U$ has orthonormal columns, then $\norm{U\vect{x}} = \norm{\vect{x}}$ and $(U\vect{x})\cdot(U\vect{y}) = \vect{x}\cdot\vect{y}$ for all $\vect{x}, \vect{y} \in \R^n$.
+}
+
+\defn{Orthogonal Matrix}{
+    A square $n \times n$ matrix $U$ is an \emph{orthogonal matrix} if $U^{-1} = U^T$, i.e., $UU^T = U^TU = I_n$. Equivalently, $U$ has orthonormal columns (and rows).
+}
+
+\thm{Projection via Orthonormal Basis}{
+    If $\{\vect{u}_1, \ldots, \vect{u}_p\}$ is an orthonormal basis for a subspace $W$ and $U = [\vect{u}_1 \; \cdots \; \vect{u}_p]$, then
+    \[
+        \mathrm{proj}_W\,\vect{y} = (\vect{y}\cdot\vect{u}_1)\vect{u}_1 + \cdots + (\vect{y}\cdot\vect{u}_p)\vect{u}_p = UU^T\vect{y}
+    \]
+}
+
+\subsection{The Gram-Schmidt Process}
+
+\thmr{Gram-Schmidt Process}{gram-schmidt}{
+    Given a basis $\{\vect{x}_1, \ldots, \vect{x}_p\}$ for a nonzero subspace $W$ of $\R^n$, define
+    \begin{align*}
+        \vect{v}_1 &= \vect{x}_1 \\
+        \vect{v}_k &= \vect{x}_k - \sum_{j=1}^{k-1}\frac{\vect{x}_k\cdot\vect{v}_j}{\vect{v}_j\cdot\vect{v}_j}\,\vect{v}_j \quad (k = 2, \ldots, p)
+    \end{align*}
+    Then $\{\vect{v}_1, \ldots, \vect{v}_p\}$ is an orthogonal basis for $W$, and
+    $\mathrm{Span}\{\vect{v}_1, \ldots, \vect{v}_k\} = \mathrm{Span}\{\vect{x}_1, \ldots, \vect{x}_k\}$ for each $k$.
+    An orthonormal basis is obtained by normalizing: $\vect{u}_k = \vect{v}_k/\norm{\vect{v}_k}$.
+}
+
+\ex{
+    Apply Gram-Schmidt to $\vect{x}_1 = \begin{bmatrix}1\\1\\1\\1\end{bmatrix}$, $\vect{x}_2 = \begin{bmatrix}0\\1\\1\\1\end{bmatrix}$:
+    \[
+        \vect{v}_1 = \begin{bmatrix}1\\1\\1\\1\end{bmatrix}, \quad
+        \vect{v}_2 = \vect{x}_2 - \frac{\vect{x}_2\cdot\vect{v}_1}{\vect{v}_1\cdot\vect{v}_1}\vect{v}_1 = \begin{bmatrix}0\\1\\1\\1\end{bmatrix} - \frac{3}{4}\begin{bmatrix}1\\1\\1\\1\end{bmatrix} = \begin{bmatrix}-3/4\\1/4\\1/4\\1/4\end{bmatrix}
+    \]
+    These form an orthogonal basis for $W = \mathrm{Span}\{\vect{x}_1, \vect{x}_2\}$.
+}
+
+\subsection{QR Factorization}
+
+\thmr{QR Factorization}{qr-factorization}{
+    If $A$ is an $m \times n$ matrix with linearly independent columns, then $A = QR$, where $Q$ is an $m \times n$ matrix with orthonormal columns that form a basis for $\mathrm{Col}\,A$, and $R$ is an $n \times n$ upper triangular matrix with positive diagonal entries. This factorization is unique.
+}
+
+\paragraph{Algorithm for $QR$ Factorization.}
+\begin{enumerate}
+    \item Apply the Gram-Schmidt process (with normalization) to the columns $\vect{x}_1, \ldots, \vect{x}_n$ of $A$ to obtain an orthonormal basis $\vect{u}_1, \ldots, \vect{u}_n$ for $\mathrm{Col}\,A$.
+    \item Set $Q = [\vect{u}_1 \; \cdots \; \vect{u}_n]$.
+    \item Compute $R = Q^T A$ (an upper triangular matrix with positive diagonal entries).
+\end{enumerate}
+
+\subsection{Inner Product Spaces}
+
+\defn{Inner Product Space}{
+    An \emph{inner product} on a real vector space $V$ is a function $\langle\cdot,\cdot\rangle : V \times V \to \R$ satisfying for all $\vect{u}, \vect{v}, \vect{w} \in V$ and scalars $c$:
+    \begin{enumerate}
+        \item $\langle\vect{u},\vect{v}\rangle = \langle\vect{v},\vect{u}\rangle$
+        \item $\langle\vect{u}+\vect{v},\vect{w}\rangle = \langle\vect{u},\vect{w}\rangle + \langle\vect{v},\vect{w}\rangle$
+        \item $\langle c\vect{u},\vect{v}\rangle = c\langle\vect{u},\vect{v}\rangle$
+        \item $\langle\vect{u},\vect{u}\rangle \geq 0$, and $\langle\vect{u},\vect{u}\rangle = 0$ iff $\vect{u} = \vect{0}$
+    \end{enumerate}
+    A vector space with an inner product is an \emph{inner product space}. The induced norm is $\norm{\vect{u}} = \sqrt{\langle\vect{u},\vect{u}\rangle}$.
+}
+
+\thm{Cauchy--Schwarz Inequality}{
+    In any inner product space, for all $\vect{u}, \vect{v}$:
+    \[
+        |\langle\vect{u},\vect{v}\rangle| \leq \norm{\vect{u}}\,\norm{\vect{v}}
+    \]
+    with equality if and only if $\vect{u}$ and $\vect{v}$ are linearly dependent.
+}
+
+\section{Least-Squares Problems}
+
+\subsection{Least-Squares Solutions}
+
+\defn{Least-Squares Solution}{
+    Given an $m \times n$ matrix $A$ and $\vect{b} \in \R^m$, a \emph{least-squares solution} of $A\vect{x} = \vect{b}$ is a vector $\hat{\vect{x}} \in \R^n$ such that
+    \[
+        \norm{\vect{b} - A\hat{\vect{x}}} \leq \norm{\vect{b} - A\vect{x}} \quad \text{for all } \vect{x} \in \R^n
+    \]
+    The quantity $\norm{\vect{b} - A\hat{\vect{x}}}$ is called the \emph{least-squares error}.
+}
+
+\rmkb{
+    Since $A\vect{x}$ ranges over $\mathrm{Col}\,A$ as $\vect{x}$ varies in $\R^n$, the least-squares solution minimizes the distance from $\vect{b}$ to $\mathrm{Col}\,A$. By the Best Approximation Theorem, $A\hat{\vect{x}} = \mathrm{proj}_{\mathrm{Col}\,A}\,\vect{b}$.
+}
+
+\thmr{Normal Equations}{normal-equations}{
+    The set of least-squares solutions of $A\vect{x} = \vect{b}$ coincides with the (nonempty) solution set of the \emph{normal equations}:
+    \[
+        A^T A\,\vect{x} = A^T\vect{b}
+    \]
+}
+
+\begin{proof}
+Since $A\hat{\vect{x}} = \mathrm{proj}_{\mathrm{Col}\,A}\,\vect{b}$, we have $\vect{b} - A\hat{\vect{x}} \in (\mathrm{Col}\,A)^\perp = \mathrm{Nul}\,A^T$. Thus $A^T(\vect{b} - A\hat{\vect{x}}) = \vect{0}$, giving $A^T A\hat{\vect{x}} = A^T\vect{b}$.
+\end{proof}
+
+\paragraph{Algorithm for Least-Squares Solutions.}
+\begin{enumerate}
+    \item Compute $A^T A$ and $A^T\vect{b}$.
+    \item Row reduce $[A^T A \mid A^T\vect{b}]$ to find all solutions $\hat{\vect{x}}$.
+\end{enumerate}
+
+\ex{
+    Find the least-squares solution of $A\vect{x} = \vect{b}$ where $A = \begin{bmatrix}4&0\\0&2\\1&1\end{bmatrix}$, $\vect{b} = \begin{bmatrix}2\\0\\11\end{bmatrix}$.
+
+    $A^TA = \begin{bmatrix}17&1\\1&5\end{bmatrix}$, $A^T\vect{b} = \begin{bmatrix}19\\11\end{bmatrix}$.
+    Solving $A^TA\hat{\vect{x}} = A^T\vect{b}$ gives $\hat{\vect{x}} = \begin{bmatrix}1\\2\end{bmatrix}$.
+}
+
+\thm{Unique Least-Squares Solution}{
+    The following are equivalent for an $m \times n$ matrix $A$:
+    \begin{enumerate}
+        \item[(a)] The equation $A\vect{x} = \vect{b}$ has a unique least-squares solution for each $\vect{b} \in \R^m$.
+        \item[(b)] The columns of $A$ are linearly independent.
+        \item[(c)] The matrix $A^T A$ is invertible.
+    \end{enumerate}
+    When these hold, $\hat{\vect{x}} = (A^T A)^{-1}A^T\vect{b}$.
+}
+
+\thm{Least Squares via $QR$ Factorization}{
+    Let $A = QR$ be a $QR$ factorization of $A$ with linearly independent columns. Then for each $\vect{b} \in \R^m$, the unique least-squares solution of $A\vect{x} = \vect{b}$ is
+    \[
+        \hat{\vect{x}} = R^{-1}Q^T\vect{b}
+    \]
+    which in practice is found by solving the upper triangular system $R\vect{x} = Q^T\vect{b}$.
+}
+
+\subsection{Least-Squares Lines and Linear Models}
+
+\paragraph{The Linear Regression Model.}
+Given data points $(x_1, y_1), \ldots, (x_n, y_n)$, we seek the \emph{least-squares line} $y = \beta_0 + \beta_1 x$ that minimizes the sum of squared residuals. Write this as the inconsistent system $X\vect{\beta} = \vect{y}$ where
+\[
+    X = \begin{bmatrix}1 & x_1\\ 1 & x_2\\ \vdots & \vdots\\ 1 & x_n\end{bmatrix}, \quad \vect{\beta} = \begin{bmatrix}\beta_0\\\beta_1\end{bmatrix}, \quad \vect{y} = \begin{bmatrix}y_1\\y_2\\\vdots\\y_n\end{bmatrix}
+\]
+The least-squares solution $\hat{\vect{\beta}}$ satisfies the normal equations $X^TX\,\hat{\vect{\beta}} = X^T\vect{y}$.
+
+\ex{
+    Find the least-squares line through $(2,1), (5,2), (7,3), (8,3)$.
+
+    $X^TX = \begin{bmatrix}4 & 22\\ 22 & 142\end{bmatrix}$, $X^T\vect{y} = \begin{bmatrix}9\\ 57\end{bmatrix}$.
+
+    Solving gives $\hat{\beta}_0 = 2/7$ and $\hat{\beta}_1 = 5/14$, so the least-squares line is $y = \dfrac{2}{7} + \dfrac{5}{14}x$.
+}
+
 
 \chapter{Multivariable Calculus}
 
@@ -122,21 +1060,12 @@
 \defn{Function}{
     A \emph{function} $f:D\to E$ is a rule that assigns to each element $x\in D$ exactly one element $f(x)\in E$. The set $D$ is the \emph{domain}, and the set of all actual output values is the \emph{range}.
 }
-\paragraph{Increasing and Decreasing Functions}{
-    Let $f$ be defined on an interval $I$: 
-    \begin{itemize}
-        \item Whenever $x_1<x_2$ in $I$, $f$ is \emph{increasing} on $I$ if $f(x_1)<f(x_2)$, is \emph{nondecreasing} on $I$ if $f(x_1)\le f(x_2)$.
-        \item Whenever $x_1<x_2$ in $I$, $f$ is \emph{decreasing} on $I$ if $f(x_1)>f(x_2)$, is \emph{nonincreasing} on $I$ if $f(x_1)\ge f(x_2)$.
-    \end{itemize}
-}
+
 
 \paragraph{Informal Definition of Limit} The statement $\lim_{x\to a} f(x)=L$ means that $f(x)$ can be made arbitrarily close to $L$ by taking $x$ sufficiently close to $a$, from both the left and the right, but with $x\ne a$.
 
 \paragraph{Right- and Left-Hand Limits}{
     $\lim_{x\to a^+} f(x)=L$ means that $f(x)$ can be made arbitrarily close to $L$ by taking $x$ sufficiently close to $a$ with $x>a$. Similarly. $\lim_{x\to a^-} f(x)=L$ means that $x$ approaches $a$ from the left, so $x<a$.
-}
-
-\paragraph{Two-Sided Limit}{
     The two-sided limit exists and equals $L$ if and only if:
     \[
         \lim_{x\to a} f(x)=L
@@ -1342,1463 +2271,1385 @@ Let $E$ be a solid region with positively oriented closed boundary surface $S=\p
 
 
 
-% \chapter{Ordinary Differential Equations}
-
-% \section{Introduction to Differential Equations}
-
-% \subsection{Definitions and Terminology}
-
-% \defn{Differential Equation}{
-%     A \emph{differential equation} is an equation that contains derivatives of one
-%     or more unknown functions with respect to one or more independent variables.
-%     The unknown function is usually called the \emph{dependent variable}, and the
-%     variable with respect to which differentiation is taken is called the
-%     \emph{independent variable}.
-% }
-
-% \paragraph{Ordinary and Partial Differential Equations}{
-%     A DE is called an \emph{ordinary differential equation}
-%     (ODE) if it contains only ordinary derivatives with respect to a single
-%     independent variable. It is called a \emph{partial differential equation}
-%     (PDE) if it contains partial derivatives of one or more unknown functions of
-%     two or more independent variables.
-% }
-
-% \ex{
-%     The equations $\frac{dy}{dx}+5y=e^x$ and $\frac{d^2y}{dx^2}-6y=0$ are ordinary differential equations.  \\
-%     By contrast, $\frac{\partial u}{\partial x} + \frac{\partial u}{\partial y} = 0$ is a partial differential equation.
-% }
-
-% \paragraph{Order.}
-% The \emph{order} of a differential equation is the order of the highest derivative
-% appearing in the equation. In one dependent variable, the general form of an
-% $n$th-order ODE is
-% \[
-%     F(x,y,y',\ldots,y^{(n)})=0
-% \]
-% If the equation can be solved for the highest derivative, it can be written in
-% \emph{normal form}:
-% \[
-%     \frac{d^n y}{dx^n} = f(x,y,y',\ldots,y^{(n-1)})
-% \]
-
-% \paragraph{Linear Ordinary Differential Equation}{
-%     An $n$th-order ODE is \emph{linear} if it's linear in the dependent
-%     variable and all of its derivatives. Its general form is
-%     \[
-%         a_n(x)y^{(n)}
-%         +a_{n-1}(x)y^{(n-1)}
-%         +\cdots
-%         +a_1(x)y'
-%         +a_0(x)y
-%         =
-%         g(x)
-%     \]
-%     The coefficients may depend on the independent variable $x$, but not on
-%     $y$ or its derivatives.
-% }
-
-% \ex{
-%     The equation $y''-2y'+y=e^x$ is linear. \\
-%     The equations $yy'+x=0$, $y''+\sin y=0$ and $(y')^2+y=0$ are nonlinear. 
-% }
-
-% \paragraph{Solution of an ODE}{
-%     A function $\phi$, defined on an interval $I$ and possessing the required
-%     derivatives on $I$, is called a \emph{solution} of an $n$th-order ODE if
-%     substituting $y=\phi(x)$ into the equation reduces it to an identity on $I$.
-% }
-
-% \paragraph{Interval of Definition}{
-%     The interval on which a solution is defined is called the \emph{interval of
-%     definition}, \emph{interval of existence}, \emph{interval of validity}, or
-%     \emph{domain of the solution}.
-% }
-
-% \paragraph{Explicit and Implicit Solutions}{
-%     An \emph{explicit solution} expresses the dependent variable directly as a
-%     function of the independent variable: $y=\phi(x)$. An \emph{implicit solution} is a relation $ G(x,y)=0$ that defines at least one differentiable function $y=\phi(x)$ satisfying the differential equation on an interval.
-% }
-
-% \ex{
-%     The relation $x^2+y^2=25$ is an implicit solution of $\frac{dy}{dx}=-\frac{x}{y}$. On the interval $(-5,5)$, it gives two explicit branches: $y=\sqrt{25-x^2}$ and $y=-\sqrt{25-x^2}$. 
-% }
-
-% \paragraph{Families, Particular Solutions, and Singular Solutions}{
-%     A solution containing one or more constants is called a
-%     \emph{family of solutions}. A solution obtained by assigning values
-%     to these constants is called a \emph{particular solution}. A \emph{singular solution} is a solution that can't be obtained from the family of solutions by any choice of the arbitrary constants.
-% }
-
-% \ex{
-%     The equation $ y'=y$ has the one-parameter family of solutions $ y=ce^x$. If the condition $y(0)=3$ is imposed, then $c=3$, so the particular solution is $y=3e^x$. 
-% }
-
-% \paragraph{System of ODEs}{
-%     A \emph{system of ordinary differential equations} consists of two or more
-%     equations involving derivatives of two or more unknown functions of a single
-%     independent variable. 
-% }
-
-% \subsection{Initial-Value Problems}
-
-% \defn{Initial-Value Problem}{
-%     An $n$th-order \emph{initial-value problem} consists of an $n$th-order
-%     differential equation together with $n$ side conditions imposed at the same
-%     point $x_0$:
-%     \[
-%         \frac{d^n y}{dx^n}
-%         =
-%         f(x,y,y',\ldots,y^{(n-1)})
-%     \]
-%     subject to
-%     \[
-%         y(x_0)=y_0,\qquad
-%         y'(x_0)=y_1,\qquad
-%         \ldots,\qquad
-%         y^{(n-1)}(x_0)=y_{n-1}
-%     \]
-% }
-
-% \thmr{Existence and Uniqueness for a First-Order IVP}{existenceuniqueness}{
-%     Let $R$ be a rectangular region in the $xy$-plane containing the point
-%     $(x_0,y_0)$. If $f(x,y)$ and $\dfrac{\partial f}{\partial y}(x,y)$ are
-%     continuous on $R$, then there exists an interval $I_0=(x_0-h,x_0+h)$ for some $h>0$ on which the initial-value problem
-%     \[
-%         \frac{dy}{dx}=f(x,y),
-%         \qquad
-%         y(x_0)=y_0
-%     \]
-%     has a unique solution.
-% }
-
-% \rmk{
-%     This theorem is local: it guarantees a unique solution only near \(x_0\), not
-% necessarily on the largest possible interval. It gives sufficient, not necessary,
-% conditions. Roughly, \(f\) continuous gives existence, and \(f_y\) continuous gives
-% uniqueness.
-% }
-
-% \ex{
-%     The initial-value problem $\frac{dy}{dx}=x\sqrt{y}, y(0)=0$ has more than one solution. For example, $y=0$ and $y=\frac{x^4}{16}$ both satisfy the differential equation and the initial condition. This does not contradict the existence--uniqueness theorem, because $\frac{\partial}{\partial y}\bigl(x\sqrt{y}\bigr) = \frac{x}{2\sqrt{y}}$ is not continuous at $y=0$.
-% }
-
-% \section{First-Order Differential Equations}
-
-% \subsection{Solution Curves Without an Explicit Solution}
-
-% \paragraph{Direction Field}{
-%     Consider a first-order differential equation in normal form $\frac{dy}{dx}=f(x,y)$
-%     At each point $(x,y)$ where $f$ is defined, the value $f(x,y)$ gives the slope
-%     of a small line segment, called a \emph{lineal element}. A collection of such
-%     lineal elements drawn on a grid in the $xy$-plane is called a
-%     \emph{direction field}.
-% }
-
-% \defn{Autonomous First-Order Differential Equation}{
-%     A first-order differential equation is called \emph{autonomous} if the
-%     independent variable does not appear explicitly. In normal form, it can be
-%     written as
-%     \[
-%         \frac{dy}{dx}=f(y)
-%     \]
-% }
-
-% \paragraph{Critical Point and Equilibrium Solution}{
-%     A real number $c$ is called a \emph{critical point}, \emph{equilibrium point}, or
-%     \emph{stationary point} of $\frac{dy}{dx}=f(y)$ if $f(c)=0$. In this case, the constant function $y(x)=c$ is a solution, called an \emph{equilibrium solution}.
-% }
-
-% \paragraph{Phase Line and Phase Portrait}{
-%     For an autonomous equation $\frac{dy}{dx}=f(y)$ a \emph{phase line} is a vertical line on which the critical points are marked. The sign of $f(y)$ on each interval between critical points determines whether solutions are increasing or decreasing. The resulting diagram is called a \emph{one-dimensional phase portrait}.
-% }
-
-% \paragraph{Attractors, Repellers, and Semi-Stable Points}{
-%     Let $c$ be a critical point of $\frac{dy}{dx}=f(y)$
-%     \begin{itemize}
-%         \item If nearby solutions approach $c$ as $x\to\infty$, then $c$ is an
-%         \emph{attractor} or \emph{asymptotically stable equilibrium}.
-%         \item If nearby solutions move away from $c$, then $c$ is a \emph{repeller}
-%         or \emph{unstable equilibrium}.
-%         \item If solutions approach $c$ from one side and move away from $c$ from
-%         the other side, then $c$ is \emph{semi-stable}.
-%     \end{itemize}
-% }
-
-% \prop{
-%     If $y(x)$ is a solution of the autonomous equation $\frac{dy}{dx}=f(y)$ then for any constant $k$, $y_1(x)=y(x-k)$ is also a solution. This is called the \emph{translation property.}
-% }
-
-
-% \subsection{Separable Equations}
-
-% \defn{Separable Equation}{
-%     A first-order differential equation of the form
-%     \[
-%         \frac{dy}{dx}=g(x)h(y)
-%     \]
-%     is called a \emph{separable differential equation}.
-% }
-
-% \paragraph{Procedure.}
-% To solve a separable differential equation:
-% \begin{enumerate}
-%     \item Write the equation in separable form $\frac{dy}{dx}=g(x)h(y)$.
-%     \item Assuming $h(y)\neq 0$, separate the variables $\frac{1}{h(y)}\,dy=g(x)\,dx$. 
-%      \item Integrate both sides $\int \frac{1}{h(y)}\,dy=\int g(x)\,dx$. 
-%     \item Write the solution implicitly as $ H(y)=G(x)+C$.
-% \end{enumerate}
-
-% \rmk{
-%     When solving a separable equation, any value $r$ such that $h(r)=0$ should be
-%     checked separately. The constant function $y=r$ may be a solution, but it may
-%     be lost after division by $h(y)$.
-% }
-
-
-% \subsection{Linear Equations}
-
-% \defn{First-Order Linear Equation}{
-%     A first-order differential equation of the form $ a_1(x)\frac{dy}{dx}+a_0(x)y=g(x)$ is called a \emph{linear differential equation} in the dependent variable $y$.
-%     If $a_1(x)\neq 0$, division by $a_1(x)$ gives the standard form
-%     \[
-%         \frac{dy}{dx}+P(x)y=f(x)
-%     \]
-% }
-
-% \paragraph{Procedure.}
-% To solve a first-order linear equation:
-% \begin{enumerate}
-%     \item Put the equation in standard form $\frac{dy}{dx}+P(x)y=f(x)$. 
-%     \item Compute the integrating factor $\mu(x)=e^{\int P(x)\,dx}$. 
-%     \item Multiply both sides by $\mu(x)$ and rewrite the left-hand side as $\frac{d}{dx}\bigl(\mu(x)y\bigr)$. 
-%     \item Integrate both sides and solve for $y$.
-%     \[
-%     y=e^{-\int P(x)\,dx}
-%     \left(
-%         \int e^{\int P(x)\,dx}f(x)\,dx+C
-%     \right)
-%     \]
-% \end{enumerate}
-
-
-
-% \subsection{Exact Differential Equations}
-
-% \defn{Exact Differential Equation}{
-%     A first-order differential equation written in differential form
-%     \[
-%         M(x,y)\,dx+N(x,y)\,dy=0
-%     \]
-%     is called an \emph{exact equation} if there exists a function $\Phi(x,y)$ such
-%     that
-%     \[
-%         \frac{\partial \Phi}{\partial x}=M(x,y),
-%         \qquad
-%         \frac{\partial \Phi}{\partial y}=N(x,y)
-%     \]
-%     In that case, $d\Phi=M\,dx+N\,dy$ and the solution is given implicitly by $\Phi(x,y)=C$.
-% }
-
-% \thmr{Criterion for Exactness}{exactnesscriterion}{
-%     Suppose $M(x,y)$ and $N(x,y)$ have continuous first partial derivatives in a
-%     rectangular region $R$. Then $M(x,y)\,dx+N(x,y)\,dy$
-%     is an exact differential in $R$ if and only if
-%     \[
-%         \frac{\partial M}{\partial y}
-%         =
-%         \frac{\partial N}{\partial x}
-%     \]
-% }
-
-% \paragraph{Procedure.}
-
-% \begin{enumerate}
-%     \item Integrate $M$ with respect to $x$: $ \Phi(x,y)=\int M(x,y)\,dx+g(y)$.
-%     \item Differentiate this expression with respect to $y$: $\Phi_y=\frac{\partial}{\partial y}
-%         \left(\int M(x,y)\,dx\right)+g'(y)$. 
-%     \item Set $\Phi_y=N(x,y)$ and solve for $g'(y)$. Integrate to find $g(y)$.
-%     \item Write the solution as $\Phi(x,y)=C$.
-% \end{enumerate}
-
-% \paragraph{Integrating Factors for Nonexact Equations.}
-% If $M(x,y)\,dx+N(x,y)\,dy=0$ is not exact, it may become exact after multiplication by a nonzero function $\mu(x,y)$: $\mu M\,dx+\mu N\,dy=$. Two useful special cases are:
-% \[
-% \begin{cases}
-%     \mu(x) =\exp\left( \int \frac{M_y-N_x}{N}\,dx \right), \qquad \text{if } \frac{M_y-N_x}{N} \text{ depends only on }x \\
-%     \mu(y)
-%     =
-%     \exp\left(
-%         \int \frac{N_x-M_y}{M}\,dy
-%     \right),
-%     \qquad
-%     \text{if }
-%     \frac{N_x-M_y}{M}
-%     \text{ depends only on }y
-% \end{cases}
-% \]
-
-
-% \subsection{Solutions by Substitutions}
-
-% \defn{Substitution Method}{
-%     For a first-order equation $\frac{dy}{dx}=f(x,y)$ introduce a substitution $y=g(x,u), u=u(x)$. By the chain rule,
-%     \[
-%         \frac{dy}{dx}
-%         =
-%         \frac{\partial g}{\partial x}(x,u)
-%         +
-%         \frac{\partial g}{\partial u}(x,u)\frac{du}{dx}
-%     \]
-%     After substitution, the original equation may become a simpler equation $\frac{du}{dx}=F(x,u)$. If this new equation is separable or linear, it can be solved by earlier methods. Finally, substitute back to obtain $y$.
-% }
-
-% \paragraph{Solving a Homogeneous Equation.}
-% If the equation is homogeneous, use the substitution
-% \[
-%     y=ux,
-%     \qquad
-%     \frac{dy}{dx}=u+x\frac{du}{dx}
-% \]
-
-% \paragraph{Solving a Bernoulli Equation.}{
-%     A differential equation of the form $\frac{dy}{dx}+P(x)y=f(x)y^n$ is called a \emph{Bernoulli equation}. For $n\neq 0,1$, it can be reduced to a linear equation by the substitution
-%     \[
-%         u=y^{1-n}, \qquad  \frac{du}{dx}
-%     =
-%     (1-n)y^{-n}\frac{dy}{dx}
-%     \]
-% }
-
-% \paragraph{Reduction to Separation of Variables}{
-%     A differential equation of the form $\frac{dy}{dx}=f(Ax+By+C),B\neq 0$ can be reduced to a separable equation by the substitution
-%     \[
-%         u=Ax+By+C,\qquad \frac{du}{dx}=A+B\frac{dy}{dx}
-%     \]
-% }
-
-
-% \subsection{A Numerical Method}
-
-% \defn{Euler's Method}{
-%     Consider the initial-value problem $y'=f(x,y), y(x_0)=y_0$, Euler's method approximates the solution by repeatedly following tangent lines: 
-%     \[
-%     x_n=x_0+nh,
-%     \qquad
-%     y_{n+1}=y_n+h f(x_n,y_n),
-%     \qquad
-%     n=0,1,2,\ldots
-%     \]
-% }
-
-% \section{Higher-Order Differential Equations}
-
-% \subsection{Theory of Linear Equations}
-
-% \paragraph{Linear $n$th-Order Differential Equation}{
-%     A linear $n$th-order differential equation has the form
-%     \[
-%         a_n(x)y^{(n)}+a_{n-1}(x)y^{(n-1)}+\cdots+a_1(x)y'+a_0(x)y=g(x)
-%     \]
-%     where $a_n(x)\neq 0$ on an interval $I$. If $g(x)=0$, the equation is
-%     \emph{homogeneous}; otherwise it is \emph{nonhomogeneous}. An $n$th-order initial-value problem specifies the value of $y$ and its first
-%     $n-1$ derivatives at the same point $x_0$:
-%     \[
-%         y(x_0)=y_0,\qquad
-%         y'(x_0)=y_1,\qquad
-%         \ldots,\qquad
-%         y^{(n-1)}(x_0)=y_{n-1}
-%     \]
-% }
-
-% \thmr{Existence and Uniqueness for Linear IVPs}{higherorderexistence}{
-%     Suppose $a_n,a_{n-1},\ldots,a_0$ and $g$ are continuous on an interval $I$, and
-%     $a_n(x)\neq 0$ for every $x\in I$. Then for any $x_0\in I$, the corresponding
-%     $n$th-order linear initial-value problem has a unique solution on $I$.
-% }
-
-% \rmk{
-%     This theorem is much stronger than the first-order local theorem: for linear
-%     equations, the solution exists on the whole interval on which the coefficient
-%     functions are continuous and the leading coefficient is nonzero.
-% }
-
-% \paragraph{Boundary-Value Problems.}
-% A boundary-value problem imposes conditions at different points, for example $y(a)=y_0, y(b)=y_1$. Unlike initial-value problems, a boundary-value problem may have infinitely many
-% solutions, exactly one solution, or no solution.
-
-% \paragraph{Differential Operator Notation.}
-% Let $D=\frac{d}{dx}$. Then $D^n y=\frac{d^n y}{dx^n}$. The linear differential operator is
-% \[
-%     L=a_n(x)D^n+a_{n-1}(x)D^{n-1}+\cdots+a_1(x)D+a_0(x)
-% \]
-% so the differential equation can be written compactly as $L[y]=g(x)$. 
-
-% \prop{
-%     The operator $L$ is linear, where $\alpha$ and $\beta$ are constants:
-%     \[
-%         L[\alpha f+\beta g]=\alpha L[f]+\beta L[g],
-%     \]
-% }
-
-% \thmr{Superposition Principle for Homogeneous Equations}{homogeneoussuperposition}{
-%     If $y_1,\ldots,y_k$ are solutions of the homogeneous equation $L[y]=0$ on an
-%     interval $I$, then every linear combination $y=c_1y_1+\cdots+c_ky_k$ is also a solution on $I$.
-% }
-
-% \defn{Linear Independence and the Wronskian}{
-%     Functions $f_1,\ldots,f_n$ are linearly dependent on $I$ if there exist
-%     constants $c_1,\ldots,c_n$, not all zero, such that
-%     \[
-%         c_1f_1(x)+\cdots+c_nf_n(x)=0
-%     \]
-%     for every $x\in I$. Otherwise they are linearly independent. The \emph{Wronskian} of $f_1,\ldots,f_n$ is
-%     \[
-%         W(f_1,\ldots,f_n)=
-%         \begin{vmatrix}
-%             f_1 & f_2 & \cdots & f_n\\
-%             f_1' & f_2' & \cdots & f_n'\\
-%             \vdots & \vdots & & \vdots\\
-%             f_1^{(n-1)} & f_2^{(n-1)} & \cdots & f_n^{(n-1)}
-%         \end{vmatrix}
-%     \]
-% }
-
-% \paragraph{Wronskian Criterion for Solutions}{wronskiancriterion}{
-%     Let $y_1,\ldots,y_n$ be $n$ solutions of a homogeneous linear $n$th-order
-%     differential equation on $I$. Then they are linearly independent on $I$ if and
-%     only if for every $x\in I$: 
-%     \[
-%         W(y_1,\ldots,y_n)(x)\neq 0
-%     \]
-% }
-
-% \paragraph{Fundamental Set of Solutions}{
-%     A set of $n$ linearly independent solutions of a homogeneous linear
-%     $n$th-order differential equation is called a \emph{fundamental set of
-%     solutions}.
-% }
-
-% \thmr{General Solution of a Homogeneous Linear Equation}{homogeneousgeneralsolution}{
-%     If $y_1,\ldots,y_n$ form a fundamental set of solutions for $L[y]=0$ on $I$,
-%     then the general solution is
-%     \[
-%         y=c_1y_1+\cdots+c_ny_n
-%     \]
-% }
-
-% \thmr{General Solution of a Nonhomogeneous Linear Equation}{nonhomogeneousgeneralsolution}{
-%     If $y_p$ is one particular solution of $L[y]=g(x)$ and
-%     $y_c=c_1y_1+\cdots+c_ny_n$ is the general solution of the associated
-%     homogeneous equation $L[y]=0$, then the general solution of the
-%     nonhomogeneous equation is
-%     \[
-%         y=y_c+y_p
-%     \]
-% }
-
-% \prop{
-%     If $y_{p1},\ldots,y_{pk}$ are particular solutions of
-%     \[
-%         L[y]=g_1(x),\qquad \ldots,\qquad L[y]=g_k(x)
-%     \]
-%     then $y_p=y_{p1}+\cdots+y_{pk}$ is a particular solution of
-%     \[
-%         L[y]=g_1(x)+\cdots+g_k(x)
-%     \]
-% }
-
-% \subsection{Reduction of Order}
-
-% \thmr{Reduction of Order Formula}{reductionoforder}{
-%     Let $y_1(x)$ be a nonzero solution of
-%     \[
-%         y''+P(x)y'+Q(x)y=0
-%     \]
-%     on an interval $I$. Then a second solution is
-%     \[
-%         y_2(x)=y_1(x)\int
-%         \frac{e^{-\int P(x)\,dx}}{[y_1(x)]^2}\,dx
-%     \]
-% }
-
-% \paragraph{Procedure.}
-% \begin{enumerate}
-%     \item Put the equation in standard form $y''+P(x)y'+Q(x)y=0$.
-%     \item Identify a known nonzero solution $y_1$.
-%     \item Use $y_2=y_1\int \frac{e^{-\int P(x)\,dx}}{y_1^2}\,dx$. 
-%     \item Write the general solution as $y=c_1y_1+c_2y_2$.
-% \end{enumerate}
-
-
-% \subsection{Homogeneous Linear Equations with Constant Coefficients}
-
-% \paragraph{Auxiliary Equation.}
-% For $a_ny^{(n)}+a_{n-1}y^{(n-1)}+\cdots+a_1y'+a_0y=0$, try $y=e^{mx}$. Substitution gives the \emph{auxiliary equation} $a_nm^n+a_{n-1}m^{n-1}+\cdots+a_1m+a_0=0$. The roots of this polynomial determine the solution.
-
-% \paragraph{Second-Order Case.}
-% For $ay''+by'+cy=0$ the auxiliary equation is $am^2+bm+c=0$.
-
-% \begin{center}
-% \begin{tabular}{c|c}
-% Root type & General solution\\
-% \hline
-% $m_1\neq m_2$ real & $y=c_1e^{m_1x}+c_2e^{m_2x}$\\[0.3em]
-% $m_1=m_2=m$ & $y=c_1e^{mx}+c_2xe^{mx}$\\[0.3em]
-% $m=\alpha\pm i\beta$ & $y=e^{\alpha x}\bigl(c_1\cos \beta x+c_2\sin \beta x\bigr)$
-% \end{tabular}
-% \end{center}
-
-% \paragraph{Higher-Order Roots.}
-% If $m$ is a real root of multiplicity $k$, then the corresponding solutions are
-% \[
-%     e^{mx},\quad xe^{mx},\quad x^2e^{mx},\quad \ldots,\quad x^{k-1}e^{mx}
-% \]
-% If $\alpha\pm i\beta$ is a complex conjugate pair of multiplicity $k$, then the
-% real solutions are
-% \[
-%     e^{\alpha x}\cos \beta x,\quad xe^{\alpha x}\cos \beta x,
-%     \quad \ldots,\quad x^{k-1}e^{\alpha x}\cos \beta x
-% \]
-% \[
-%     e^{\alpha x}\sin \beta x,\quad xe^{\alpha x}\sin \beta x,
-%     \quad \ldots,\quad x^{k-1}e^{\alpha x}\sin \beta x
-% \]
-
-% \subsection{Undetermined Coefficients: Superposition Approach}
-
-% \paragraph{When the Method Applies.}
-% The method of undetermined coefficients applies to nonhomogeneous linear
-% differential equations with constant coefficients, $a_ny^{(n)}+a_{n-1}y^{(n-1)}+\cdots+a_1y'+a_0y=g(x)$, when $g(x)$ is a finite sum of constants, polynomials, exponentials, sines, cosines, or products of these functions.
-
-% \paragraph{Procedure.}
-% \begin{enumerate}
-%     \item Solve the associated homogeneous equation to find $y_c$.
-%     \item Guess the form of a particular solution $y_p$ based on $g(x)$.
-%     \item Substitute $y_p$ into the original equation and solve for the unknown coefficients.
-%     \item Write the general solution as $y=y_c+y_p$.
-% \end{enumerate}
-
-% \paragraph{Common Trial Forms.}
-% \begin{center}
-% \begin{tabular}{c|c}
-% $g(x)$ & Trial form for $y_p$\\
-% \hline
-% $k$ & $A$\\[0.2em]
-% $a_mx^m+\cdots+a_0$ & $A_mx^m+\cdots+A_0$\\[0.2em]
-% $e^{\alpha x}$ & $Ae^{\alpha x}$\\[0.2em]
-% $x^me^{\alpha x}$ & $(A_mx^m+\cdots+A_0)e^{\alpha x}$\\[0.2em]
-% $\cos \beta x$ or $\sin \beta x$ & $A\cos \beta x+B\sin \beta x$\\[0.2em]
-% $e^{\alpha x}\cos \beta x$ or $e^{\alpha x}\sin \beta x$ &
-% $e^{\alpha x}(A\cos \beta x+B\sin \beta x)$
-% \end{tabular}
-% \end{center}
-
-% \rmk{If any term in the guessed $y_p$ is already contained in $y_c$, multiply the whole
-% guess by the smallest power $x^s$ that removes the duplication: $y_p=x^s(\text{original guess})$.}
-
-% \subsection{Undetermined Coefficients: Annihilator Approach}
-
-% \defn{Annihilator}{
-%     A differential operator $L$ with constant coefficients is called an
-%     \emph{annihilator} of $f(x)$ if
-%     \[
-%         L[f(x)]=0
-%     \]
-% }
-
-% \paragraph{Basic Annihilators.}
-% \[
-%     D^n \text{ annihilates } 1,x,x^2,\ldots,x^{n-1}.
-% \]
-% \[
-%     (D-\alpha)^n \text{ annihilates }
-%     e^{\alpha x},xe^{\alpha x},\ldots,x^{n-1}e^{\alpha x}.
-% \]
-% \[
-%     \bigl[(D-\alpha)^2+\beta^2\bigr]^n
-%     \text{ annihilates }
-%     x^ke^{\alpha x}\cos\beta x
-%     \text{ and }
-%     x^ke^{\alpha x}\sin\beta x, k=0,1,\ldots,n-1.
-% \]
-
-% \paragraph{Procedure.}
-% To solve $L[y]=g(x)$ by annihilators:
-% \begin{enumerate}
-%     \item Solve $L[y]=0$ to find the complementary function $y_c$.
-%     \item Find an operator $L_1$ such that $L_1[g]=0$.
-%     \item Apply $L_1$ to obtain the homogeneous equation $L_1L[y]=0$. 
-%     \item Solve the higher-order homogeneous equation.
-%     \item Remove the terms already in $y_c$; the remaining terms give the form of $y_p$.
-%     \item Substitute into the original equation to determine the coefficients.
-% \end{enumerate}
-
-% \rmk{
-%     The annihilator method justifies the guessing method. It is often more useful
-%     for finding the correct form of $y_p$ than for doing the final coefficient
-%     calculation.
-% }
-
-% \subsection{Variation of Parameters}
-
-% \paragraph{Procedure.}
-% \begin{enumerate}
-%     \item Put the equation in standard form $y''+P(x)y'+Q(x)y=f(x)$.
-%     \item Solve the homogeneous equation to find $y_1,y_2$.
-%     \item Compute $W=y_1y_2'-y_2y_1'$. Compute $u_1'$ and $u_2'$ using $u_1'=-\frac{y_2f}{W}, u_2'=\frac{y_1f}{W}$
-%     \item Integrate to find $u_1,u_2$, then write $y_p=u_1y_1+u_2y_2$.
-%     \item The general solution is $y=y_c+y_p$.
-% \end{enumerate}
-
-% \subsection{Cauchy--Euler Equations}
-
-% \defn{Cauchy--Euler Equation}{
-%     A second-order Cauchy--Euler equation has the form where $a,b,c$ are constants:
-%     \[
-%         ax^2y''+bxy'+cy=g(x)
-%     \]
-%     More generally, an $n$th-order Cauchy--Euler
-%     equation has powers of $x$ matched to the order of the derivative:
-%     \[
-%         a_nx^ny^{(n)}+a_{n-1}x^{n-1}y^{(n-1)}+
-%         \cdots+a_1xy'+a_0y=g(x)
-%     \]
-% }
-
-% \paragraph{Root Cases.}
-% On an interval where $x>0$:
-% \begin{center}
-% \begin{tabular}{c|c}
-% Root type & General solution\\
-% \hline
-% $m_1\neq m_2$ real & $y=c_1x^{m_1}+c_2x^{m_2}$\\[0.3em]
-% $m_1=m_2=m$ & $y=c_1x^m+c_2x^m\ln x$\\[0.3em]
-% $m=\alpha\pm i\beta$ &
-% $y=x^\alpha\bigl(c_1\cos(\beta\ln x)+c_2\sin(\beta\ln x)\bigr)$
-% \end{tabular}
-% \end{center}
-
-% \paragraph{Nonhomogeneous Case.}
-% \begin{enumerate}
-%     \item Solve the associated homogeneous Cauchy--Euler equation.
-%     \item Divide by the leading coefficient to put the equation in standard form.
-%     \item Use variation of parameters to find $y_p$.
-% \end{enumerate}
-
-% \subsection{Solving Systems of Linear Differential Equations by Elimination}
-
-% \defn{Solution of a System}{
-%     A solution of a system of differential equations is a set of sufficiently
-%     differentiable functions, such as
-%     \[
-%         x=\Phi_1(t),\qquad y=\Phi_2(t),\qquad z=\Phi_3(t)
-%     \]
-%     that satisfies every equation in the system on a common interval $I$.
-% }
-
-% \paragraph{Procedure.}
-% \begin{enumerate}
-%     \item Rewrite the system using the differential operator $D$.
-%     \item Apply operators to the equations so that one unknown can be eliminated.
-%     \item Solve the resulting higher-order equation for one dependent variable.
-%     \item Substitute back into one original equation to find the other variables.
-%     \item Use the original system to relate the arbitrary constants.
-% \end{enumerate}
-
-% \section{Series Solutions of Linear Equations}
-
-% \subsection{Review of Power Series}
-
-% \defn{Power Series}{
-%     A \emph{power series centered at $a$} is an infinite series of the form
-%     \[
-%         \sum_{n=0}^{\infty} c_n(x-a)^n
-%         =
-%         c_0+c_1(x-a)+c_2(x-a)^2+\cdots
-%     \]
-% }
-
-% \paragraph{Convergence and Radius of Convergence.}
-% A power series may converge for some values of $x$ and diverge for others. The set
-% of all real numbers $x$ for which the series converges is called its
-% \emph{interval of convergence}. There is a number $R$, called the
-% \emph{radius of convergence}, such that
-% $
-%     \sum_{n=0}^{\infty} c_n(x-a)^n
-%     \text{converges for } |x-a|<R
-% $
-% and diverges for $|x-a|>R$. At the endpoints $x=a\pm R$, convergence must be
-% checked separately.
-
-% \paragraph{Ratio Test.}
-% For a power series, the ratio test often gives the radius of convergence. If
-% $
-%     L
-%     =
-%     \lim_{n\to\infty}
-%     \left|
-%         \frac{c_{n+1}(x-a)^{n+1}}{c_n(x-a)^n}
-%     \right|
-% $
-% then the series converges absolutely when $L<1$ and diverges when $L>1$.
-% The test is inconclusive when $L=1$, which usually corresponds to the endpoints.
-
-% \defn{Analytic Function}{
-%     A function $f$ is \emph{analytic at $a$} if it can be represented by a power
-%     series centered at $a$ with $R>0$:
-%     \[
-%         f(x)=\sum_{n=0}^{\infty} c_n(x-a)^n
-%     \]
-% }
-
-% \prop{
-%     If $\sum_{n=0}^{\infty} c_n(x-a)^n=0$ for all $x$ in some open interval around $a$, then every coefficient must be
-%     zero: $c_n=0, n=0,1,2,\ldots$. This is called the \emph{identity property} of power series.
-% }
-
-
-% \subsection{Solutions About Ordinary Points}
-
-% \defn{Ordinary and Singular Points}{
-%     Consider the homogeneous linear second-order equation $a_2(x)y''+a_1(x)y'+a_0(x)y=0$. After division by $a_2(x)$, write it in standard form $y''+P(x)y'+Q(x)y=0$. A point $x=x_0$ is an \emph{ordinary point} if both $P(x)$ and $Q(x)$ are
-%     analytic at $x_0$. Otherwise, $x=x_0$ is a \emph{singular point}.
-% }
-
-% \thmr{Existence of Power Series Solutions}{powerseriesordinary}{
-%     If $x=x_0$ is an ordinary point of $a_2(x)y''+a_1(x)y'+a_0(x)y=0$ then the equation has two linearly independent solutions of the form $y=\sum_{n=0}^{\infty} c_n(x-x_0)^n$. Each power series solution converges at least for $|x-x_0|<R$ where $R$ is the distance from $x_0$ to the nearest singular point.
-% }
-
-% \paragraph{Procedure.}
-% To find a power series solution about an ordinary point:
-% \begin{enumerate}
-%     \item Assume $ y=\sum_{n=0}^{\infty} c_n(x-x_0)^n$.
-%     \item Differentiate term by term to find $y'$ and $y''$. Substitute $y,y',y''$ into the differential equation. Make all series use the same power of $x-x_0$. Set each coefficient equal to zero. Solve the resulting recurrence relation. 
-%     \item Write the solution in terms of the arbitrary constants, usually $c_0$ and $c_1$.
-% \end{enumerate}
-
-
-% \subsection{Solutions About Singular Points}
-
-% \defn{Regular and Irregular Singular Points}{
-%     Suppose $x=x_0$ is a singular point of $y''+P(x)y'+Q(x)y=0$. Then $x=x_0$ is a \emph{regular singular point} if
-%     \[
-%         p(x)=(x-x_0)P(x),
-%         \qquad
-%         q(x)=(x-x_0)^2Q(x)
-%     \]
-%     are both analytic at $x_0$. A singular point that is not regular is called an
-%     \emph{irregular singular point}.
-% }
-
-% \thmr{Frobenius' Theorem}{frobeniustheorem}{
-%     If $x=x_0$ is a regular singular point of $a_2(x)y''+a_1(x)y'+a_0(x)y=0$, then there exists at least one solution of the following form  where $r$ is a constant determined by the differential equation
-%     \[
-%         y
-%         =
-%         \sum_{n=0}^{\infty} c_n(x-x_0)^{n+r}
-%         =
-%         (x-x_0)^r
-%         \sum_{n=0}^{\infty} c_n(x-x_0)^n,
-%         \qquad c_0\neq 0
-%     \]
-% }
-
-% \paragraph{Indicial Equation.}
-% For a regular singular point at $x=0$, write $ y''+P(x)y'+Q(x)y=0$, and define
-% \[
-%     p(x)=xP(x)=a_0+a_1x+a_2x^2+\cdots,
-%     \qquad
-%     q(x)=x^2Q(x)=b_0+b_1x+b_2x^2+\cdots
-% \]
-% Then the \emph{indicial equation} is $r(r-1)+a_0r+b_0=0$. Its roots are called the \emph{indicial roots}.
-
-% \paragraph{Procedure.}
-% To solve near a regular singular point $x=0$:
-% \begin{enumerate}
-%     \item Assume a Frobenius solution $y=\sum_{n=0}^{\infty} c_nx^{n+r},
-%         c_0\neq 0$.
-%     \item Compute $y'$ and $y''$. Substitute into the differential equation. Set the coefficient of the lowest power of $x$ equal to zero. This gives the indicial equation. Solve the recurrence relation for each indicial root.
-%     \item Determine whether one or two linearly independent Frobenius series are obtained.
-% \end{enumerate}
-
-% \paragraph{Three Cases for Indicial Roots.}
-% Assume $r_1$ and $r_2$ are real indicial roots with $r_1\ge r_2$.
-
-% \begin{center}
-% \begin{tabular}{c|c}
-% Case & Form of solutions\\
-% \hline
-% $r_1-r_2\notin \mathbb{Z}_{>0}$ &
-% Two Frobenius series usually exist\\[0.4em]
-% $r_1-r_2\in \mathbb{Z}_{>0}$ &
-% One Frobenius series always exists; the second may contain $\ln x$\\[0.4em]
-% $r_1=r_2$ &
-% Second solution contains $\ln x$
-% \end{tabular}
-% \end{center}
-% More explicitly $ y_1=\sum_{n=0}^{\infty} c_nx^{n+r_1}, c_0\neq 0$. The second solution may have the form
-% \[
-%     y_2=C y_1\ln x+\sum_{n=0}^{\infty} b_nx^{n+r_2},
-%     \qquad b_0\neq 0,
-% \]
-% where $C$ may be zero in the second case, but is nonzero in the repeated-root case.
-
-
-% \section{The Laplace Transform}
-
-% \subsection{Definition of the Laplace Transform}
-
-% \defn{Laplace Transform}{
-%     Let $f$ be defined for $t\ge 0$. The \emph{Laplace transform} of $f$ is
-%     \[
-%         \mathcal{L}\{f(t)\}=F(s)=\int_0^\infty e^{-st}f(t)\,dt 
-%         =
-%         \lim_{b\to\infty}\int_0^b e^{-st}f(t)\,dt
-%     \]
-%     The variable $t$ is the original variable, while $s$ is the transform variable.
-% }
-
-% \paragraph{Basic Transform Table.}
-% For suitable values of $s$,
-% \[
-% \begin{array}{c|c}
-%     f(t) & \mathcal{L}\{f(t)\}=F(s)\\
-%     \hline
-%     1 & \dfrac{1}{s}\\[0.7em]
-%     t^n & \dfrac{n!}{s^{n+1}},\quad n=1,2,3,\ldots\\[0.7em]
-%     e^{at} & \dfrac{1}{s-a}\\[0.7em]
-%     \sin kt & \dfrac{k}{s^2+k^2}\\[0.7em]
-%     \cos kt & \dfrac{s}{s^2+k^2}\\[0.7em]
-%     \sinh kt & \dfrac{k}{s^2-k^2}\\[0.7em]
-%     \cosh kt & \dfrac{s}{s^2-k^2}
-% \end{array}
-% \]
-
-% \prop{
-%     The Laplace transform is linear. If $\mathcal{L}\{f\}=F$ and
-%     $\mathcal{L}\{g\}=G$, then
-%     \[
-%         \mathcal{L}\{\alpha f(t)+\beta g(t)\}
-%         =
-%         \alpha F(s)+\beta G(s)
-%     \]
-% }
-
-% \defn{Piecewise Continuity and Exponential Order}{
-%     A function $f$ is \emph{piecewise continuous} on $[0,\infty)$ if, on every finite
-%     interval, it is continuous except possibly at finitely many points, and each
-%     discontinuity is finite. A function $f$ is of \emph{exponential order} $c$ as $t\to\infty$ if there exist
-%     constants $M>0$, $c>0$, and $T>0$ such that
-%     \[
-%         |f(t)|\le Me^{ct},\qquad t>T
-%     \]
-% }
-
-% \thmr{Existence of the Laplace Transform}{laplaceexistence}{
-%     If $f$ is piecewise continuous on $[0,\infty)$ and is of exponential order $c$,
-%     then $\mathcal{L}\{f(t)\}$ exists for $s>c$.
-% }
-
-% \subsection{Inverse Transforms and Transforms of Derivatives}
-
-% \defn{Inverse Laplace Transform}{
-%     If $\mathcal{L}\{f(t)\}=F(s)$, then $f(t)$ is called the \emph{inverse Laplace
-%     transform} of $F(s)$, written
-%     \[
-%         f(t)=\mathcal{L}^{-1}\{F(s)\}
-%     \]
-% }
-
-% \paragraph{Partial Fractions.}
-% For rational functions, first decompose into simpler fractions. Typical patterns are
-% \[
-%     \frac{P(s)}{(s-a)(s-b)}
-%     =
-%     \frac{A}{s-a}+\frac{B}{s-b}
-% \]
-% \[
-%     \frac{P(s)}{(s-a)^m}
-%     =
-%     \frac{A_1}{s-a}+\frac{A_2}{(s-a)^2}+\cdots+
-%     \frac{A_m}{(s-a)^m}
-% \]
-
-
-% \thmr{Transform of a Derivative}{transformderivative}{
-%     Suppose the needed derivatives of $f$ are continuous or piecewise continuous
-%     and of exponential order. If $\mathcal{L}\{f(t)\}=F(s)$, then
-%     \[
-%         \mathcal{L}\{f^{(n)}(t)\}
-%         =
-%         s^nF(s)-s^{n-1}f(0)-s^{n-2}f'(0)-\cdots-f^{(n-1)}(0)
-%     \]
-%     \[
-%         \mathcal{L}\{f'(t)\}=sF(s)-f(0),
-%         \qquad
-%         \mathcal{L}\{f''(t)\}=s^2F(s)-sf(0)-f'(0)
-%     \]
-% }
-
-% \paragraph{Solving Linear IVPs by Laplace Transform.}
-% For a constant-coefficient linear initial-value problem:
-% \begin{enumerate}
-%     \item Take the Laplace transform of both sides. Use initial conditions through the derivative formulas.
-%     \item Solve the algebraic equation for $Y(s)$. Decompose $Y(s)$ into recognizable pieces. Apply $\mathcal{L}^{-1}$ to obtain $y(t)$.
-% \end{enumerate}
-
-% \subsection{Operational Properties}
-
-% \thmr{First Translation Theorem}{firsttranslation}{
-%     If $\mathcal{L}\{f(t)\}=F(s)$, then
-%     \[
-%         \mathcal{L}\{e^{at}f(t)\}=F(s-a) \Leftrightarrow \mathcal{L}^{-1}\{F(s-a)\}=e^{at}f(t)
-%     \]
-% }
-
-% \defn{Unit Step Function}{
-%     The \emph{unit step function} at $a$ is
-%     \[
-%         U(t-a)=
-%         \begin{cases}
-%             0, & 0\le t<a,\\
-%             1, & t\ge a
-%         \end{cases}
-%     \]
-% }
-
-% \thmr{Second Translation Theorem}{secondtranslation}{
-%     If $\mathcal{L}\{f(t)\}=F(s)$ and $a>0$, then
-%     \[
-%         \mathcal{L}\{U(t-a)f(t-a)\}=e^{-as}F(s) \Leftrightarrow  \mathcal{L}^{-1}\{e^{-as}F(s)\}=U(t-a)f(t-a)
-%     \]
-% }
-
-% \paragraph{Alternative Form.}
-% For a term of the form $g(t)U(t-a)$, it is often easier to use
-% \[
-%     \mathcal{L}\{g(t)U(t-a)\}
-%     =
-%     e^{-as}\mathcal{L}\{g(t+a)\}
-% \]
-
-% \thmr{Derivatives of Transforms}{derivativesoftransforms}{
-%     If $\mathcal{L}\{f(t)\}=F(s)$, then for $n=1,2,3,\ldots$,
-%     \[
-%         \mathcal{L}\{t^n f(t)\}
-%         =
-%         (-1)^n\frac{d^n}{ds^n}F(s)
-%     \]
-%     \[
-%         \mathcal{L}\{t f(t)\}=-F'(s)
-%     \]
-% }
-
-% \defn{Convolution}{
-%     If $f$ and $g$ are piecewise continuous on $[0,\infty)$, their \emph{convolution}
-%     is
-%     \[
-%         (f*g)(t)=\int_0^t f(\tau)g(t-\tau)\,d\tau
-%     \]
-% }
-
-% \paragraph{Basic Properties of Convolution.}
-% Convolution behaves like a generalized product:
-% \[
-%     f*g=g*f,
-%     \qquad
-%     (f*g)*h=f*(g*h),
-%     \qquad
-%     f*(g+h)=f*g+f*h
-% \]
-
-% \thmr{Convolution Theorem}{convolutiontheorem}{
-%     If $\mathcal{L}\{f(t)\}=F(s)$ and $\mathcal{L}\{g(t)\}=G(s)$, then
-%     \[
-%         \mathcal{L}\{(f*g)(t)\}=F(s)G(s) \Leftrightarrow \mathcal{L}^{-1}\{F(s)G(s)\}=f*g
-%     \]
-% }
-
-% \paragraph{Transform of an Integral.}
-% Taking $g(t)=1$ in the convolution theorem gives
-% \[
-%     \mathcal{L}\left\{\int_0^t f(\tau)\,d\tau\right\}
-%     =
-%     \frac{F(s)}{s},
-%     \qquad
-%     F(s)=\mathcal{L}\{f(t)\}
-% \]
-
-% \defn{Volterra Integral Equation}{
-%     An equation of the following form  is a \emph{Volterra integral equation}. The integral term is a convolution,
-%     so Laplace transforms turn the equation into an algebraic equation for
-%     $F(s)=\mathcal{L}\{f(t)\}$
-%     \[
-%         f(t)=g(t)+\int_0^t f(\tau)h(t-\tau)\,d\tau
-%     \]
-% }
-
-% \thmr{Transform of a Periodic Function}{periodiclaplace}{
-%     If $f$ is piecewise continuous on $[0,\infty)$ and periodic with period $T$, then
-%     \[
-%         \mathcal{L}\{f(t)\}
-%         =
-%         \frac{\displaystyle\int_0^T e^{-st}f(t)\,dt}{1-e^{-sT}}
-%     \]
-% }
-
-% \subsection{The Dirac Delta Function}
-
-% \paragraph{Unit Impulse.}
-% A unit impulse models a force of very large magnitude acting over a very short time.
-% A rectangular impulse centered near $t_0$ has total area $1$, and as its width tends
-% to zero, it is idealized by the Dirac delta.
-
-% \defn{Dirac Delta}{
-%     The \emph{Dirac delta} $\delta(t-t_0)$ is not an ordinary function. It is a
-%     generalized function characterized formally by
-%     \[
-%         \delta(t-t_0)=0\quad (t\ne t_0),
-%         \qquad
-%         \int_0^\infty \delta(t-t_0)\,dt=1
-%     \]
-% }
-
-% \thmr{Transform of the Dirac Delta Function}{deltatransform}{
-%     For $t_0>0$,
-%     \[
-%         \mathcal{L}\{\delta(t-t_0)\}=e^{-st_0}
-%     \]
-% }
-
-
-% \section{Systems of Linear Differential Equations}
-
-% \subsection{Theory of Linear Systems}
-
-% \defn{First-Order System}{
-%     A system of $n$ first-order differential equations has normal form
-%     \[
-%         \frac{dx_i}{dt}=g_i(t,x_1,x_2,\ldots,x_n),
-%         \qquad i=1,2,\ldots,n
-%     \]
-%     If each $g_i$ is linear in the dependent variables, the system is linear.
-% }
-
-% \paragraph{Matrix Form.} If $\mathbf{F}(t)=\mathbf{0}$, the system is \emph{homogeneous}; otherwise it's \emph{nonhomogeneous}.
-% \[
-%     \mathbf{X}'=A(t)\mathbf{X}+\mathbf{F}(t), \qquad \mathbf{X}=\begin{pmatrix}x_1\\x_2\\\vdots\\x_n\end{pmatrix},
-%     \qquad
-%     \mathbf{F}(t)=\begin{pmatrix}f_1(t)\\f_2(t)\\\vdots\\f_n(t)\end{pmatrix}
-% \]
-
-% \rmk{
-%     Any $n$th-order equation $ y^{(n)}=f(t,y,y',\ldots,y^{(n-1)})$ can be rewritten as a first-order system by setting $x_1=y, x_2=y',\ldots, x_n=y^{(n-1)}$. Then $ x_1'=x_2, x_2'=x_3,\ldots,x_{n-1}'=x_n,x_n'=f(t,x_1,x_2,\ldots,x_n)$
-% }
-
-% \defn{Solution Vector}{
-%     A \emph{solution vector} on an interval $I$ is a column vector whose entries are differentiable and satisfy the system on $I$.
-%     \[
-%         \mathbf{X}(t)=
-%         \begin{pmatrix}
-%             x_1(t)\\x_2(t)\\\vdots\\x_n(t)
-%         \end{pmatrix}
-%     \]
-% }
-
-% \thmr{Existence and Uniqueness for Linear Systems}{linearsystemexistence}{
-%     Suppose the entries of $A(t)$ and $\mathbf{F}(t)$ are continuous on an interval
-%     $I$ containing $t_0$. Then the initial-value problem $\mathbf{X}'=A(t)\mathbf{X}+\mathbf{F}(t), \mathbf{X}(t_0)=\mathbf{X}_0$ has a unique solution on $I$. 
-% }
-
-% \thmr{Superposition for Homogeneous Systems}{systemsuperposition}{
-%     If $\mathbf{X}_1,\ldots,\mathbf{X}_k$ are solution vectors of
-%     $\mathbf{X}'=A(t)\mathbf{X}$ on $I$, then $ \mathbf{X}=c_1\mathbf{X}_1+\cdots+c_k\mathbf{X}_k$ is also a solution. 
-% }
-
-% \defn{Linear Independence of Solution Vectors}{
-%     Solution vectors $\mathbf{X}_1,\ldots,\mathbf{X}_k$ are linearly dependent on
-%     $I$ if there exist constants $c_1,
-%     \ldots,c_k$, not all zero, such that
-%     \[
-%         c_1\mathbf{X}_1(t)+\cdots+c_k\mathbf{X}_k(t)=\mathbf{0}
-%     \]
-%     for every $t\in I$. Otherwise, they are linearly independent.
-% }
-
-% \paragraph{Fundamental Matrix.}
-% For $n$ linearly independent solutions $\mathbf{X}_1,\ldots,\mathbf{X}_n$ (fundamental set of solutions), the matrix
-% \[
-%     \Phi(t)=
-%     \begin{pmatrix}
-%         | & | & & |\\
-%         \mathbf{X}_1 & \mathbf{X}_2 & \cdots & \mathbf{X}_n\\
-%         | & | & & |
-%     \end{pmatrix}
-% \]
-% is called a \emph{fundamental matrix}. Its determinant is the Wronskian of the
-% solution vectors. the set of solution vectors is linearly independent on I if and only if the Wronskian $W(X_1,X_2,\cdots,X_n)=|\Phi(t)| \neq 0 $ for every $t$ in the interval.
-
-% \thmr{General Solution of a Homogeneous Linear System}{systemgeneralsolution}{
-%     If $\Phi(t)$ is a fundamental matrix for $\mathbf{X}'=A(t)\mathbf{X}$, then the
-%     general solution is $\mathbf{X}(t)=\Phi(t)\mathbf{C}$ where $\mathbf{C}$ is a constant column vector.
-% }
-
-% \thmr{General Solution of a Nonhomogeneous System}{nonhomog}{
-%     Let $\mathbf{X}_p$ be a particular solution of $\mathbf{X}'=A(t)\mathbf{X}+\mathbf{F}(t)$, and let $\mathbf{X}_c=\Phi(t)\mathbf{C}$ be the general solution of the
-%     associated homogeneous system $\mathbf{X}'=A(t)\mathbf{X}$. Then the general solution is $\mathbf{X}(t)=\mathbf{X}_c(t)+\mathbf{X}_p(t)$. 
-% }
-
-% \subsection{Homogeneous Linear Systems}
-
-% \paragraph{Procedure} To solve $\mathbf{X}'=A\mathbf{X}$ use the following steps:
-% \begin{enumerate}
-%     \item Find the eigenvalues by solving $\det(A-\lambda I)=0$. 
-%     \item For each eigenvalue $\lambda$, find eigenvectors by solving $ (A-\lambda I)\mathbf{K}=\mathbf{0}$.
-%     \item If $A$ has $n$ linearly independent eigenvectors, form $n$ solutions $\mathbf{K}_i e^{\lambda_i t}$.
-%     \item If an eigenvalue is repeated but has too few eigenvectors, find
-%     generalized eigenvectors. If eigenvalues are complex, use the real and imaginary parts of
-%     $\mathbf{K}e^{\lambda t}$ to form real-valued solutions.
-% \end{enumerate}
-
-% \paragraph{Distinct Real Eigenvalues}{distinctrealeigenvalues}{
-%     If $A$ has $n$ distinct real eigenvalues $\lambda_1,\lambda_2,\ldots,\lambda_n$ with corresponding eigenvectors $\mathbf{K}_1,\mathbf{K}_2,\ldots,\mathbf{K}_n$, then the general solution of $ \mathbf{X}'=A\mathbf{X}$ is
-%     \[
-%         \mathbf{X}(t)
-%         =
-%         c_1\mathbf{K}_1e^{\lambda_1 t}
-%         +
-%         c_2\mathbf{K}_2e^{\lambda_2 t}
-%         +\cdots+
-%         c_n\mathbf{K}_ne^{\lambda_n t}
-%     \]
-% }
-
-% \paragraph{Repeated Eigenvalues: Enough Eigenvectors.}
-% Suppose $\lambda$ is an eigenvalue with algebraic multiplicity $m$. If there are
-% $m$ linearly independent eigenvectors $\mathbf{K}_1,\mathbf{K}_2,\ldots,\mathbf{K}_m$, then the corresponding part of the general solution is
-% \[
-%     c_1\mathbf{K}_1e^{\lambda t}
-%     +
-%     c_2\mathbf{K}_2e^{\lambda t}
-%     +\cdots+
-%     c_m\mathbf{K}_me^{\lambda t}
-% \]
-
-
-% \paragraph{Multiplicity Two with One Eigenvector.}
-% Suppose $\lambda$ has algebraic multiplicity $2$ but only one eigenvector
-% $\mathbf{K}$. The first solution is $\mathbf{X}_1=\mathbf{K}e^{\lambda t}$. To find a second solution, solve for a generalized eigenvector $\mathbf{P}$: $ (A-\lambda I)\mathbf{P}=\mathbf{K}$. Then a second linearly independent solution is $\mathbf{X}_2=(t\mathbf{K}+\mathbf{P})e^{\lambda t}$. 
-
-% \paragraph{Multiplicity Three with One Eigenvector.}
-% Suppose $\lambda$ has algebraic multiplicity $3$ but only one eigenvector
-% $\mathbf{K}$. First solve $(A-\lambda I)\mathbf{K}=\mathbf{0}$. Then find generalized eigenvectors $\mathbf{P}$ and $\mathbf{Q}$ satisfying $(A-\lambda I)\mathbf{P}=\mathbf{K},  (A-\lambda I)\mathbf{Q}=\mathbf{P}$. The three linearly independent solutions are
-% \[
-% \begin{cases}
-%     \mathbf{X}_1=\mathbf{K}e^{\lambda t} \\
-%     \mathbf{X}_2=(t\mathbf{K}+\mathbf{P})e^{\lambda t} \\
-%     \mathbf{X}_3=
-%     \left(
-%         \frac{t^2}{2}\mathbf{K}
-%         +
-%         t\mathbf{P}
-%         +
-%         \mathbf{Q}
-%     \right)e^{\lambda t} 
-% \end{cases}
-% \]
-
-% \paragraph{General Repeated Eigenvalue with One Eigenvector}
-% Suppose $\lambda$ has algebraic multiplicity $m$ but only one eigenvector. We first
-% find a generalized eigenvector chain $(A-\lambda I)\mathbf{K}_1=\mathbf{0}, (A-\lambda I)\mathbf{K}_2=\mathbf{K}_1,(A-\lambda I)\mathbf{K}_3=\mathbf{K}_2,\cdots  (A-\lambda I)\mathbf{K}_m=\mathbf{K}_{m-1}$. Here $\mathbf{K}_1$ is the ordinary eigenvector, while
-% $\mathbf{K}_2,\ldots,\mathbf{K}_m$ are generalized eigenvectors. Then $m$ linearly independent solutions are
-% \[
-% \begin{cases}
-%     \mathbf{X}_1
-%     =
-%     \mathbf{K}_1 e^{\lambda t} \\
-%     \mathbf{X}_2
-%     =
-%     \left(
-%         t\mathbf{K}_1+\mathbf{K}_2
-%     \right)e^{\lambda t} \\
-%      \mathbf{X}_3
-%     =
-%     \left(
-%         \frac{t^2}{2!}\mathbf{K}_1
-%         +
-%         t\mathbf{K}_2
-%         +
-%         \mathbf{K}_3
-%     \right)e^{\lambda t} \\
-%     \cdots \\
-%      \mathbf{X}_j
-%     =
-%     \left(
-%         \frac{t^{j-1}}{(j-1)!}\mathbf{K}_1
-%         +
-%         \frac{t^{j-2}}{(j-2)!}\mathbf{K}_2
-%         +
-%         \cdots
-%         +
-%         t\mathbf{K}_{j-1}
-%         +
-%         \mathbf{K}_j
-%     \right)e^{\lambda t},
-%     \qquad
-%     j=1,2,\ldots,m
-% \end{cases}
-% \]
-
-
-
-
-
-% \paragraph{Complex Eigenvalues.}
-% Suppose $A$ has real entries and has a complex eigenvalue $ \lambda=\alpha+i\beta, \beta>0$. The conjugate $\overline{\lambda}=\alpha-i\beta$ is also an eigenvalue. Let the eigenvector corresponding to $\lambda=\alpha+i\beta$ be $\mathbf{K}=\mathbf{B}+i\mathbf{C}$, where $\mathbf{B}$ is the real part of $\mathbf{K}$ and $\mathbf{C}$ is the imaginary part of $\mathbf{K}$. Then two real linearly independent solutions are
-% \[
-% \begin{cases}
-%      \mathbf{X}_1
-%     =
-%     e^{\alpha t}
-%     \left(
-%         \mathbf{B}\cos\beta t
-%         -
-%         \mathbf{C}\sin\beta t
-%     \right) \\
-%     \mathbf{X}_2
-%     =
-%     e^{\alpha t}
-%     \left(
-%         \mathbf{B}\sin\beta t
-%         +
-%         \mathbf{C}\cos\beta t
-%     \right)
-% \end{cases}
-% \]
-
-% \paragraph{Summary of Cases.}
-% For $\mathbf{X}'=A\mathbf{X}$ the form of the general solution:
-% \[
-% \begin{array}{c|c}
-% \text{Case} & \text{Solution Form}\\
-% \hline
-% \text{Distinct real eigenvalues}
-% &
-% \mathbf{K}_i e^{\lambda_i t}
-% \\[6pt]
-% \text{Repeated eigenvalue with enough eigenvectors}
-% &
-% \mathbf{K}_1e^{\lambda t},\ldots,\mathbf{K}_me^{\lambda t}
-% \\[6pt]
-% \text{Multiplicity two with one eigenvector}
-% &
-% \mathbf{K}e^{\lambda t},\quad
-% (t\mathbf{K}+\mathbf{P})e^{\lambda t}
-% \\[6pt]
-% \text{Multiplicity three with one eigenvector}
-% &
-% \mathbf{K}e^{\lambda t},\quad
-% (t\mathbf{K}+\mathbf{P})e^{\lambda t},\quad
-% \left(\frac{t^2}{2}\mathbf{K}+t\mathbf{P}+\mathbf{Q}\right)e^{\lambda t}
-% \\[6pt]
-% \text{General repeated eigenvalue with one eigenvector}
-% &
-% \mathbf{X}_j
-% =
-% \left(
-%     \frac{t^{j-1}}{(j-1)!}\mathbf{K}_1
-%     +
-%     \frac{t^{j-2}}{(j-2)!}\mathbf{K}_2
-%     +
-%     \cdots
-%     +
-%     t\mathbf{K}_{j-1}
-%     +
-%     \mathbf{K}_j
-% \right)e^{\lambda t}
-% \\[10pt]
-% \text{Complex eigenvalues } \alpha\pm i\beta
-% &
-% e^{\alpha t}(\mathbf{B}\cos\beta t-\mathbf{C}\sin\beta t),\quad
-% e^{\alpha t}(\mathbf{B}\sin\beta t+\mathbf{C}\cos\beta t)
-% \end{array}
-% \]
-
-
-
-% \subsection{Nonhomogeneous Linear Systems}
-
-% \paragraph{General Form.}
-% A nonhomogeneous linear system has the form $\mathbf{X}'=A\mathbf{X}+\mathbf{F}(t)$. Its general solution is $\mathbf{X}=\mathbf{X}_c+\mathbf{X}_p$ where $\mathbf{X}_c$ solves the associated homogeneous system and
-% $\mathbf{X}_p$ is one particular solution.
-
-% \paragraph{Undetermined Coefficients.}
-% For constant $A$, the method of undetermined coefficients applies when the entries
-% of $\mathbf{F}(t)$ are finite combinations of constants, polynomials,
-% exponentials, sines, and cosines.
-
-% \paragraph{Procedure.}
-% \begin{enumerate}
-%     \item Solve the associated homogeneous system $\mathbf{X}'=A\mathbf{X}$.
-%     \item Guess the form of $\mathbf{X}_p$ from the form of $\mathbf{F}(t)$.
-%     \item Substitute $\mathbf{X}_p$ into $\mathbf{X}'=A\mathbf{X}+\mathbf{F}(t)$.
-%     \item Solve the resulting algebraic equations for the unknown coefficients.
-%     \item Write $\mathbf{X}=\mathbf{X}_c+\mathbf{X}_p$.
-% \end{enumerate}
-
-% \paragraph{Variation of Parameters for Systems.}
-% Let $\Phi(t)$ be a fundamental matrix for the homogeneous system
-% $\mathbf{X}'=A(t)\mathbf{X}$.
-% \[
-%     \mathbf{X}(t)=\Phi(t)\mathbf{C}
-%     +
-%     \Phi(t)\int \Phi^{-1}(t)\mathbf{F}(t)\,dt
-% \]
-
-% \subsection{Matrix Exponential}
-
-% \defn{Matrix Exponential}{
-%     For an $n\times n$ matrix $A$, the \emph{matrix exponential} is defined by
-%     \[
-%         e^{At}
-%         =
-%         I+At+\frac{A^2t^2}{2!}+\frac{A^3t^3}{3!}+\cdots
-%         =
-%         \sum_{k=0}^{\infty}\frac{A^kt^k}{k!}
-%     \]
-% }
-
-% \paragraph{Derivative and Initial Value.}
-% The matrix exponential behaves like the scalar exponential:
-% \[
-%     \frac{d}{dt}e^{At}=Ae^{At}=e^{At}A,
-%     \qquad
-%     e^{A\cdot 0}=I
-% \]
-
-% \thmr{Homogeneous Solution Using the Matrix Exponential}{matrixexphomogeneous}{
-%     The solution of $\mathbf{X}'=A\mathbf{X},
-%         \mathbf{X}(0)=\mathbf{X}_0$
-%     is
-%     \[
-%         \mathbf{X}(t)=e^{At}\mathbf{X}_0
-%     \]
-%     More generally, the general solution is
-%     \[
-%         \mathbf{X}(t)=e^{At}\mathbf{C}
-%     \]
-% }
-
-% \paragraph{Nonhomogeneous Solution.}
-% For constant $A$,$
-%     \mathbf{X}'=A\mathbf{X}+\mathbf{F}(t),
-%     \mathbf{X}(t_0)=\mathbf{X}_0,
-% $
-% we have
-% \[
-%     \mathbf{X}(t)
-%     =
-%     e^{A(t-t_0)}\mathbf{X}_0
-%     +
-%     \int_{t_0}^{t}e^{A(t-s)}\mathbf{F}(s)\,ds
-% \]
-
-% \paragraph{Computing $e^{At}$ by Diagonalization.}
-% If $A=PDP^{-1}$, where $ D=\operatorname{diag}(\lambda_1,\ldots,\lambda_n)$ then
-% \[
-%     e^{At}=Pe^{Dt}P^{-1},
-%     \qquad
-%     e^{Dt}=\operatorname{diag}(e^{\lambda_1t},\ldots,e^{\lambda_nt})
-% \]
-
-% \paragraph{Computing $e^{At}$ by Laplace Transform.}
-
-% \[
-%     \mathcal{L}\{e^{At}\}=(sI-A)^{-1},
-%     \qquad
-%     e^{At}=\mathcal{L}^{-1}\{(sI-A)^{-1}\}
-% \]
-
-% \section{Practice Questions}
-
-% \subsection{First-Order Differential Equations}
-
-% \paragraph{Q1} Solve the given differential equation by separation of variables: $e^x y \frac{dy}{dx} = e^{-y} + e^{-7x-y}$ 
-% \paragraph{Q2} Find the general solution of the given differential equation: $x^2y^\prime + x(x+2)y = e^x$
-% \paragraph{Q3} Solve the given IVP: $(6y+2t-3)dt + (8y+6t-1)dy = 0,\quad y(-1)=2$
-% \paragraph{Q4} Solve the given differential equation by finding an appropriate integrating factor: $6xy dx+(4y+9x^2)dy=0$
-% \paragraph{Q5} Solve the given differential equation by using an appropriate substitution: $ydx=2(x+y)dy$
-% \paragraph{Q6} Solve the given differential equation by using an appropriate substitution: $x \frac{dy}{dx} - (1+x)y = xy^2$
-% \paragraph{Q7} Solve the given differential equation by using an appropriate substitution: $\frac{dy}{dx} = 4 + \sqrt{y-4x+2}$
-
-% \subsection{Higher-Order Differential Equations}
-
-% \paragraph{Q1} The indicated function $y_1(x)$ is a solution of the following differential equation, find $y_2(x)$: 
-% $$ y^{\prime \prime}+2y^{\prime}+36y=0, \quad y_1(x)=xe^{-x}$$
-% \paragraph{Q2} The indicated function $y_1(x)$ is a solution of the following differential equation, find $y_2(x)$: 
-% $$  x^2 y^{\prime \prime} - 11xy^{\prime} +36y = 0, \quad y_1(x) = x^6 $$
-% \paragraph{Q3} Find the general solution of the given equation: $\frac{d^3 u}{dt^3} + \frac{d^2 u}{dt^2} - 2u = 0$ 
-% \paragraph{Q4} Find the general solution of the given equation: $16 \frac{d^4 y}{dx^4} + 48 \frac{d^2y}{dx^2} + 36y = 0$ 
-% \paragraph{Q5} Find the general solution of the given equation: $ y^{\prime \prime} - 2y^\prime +50y = e^x \cos(7x)$ 
-% \paragraph{Q6} Find the general solution of the given equation: $y^{\prime \prime} + 3y^\prime + 2y = \frac{1}{2+e^x}$ 
-% \paragraph{Q6} Find the general solution of the given equation: $y^{\prime\prime} - y =e^{\frac{x}{2}} + 8 $
-% \paragraph{Q7} Find the general solution of the given equation: $y^{\prime\prime} + 3y^\prime + 2y = \cos(e^x)  $
-% \paragraph{Q8} Find the general solution of the given equation: $x^2y^{\prime\prime} - xy^\prime + y = 14x  $
-% \paragraph{Q9} Find the general solution of the given equation: $16x^2y^{\prime\prime} + 16xy^\prime + y = 0  $
-% \paragraph{Q10} Solve the given system of differential equations: $\frac{dx}{dt} = 12x + 19y, \quad \frac{dy}{dt} = x = 6y$
-% \paragraph{Q11} Find the general solution of the given equation: 
-% $ y^{\prime \prime} + y = \sec (x)$
-
-% \subsection{Series Solutions of Linear Equations}
-% \paragraph{Q1} Find two power series solutions of the given differential equation about the ordinary point $x=0$: 
-% $$ y^{\prime \prime} -4xy^{\prime} + y = 0 $$
-% \paragraph{Q2} Find the general solution of the given equation:  $y^{\prime \prime} - xy^{\prime} - y = 0$
-% \paragraph{Q3} Find the general solution of the given equation: $ x^2 y^{\prime \prime} + x(x-2)y^\prime +(2-x)y = 0$
-
-% \subsection{The Laplace Transform}
-% \paragraph{Q1} Find the general solution of the given equation: $y^{\prime \prime} + 2y^\prime = \delta (t-\pi) -u(t-2\pi)$
-
-% \subsection{Systems of Linear Differential Equations}
-% \paragraph{Q1} Solve the given initial-value problem: \[
-% \mathbf{X}'=
-% \begin{pmatrix}
-% \frac{1}{2} & 0 \\
-% 1 & -\frac{1}{2}
-% \end{pmatrix}
-% \mathbf{X},
-% \qquad
-% \mathbf{X}(0)=
-% \begin{pmatrix}
-% 5 \\
-% 8
-% \end{pmatrix}
-% \]
-% \paragraph{Q2} Find the general solution of the given system: 
-% \[
-% \mathbf{X}'=
-% \begin{pmatrix}
-% 9 & -4 & 0 \\
-% 1 & 0 & 2 \\
-% 0 & 2 & 9
-% \end{pmatrix}
-% \mathbf{X}
-% \]
-% \paragraph{Q3} Find the general solution of the given system: $\frac{dx}{dt} =5x - y, \frac{dy}{dt} = 25x - 5y$
-% \paragraph{Q4} Find the general solution of the given system: $\frac{dx}{dt} =8x - y, \frac{dy}{dt} = 5x + 4y$
-% \paragraph{Q5} Find the general solution of the given system:
-% \[
-% \mathbf{x}'=
-% \begin{pmatrix}
-% 0 & 5\\
-% -1 & 6
-% \end{pmatrix}\mathbf{x}
-% +
-% \begin{pmatrix}
-% 16\\
-% -16
-% \end{pmatrix}e^t
-% \]
+\chapter{Ordinary Differential Equations}
+
+\section{Introduction to Differential Equations}
+
+\subsection{Definitions and Terminology}
+
+\defn{Differential Equation}{
+    A \emph{differential equation} is an equation that contains derivatives of one
+    or more unknown functions with respect to one or more independent variables.
+    The unknown function is usually called the \emph{dependent variable}, and the
+    variable with respect to which differentiation is taken is called the
+    \emph{independent variable}.
+}
+
+\paragraph{Ordinary and Partial Differential Equations}{
+    A DE is called an \emph{ordinary differential equation}
+    (ODE) if it contains only ordinary derivatives with respect to a single
+    independent variable. It is called a \emph{partial differential equation}
+    (PDE) if it contains partial derivatives of one or more unknown functions of
+    two or more independent variables.
+}
+
+\ex{
+    The equations $\frac{dy}{dx}+5y=e^x$ and $\frac{d^2y}{dx^2}-6y=0$ are ordinary differential equations.  \\
+    By contrast, $\frac{\partial u}{\partial x} + \frac{\partial u}{\partial y} = 0$ is a partial differential equation.
+}
+
+\paragraph{Order.}
+The \emph{order} of a differential equation is the order of the highest derivative
+appearing in the equation. In one dependent variable, the general form of an
+$n$th-order ODE is
+\[
+    F(x,y,y',\ldots,y^{(n)})=0
+\]
+If the equation can be solved for the highest derivative, it can be written in
+\emph{normal form}:
+\[
+    \frac{d^n y}{dx^n} = f(x,y,y',\ldots,y^{(n-1)})
+\]
+
+\paragraph{Linear Ordinary Differential Equation}{
+    An $n$th-order ODE is \emph{linear} if it's linear in the dependent
+    variable and all of its derivatives. Its general form is
+    \[
+        a_n(x)y^{(n)}
+        +a_{n-1}(x)y^{(n-1)}
+        +\cdots
+        +a_1(x)y'
+        +a_0(x)y
+        =
+        g(x)
+    \]
+    The coefficients may depend on the independent variable $x$, but not on
+    $y$ or its derivatives.
+}
+
+\ex{
+    The equation $y''-2y'+y=e^x$ is linear. \\
+    The equations $yy'+x=0$, $y''+\sin y=0$ and $(y')^2+y=0$ are nonlinear. 
+}
+
+\paragraph{Solution of an ODE}{
+    A function $\phi$, defined on an interval $I$ and possessing the required
+    derivatives on $I$, is called a \emph{solution} of an $n$th-order ODE if
+    substituting $y=\phi(x)$ into the equation reduces it to an identity on $I$.
+}
+
+\paragraph{Interval of Definition}{
+    The interval on which a solution is defined is called the \emph{interval of
+    definition}, \emph{interval of existence}, \emph{interval of validity}, or
+    \emph{domain of the solution}.
+}
+
+\paragraph{Explicit and Implicit Solutions}{
+    An \emph{explicit solution} expresses the dependent variable directly as a
+    function of the independent variable: $y=\phi(x)$. An \emph{implicit solution} is a relation $ G(x,y)=0$ that defines at least one differentiable function $y=\phi(x)$ satisfying the differential equation on an interval.
+}
+
+\ex{
+    The relation $x^2+y^2=25$ is an implicit solution of $\frac{dy}{dx}=-\frac{x}{y}$. On the interval $(-5,5)$, it gives two explicit branches: $y=\sqrt{25-x^2}$ and $y=-\sqrt{25-x^2}$. 
+}
+
+\paragraph{Families, Particular Solutions, and Singular Solutions}{
+    A solution containing one or more constants is called a
+    \emph{family of solutions}. A solution obtained by assigning values
+    to these constants is called a \emph{particular solution}. A \emph{singular solution} is a solution that can't be obtained from the family of solutions by any choice of the arbitrary constants.
+}
+
+\ex{
+    The equation $ y'=y$ has the one-parameter family of solutions $ y=ce^x$. If the condition $y(0)=3$ is imposed, then $c=3$, so the particular solution is $y=3e^x$. 
+}
+
+\paragraph{System of ODEs}{
+    A \emph{system of ordinary differential equations} consists of two or more
+    equations involving derivatives of two or more unknown functions of a single
+    independent variable. 
+}
+
+\subsection{Initial-Value Problems}
+
+\defn{Initial-Value Problem}{
+    An $n$th-order \emph{initial-value problem} consists of an $n$th-order
+    differential equation together with $n$ side conditions imposed at the same
+    point $x_0$:
+    \[
+        \frac{d^n y}{dx^n}
+        =
+        f(x,y,y',\ldots,y^{(n-1)})
+    \]
+    subject to
+    \[
+        y(x_0)=y_0,\qquad
+        y'(x_0)=y_1,\qquad
+        \ldots,\qquad
+        y^{(n-1)}(x_0)=y_{n-1}
+    \]
+}
+
+\thmr{Existence and Uniqueness for a First-Order IVP}{existenceuniqueness}{
+    Let $R$ be a rectangular region in the $xy$-plane containing the point
+    $(x_0,y_0)$. If $f(x,y)$ and $\dfrac{\partial f}{\partial y}(x,y)$ are
+    continuous on $R$, then there exists an interval $I_0=(x_0-h,x_0+h)$ for some $h>0$ on which the initial-value problem
+    \[
+        \frac{dy}{dx}=f(x,y),
+        \qquad
+        y(x_0)=y_0
+    \]
+    has a unique solution.
+}
+
+\rmk{
+    This theorem is local: it guarantees a unique solution only near \(x_0\), not
+necessarily on the largest possible interval. It gives sufficient, not necessary,
+conditions. Roughly, \(f\) continuous gives existence, and \(f_y\) continuous gives
+uniqueness.
+}
+
+\ex{
+    The initial-value problem $\frac{dy}{dx}=x\sqrt{y}, y(0)=0$ has more than one solution. For example, $y=0$ and $y=\frac{x^4}{16}$ both satisfy the differential equation and the initial condition. This does not contradict the existence--uniqueness theorem, because $\frac{\partial}{\partial y}\bigl(x\sqrt{y}\bigr) = \frac{x}{2\sqrt{y}}$ is not continuous at $y=0$.
+}
+
+\section{First-Order Differential Equations}
+
+\subsection{Solution Curves Without an Explicit Solution}
+
+\paragraph{Direction Field}{
+    Consider a first-order differential equation in normal form $\frac{dy}{dx}=f(x,y)$
+    At each point $(x,y)$ where $f$ is defined, the value $f(x,y)$ gives the slope
+    of a small line segment, called a \emph{lineal element}. A collection of such
+    lineal elements drawn on a grid in the $xy$-plane is called a
+    \emph{direction field}.
+}
+
+\defn{Autonomous First-Order Differential Equation}{
+    A first-order differential equation is called \emph{autonomous} if the
+    independent variable does not appear explicitly. In normal form, it can be
+    written as
+    \[
+        \frac{dy}{dx}=f(y)
+    \]
+}
+
+\paragraph{Critical Point and Equilibrium Solution}{
+    A real number $c$ is called a \emph{critical point}, \emph{equilibrium point}, or
+    \emph{stationary point} of $\frac{dy}{dx}=f(y)$ if $f(c)=0$. In this case, the constant function $y(x)=c$ is a solution, called an \emph{equilibrium solution}.
+}
+
+\paragraph{Phase Line and Phase Portrait}{
+    For an autonomous equation $\frac{dy}{dx}=f(y)$ a \emph{phase line} is a vertical line on which the critical points are marked. The sign of $f(y)$ on each interval between critical points determines whether solutions are increasing or decreasing. The resulting diagram is called a \emph{one-dimensional phase portrait}.
+}
+
+\paragraph{Attractors, Repellers, and Semi-Stable Points}{
+    Let $c$ be a critical point of $\frac{dy}{dx}=f(y)$
+    \begin{itemize}
+        \item If nearby solutions approach $c$ as $x\to\infty$, then $c$ is an
+        \emph{attractor} or \emph{asymptotically stable equilibrium}.
+        \item If nearby solutions move away from $c$, then $c$ is a \emph{repeller}
+        or \emph{unstable equilibrium}.
+        \item If solutions approach $c$ from one side and move away from $c$ from
+        the other side, then $c$ is \emph{semi-stable}.
+    \end{itemize}
+}
+
+\prop{
+    If $y(x)$ is a solution of the autonomous equation $\frac{dy}{dx}=f(y)$ then for any constant $k$, $y_1(x)=y(x-k)$ is also a solution. This is called the \emph{translation property.}
+}
+
+
+\subsection{Separable Equations}
+
+\defn{Separable Equation}{
+    A first-order differential equation of the form
+    \[
+        \frac{dy}{dx}=g(x)h(y)
+    \]
+    is called a \emph{separable differential equation}.
+}
+
+\paragraph{Procedure.}
+To solve a separable differential equation:
+\begin{enumerate}
+    \item Write the equation in separable form $\frac{dy}{dx}=g(x)h(y)$.
+    \item Assuming $h(y)\neq 0$, separate the variables $\frac{1}{h(y)}\,dy=g(x)\,dx$. 
+     \item Integrate both sides $\int \frac{1}{h(y)}\,dy=\int g(x)\,dx$. 
+    \item Write the solution implicitly as $ H(y)=G(x)+C$.
+\end{enumerate}
+
+\rmk{
+    When solving a separable equation, any value $r$ such that $h(r)=0$ should be
+    checked separately. The constant function $y=r$ may be a solution, but it may
+    be lost after division by $h(y)$.
+}
+
+
+\subsection{Linear Equations}
+
+\defn{First-Order Linear Equation}{
+    A first-order differential equation of the form $ a_1(x)\frac{dy}{dx}+a_0(x)y=g(x)$ is called a \emph{linear differential equation} in the dependent variable $y$.
+    If $a_1(x)\neq 0$, division by $a_1(x)$ gives the standard form
+    \[
+        \frac{dy}{dx}+P(x)y=f(x)
+    \]
+}
+
+\paragraph{Procedure.}
+To solve a first-order linear equation:
+\begin{enumerate}
+    \item Put the equation in standard form $\frac{dy}{dx}+P(x)y=f(x)$. 
+    \item Compute the integrating factor $\mu(x)=e^{\int P(x)\,dx}$. 
+    \item Multiply both sides by $\mu(x)$ and rewrite the left-hand side as $\frac{d}{dx}\bigl(\mu(x)y\bigr)$. 
+    \item Integrate both sides and solve for $y$.
+    \[
+    y=e^{-\int P(x)\,dx}
+    \left(
+        \int e^{\int P(x)\,dx}f(x)\,dx+C
+    \right)
+    \]
+\end{enumerate}
+
+
+
+\subsection{Exact Differential Equations}
+
+\defn{Exact Differential Equation}{
+    A first-order differential equation written in differential form
+    \[
+        M(x,y)\,dx+N(x,y)\,dy=0
+    \]
+    is called an \emph{exact equation} if there exists a function $\Phi(x,y)$ such
+    that
+    \[
+        \frac{\partial \Phi}{\partial x}=M(x,y),
+        \qquad
+        \frac{\partial \Phi}{\partial y}=N(x,y)
+    \]
+    In that case, $d\Phi=M\,dx+N\,dy$ and the solution is given implicitly by $\Phi(x,y)=C$.
+}
+
+\thmr{Criterion for Exactness}{exactnesscriterion}{
+    Suppose $M(x,y)$ and $N(x,y)$ have continuous first partial derivatives in a
+    rectangular region $R$. Then $M(x,y)\,dx+N(x,y)\,dy$
+    is an exact differential in $R$ if and only if
+    \[
+        \frac{\partial M}{\partial y}
+        =
+        \frac{\partial N}{\partial x}
+    \]
+}
+
+\paragraph{Procedure.}
+
+\begin{enumerate}
+    \item Integrate $M$ with respect to $x$: $ \Phi(x,y)=\int M(x,y)\,dx+g(y)$.
+    \item Differentiate this expression with respect to $y$: $\Phi_y=\frac{\partial}{\partial y}
+        \left(\int M(x,y)\,dx\right)+g'(y)$. 
+    \item Set $\Phi_y=N(x,y)$ and solve for $g'(y)$. Integrate to find $g(y)$.
+    \item Write the solution as $\Phi(x,y)=C$.
+\end{enumerate}
+
+\paragraph{Integrating Factors for Nonexact Equations.}
+If $M(x,y)\,dx+N(x,y)\,dy=0$ is not exact, it may become exact after multiplication by a nonzero function $\mu(x,y)$: $\mu M\,dx+\mu N\,dy=$. Two useful special cases are:
+\[
+\begin{cases}
+    \mu(x) =\exp\left( \int \frac{M_y-N_x}{N}\,dx \right), \qquad \text{if } \frac{M_y-N_x}{N} \text{ depends only on }x \\
+    \mu(y)
+    =
+    \exp\left(
+        \int \frac{N_x-M_y}{M}\,dy
+    \right),
+    \qquad
+    \text{if }
+    \frac{N_x-M_y}{M}
+    \text{ depends only on }y
+\end{cases}
+\]
+
+
+\subsection{Solutions by Substitutions}
+
+\defn{Substitution Method}{
+    For a first-order equation $\frac{dy}{dx}=f(x,y)$ introduce a substitution $y=g(x,u), u=u(x)$. By the chain rule,
+    \[
+        \frac{dy}{dx}
+        =
+        \frac{\partial g}{\partial x}(x,u)
+        +
+        \frac{\partial g}{\partial u}(x,u)\frac{du}{dx}
+    \]
+    After substitution, the original equation may become a simpler equation $\frac{du}{dx}=F(x,u)$. If this new equation is separable or linear, it can be solved by earlier methods. Finally, substitute back to obtain $y$.
+}
+
+\paragraph{Solving a Homogeneous Equation.}
+If the equation is homogeneous, use the substitution
+\[
+    y=ux,
+    \qquad
+    \frac{dy}{dx}=u+x\frac{du}{dx}
+\]
+
+\paragraph{Solving a Bernoulli Equation.}{
+    A differential equation of the form $\frac{dy}{dx}+P(x)y=f(x)y^n$ is called a \emph{Bernoulli equation}. For $n\neq 0,1$, it can be reduced to a linear equation by the substitution
+    \[
+        u=y^{1-n}, \qquad  \frac{du}{dx}
+    =
+    (1-n)y^{-n}\frac{dy}{dx}
+    \]
+}
+
+\paragraph{Reduction to Separation of Variables}{
+    A differential equation of the form $\frac{dy}{dx}=f(Ax+By+C),B\neq 0$ can be reduced to a separable equation by the substitution
+    \[
+        u=Ax+By+C,\qquad \frac{du}{dx}=A+B\frac{dy}{dx}
+    \]
+}
+
+
+\subsection{A Numerical Method}
+
+\defn{Euler's Method}{
+    Consider the initial-value problem $y'=f(x,y), y(x_0)=y_0$, Euler's method approximates the solution by repeatedly following tangent lines: 
+    \[
+    x_n=x_0+nh,
+    \qquad
+    y_{n+1}=y_n+h f(x_n,y_n),
+    \qquad
+    n=0,1,2,\ldots
+    \]
+}
+
+\section{Higher-Order Differential Equations}
+
+\subsection{Theory of Linear Equations}
+
+\paragraph{Linear $n$th-Order Differential Equation}{
+    A linear $n$th-order differential equation has the form
+    \[
+        a_n(x)y^{(n)}+a_{n-1}(x)y^{(n-1)}+\cdots+a_1(x)y'+a_0(x)y=g(x)
+    \]
+    where $a_n(x)\neq 0$ on an interval $I$. If $g(x)=0$, the equation is
+    \emph{homogeneous}; otherwise it is \emph{nonhomogeneous}. An $n$th-order initial-value problem specifies the value of $y$ and its first
+    $n-1$ derivatives at the same point $x_0$:
+    \[
+        y(x_0)=y_0,\qquad
+        y'(x_0)=y_1,\qquad
+        \ldots,\qquad
+        y^{(n-1)}(x_0)=y_{n-1}
+    \]
+}
+
+\thmr{Existence and Uniqueness for Linear IVPs}{higherorderexistence}{
+    Suppose $a_n,a_{n-1},\ldots,a_0$ and $g$ are continuous on an interval $I$, and
+    $a_n(x)\neq 0$ for every $x\in I$. Then for any $x_0\in I$, the corresponding
+    $n$th-order linear initial-value problem has a unique solution on $I$.
+}
+
+\rmk{
+    This theorem is much stronger than the first-order local theorem: for linear
+    equations, the solution exists on the whole interval on which the coefficient
+    functions are continuous and the leading coefficient is nonzero.
+}
+
+\paragraph{Boundary-Value Problems.}
+A boundary-value problem imposes conditions at different points, for example $y(a)=y_0, y(b)=y_1$. Unlike initial-value problems, a boundary-value problem may have infinitely many
+solutions, exactly one solution, or no solution.
+
+\paragraph{Differential Operator Notation.}
+Let $D=\frac{d}{dx}$. Then $D^n y=\frac{d^n y}{dx^n}$. The linear differential operator is
+\[
+    L=a_n(x)D^n+a_{n-1}(x)D^{n-1}+\cdots+a_1(x)D+a_0(x)
+\]
+so the differential equation can be written compactly as $L[y]=g(x)$. 
+
+\prop{
+    The operator $L$ is linear, where $\alpha$ and $\beta$ are constants:
+    \[
+        L[\alpha f+\beta g]=\alpha L[f]+\beta L[g],
+    \]
+}
+
+\thmr{Superposition Principle for Homogeneous Equations}{homogeneoussuperposition}{
+    If $y_1,\ldots,y_k$ are solutions of the homogeneous equation $L[y]=0$ on an
+    interval $I$, then every linear combination $y=c_1y_1+\cdots+c_ky_k$ is also a solution on $I$.
+}
+
+\defn{Linear Independence and the Wronskian}{
+    Functions $f_1,\ldots,f_n$ are linearly dependent on $I$ if there exist
+    constants $c_1,\ldots,c_n$, not all zero, such that
+    \[
+        c_1f_1(x)+\cdots+c_nf_n(x)=0
+    \]
+    for every $x\in I$. Otherwise they are linearly independent. The \emph{Wronskian} of $f_1,\ldots,f_n$ is
+    \[
+        W(f_1,\ldots,f_n)=
+        \begin{vmatrix}
+            f_1 & f_2 & \cdots & f_n\\
+            f_1' & f_2' & \cdots & f_n'\\
+            \vdots & \vdots & & \vdots\\
+            f_1^{(n-1)} & f_2^{(n-1)} & \cdots & f_n^{(n-1)}
+        \end{vmatrix}
+    \]
+}
+
+\paragraph{Wronskian Criterion for Solutions}{wronskiancriterion}{
+    Let $y_1,\ldots,y_n$ be $n$ solutions of a homogeneous linear $n$th-order
+    differential equation on $I$. Then they are linearly independent on $I$ if and
+    only if for every $x\in I$: 
+    \[
+        W(y_1,\ldots,y_n)(x)\neq 0
+    \]
+}
+
+\paragraph{Fundamental Set of Solutions}{
+    A set of $n$ linearly independent solutions of a homogeneous linear
+    $n$th-order differential equation is called a \emph{fundamental set of
+    solutions}.
+}
+
+\thmr{General Solution of a Homogeneous Linear Equation}{homogeneousgeneralsolution}{
+    If $y_1,\ldots,y_n$ form a fundamental set of solutions for $L[y]=0$ on $I$,
+    then the general solution is
+    \[
+        y=c_1y_1+\cdots+c_ny_n
+    \]
+}
+
+\thmr{General Solution of a Nonhomogeneous Linear Equation}{nonhomogeneousgeneralsolution}{
+    If $y_p$ is one particular solution of $L[y]=g(x)$ and
+    $y_c=c_1y_1+\cdots+c_ny_n$ is the general solution of the associated
+    homogeneous equation $L[y]=0$, then the general solution of the
+    nonhomogeneous equation is
+    \[
+        y=y_c+y_p
+    \]
+}
+
+\prop{
+    If $y_{p1},\ldots,y_{pk}$ are particular solutions of
+    \[
+        L[y]=g_1(x),\qquad \ldots,\qquad L[y]=g_k(x)
+    \]
+    then $y_p=y_{p1}+\cdots+y_{pk}$ is a particular solution of
+    \[
+        L[y]=g_1(x)+\cdots+g_k(x)
+    \]
+}
+
+\subsection{Reduction of Order}
+
+\thmr{Reduction of Order Formula}{reductionoforder}{
+    Let $y_1(x)$ be a nonzero solution of
+    \[
+        y''+P(x)y'+Q(x)y=0
+    \]
+    on an interval $I$. Then a second solution is
+    \[
+        y_2(x)=y_1(x)\int
+        \frac{e^{-\int P(x)\,dx}}{[y_1(x)]^2}\,dx
+    \]
+}
+
+\paragraph{Procedure.}
+\begin{enumerate}
+    \item Put the equation in standard form $y''+P(x)y'+Q(x)y=0$.
+    \item Identify a known nonzero solution $y_1$.
+    \item Use $y_2=y_1\int \frac{e^{-\int P(x)\,dx}}{y_1^2}\,dx$. 
+    \item Write the general solution as $y=c_1y_1+c_2y_2$.
+\end{enumerate}
+
+
+\subsection{Homogeneous Linear Equations with Constant Coefficients}
+
+\paragraph{Auxiliary Equation.}
+For $a_ny^{(n)}+a_{n-1}y^{(n-1)}+\cdots+a_1y'+a_0y=0$, try $y=e^{mx}$. Substitution gives the \emph{auxiliary equation} $a_nm^n+a_{n-1}m^{n-1}+\cdots+a_1m+a_0=0$. The roots of this polynomial determine the solution.
+
+\paragraph{Second-Order Case.}
+For $ay''+by'+cy=0$ the auxiliary equation is $am^2+bm+c=0$.
+
+\begin{center}
+\begin{tabular}{c|c}
+Root type & General solution\\
+\hline
+$m_1\neq m_2$ real & $y=c_1e^{m_1x}+c_2e^{m_2x}$\\[0.3em]
+$m_1=m_2=m$ & $y=c_1e^{mx}+c_2xe^{mx}$\\[0.3em]
+$m=\alpha\pm i\beta$ & $y=e^{\alpha x}\bigl(c_1\cos \beta x+c_2\sin \beta x\bigr)$
+\end{tabular}
+\end{center}
+
+\paragraph{Higher-Order Roots.}
+If $m$ is a real root of multiplicity $k$, then the corresponding solutions are
+\[
+    e^{mx},\quad xe^{mx},\quad x^2e^{mx},\quad \ldots,\quad x^{k-1}e^{mx}
+\]
+If $\alpha\pm i\beta$ is a complex conjugate pair of multiplicity $k$, then the
+real solutions are
+\[
+    e^{\alpha x}\cos \beta x,\quad xe^{\alpha x}\cos \beta x,
+    \quad \ldots,\quad x^{k-1}e^{\alpha x}\cos \beta x
+\]
+\[
+    e^{\alpha x}\sin \beta x,\quad xe^{\alpha x}\sin \beta x,
+    \quad \ldots,\quad x^{k-1}e^{\alpha x}\sin \beta x
+\]
+
+\subsection{Undetermined Coefficients: Superposition Approach}
+
+\paragraph{When the Method Applies.}
+The method of undetermined coefficients applies to nonhomogeneous linear
+differential equations with constant coefficients, $a_ny^{(n)}+a_{n-1}y^{(n-1)}+\cdots+a_1y'+a_0y=g(x)$, when $g(x)$ is a finite sum of constants, polynomials, exponentials, sines, cosines, or products of these functions.
+
+\paragraph{Procedure.}
+\begin{enumerate}
+    \item Solve the associated homogeneous equation to find $y_c$.
+    \item Guess the form of a particular solution $y_p$ based on $g(x)$.
+    \item Substitute $y_p$ into the original equation and solve for the unknown coefficients.
+    \item Write the general solution as $y=y_c+y_p$.
+\end{enumerate}
+
+\paragraph{Common Trial Forms.}
+\begin{center}
+\begin{tabular}{c|c}
+$g(x)$ & Trial form for $y_p$\\
+\hline
+$k$ & $A$\\[0.2em]
+$a_mx^m+\cdots+a_0$ & $A_mx^m+\cdots+A_0$\\[0.2em]
+$e^{\alpha x}$ & $Ae^{\alpha x}$\\[0.2em]
+$x^me^{\alpha x}$ & $(A_mx^m+\cdots+A_0)e^{\alpha x}$\\[0.2em]
+$\cos \beta x$ or $\sin \beta x$ & $A\cos \beta x+B\sin \beta x$\\[0.2em]
+$e^{\alpha x}\cos \beta x$ or $e^{\alpha x}\sin \beta x$ &
+$e^{\alpha x}(A\cos \beta x+B\sin \beta x)$
+\end{tabular}
+\end{center}
+
+\rmk{If any term in the guessed $y_p$ is already contained in $y_c$, multiply the whole
+guess by the smallest power $x^s$ that removes the duplication: $y_p=x^s(\text{original guess})$.}
+
+\subsection{Undetermined Coefficients: Annihilator Approach}
+
+\defn{Annihilator}{
+    A differential operator $L$ with constant coefficients is called an
+    \emph{annihilator} of $f(x)$ if
+    \[
+        L[f(x)]=0
+    \]
+}
+
+\paragraph{Basic Annihilators.}
+\[
+    D^n \text{ annihilates } 1,x,x^2,\ldots,x^{n-1}.
+\]
+\[
+    (D-\alpha)^n \text{ annihilates }
+    e^{\alpha x},xe^{\alpha x},\ldots,x^{n-1}e^{\alpha x}.
+\]
+\[
+    \bigl[(D-\alpha)^2+\beta^2\bigr]^n
+    \text{ annihilates }
+    x^ke^{\alpha x}\cos\beta x
+    \text{ and }
+    x^ke^{\alpha x}\sin\beta x, k=0,1,\ldots,n-1.
+\]
+
+\paragraph{Procedure.}
+To solve $L[y]=g(x)$ by annihilators:
+\begin{enumerate}
+    \item Solve $L[y]=0$ to find the complementary function $y_c$.
+    \item Find an operator $L_1$ such that $L_1[g]=0$.
+    \item Apply $L_1$ to obtain the homogeneous equation $L_1L[y]=0$. 
+    \item Solve the higher-order homogeneous equation.
+    \item Remove the terms already in $y_c$; the remaining terms give the form of $y_p$.
+    \item Substitute into the original equation to determine the coefficients.
+\end{enumerate}
+
+\rmk{
+    The annihilator method justifies the guessing method. It is often more useful
+    for finding the correct form of $y_p$ than for doing the final coefficient
+    calculation.
+}
+
+\subsection{Variation of Parameters}
+
+\paragraph{Procedure.}
+\begin{enumerate}
+    \item Put the equation in standard form $y''+P(x)y'+Q(x)y=f(x)$.
+    \item Solve the homogeneous equation to find $y_1,y_2$.
+    \item Compute $W=y_1y_2'-y_2y_1'$. Compute $u_1'$ and $u_2'$ using $u_1'=-\frac{y_2f}{W}, u_2'=\frac{y_1f}{W}$
+    \item Integrate to find $u_1,u_2$, then write $y_p=u_1y_1+u_2y_2$.
+    \item The general solution is $y=y_c+y_p$.
+\end{enumerate}
+
+\subsection{Cauchy--Euler Equations}
+
+\defn{Cauchy--Euler Equation}{
+    A second-order Cauchy--Euler equation has the form where $a,b,c$ are constants:
+    \[
+        ax^2y''+bxy'+cy=g(x)
+    \]
+    More generally, an $n$th-order Cauchy--Euler
+    equation has powers of $x$ matched to the order of the derivative:
+    \[
+        a_nx^ny^{(n)}+a_{n-1}x^{n-1}y^{(n-1)}+
+        \cdots+a_1xy'+a_0y=g(x)
+    \]
+}
+
+\paragraph{Root Cases.}
+On an interval where $x>0$:
+\begin{center}
+\begin{tabular}{c|c}
+Root type & General solution\\
+\hline
+$m_1\neq m_2$ real & $y=c_1x^{m_1}+c_2x^{m_2}$\\[0.3em]
+$m_1=m_2=m$ & $y=c_1x^m+c_2x^m\ln x$\\[0.3em]
+$m=\alpha\pm i\beta$ &
+$y=x^\alpha\bigl(c_1\cos(\beta\ln x)+c_2\sin(\beta\ln x)\bigr)$
+\end{tabular}
+\end{center}
+
+\paragraph{Nonhomogeneous Case.}
+\begin{enumerate}
+    \item Solve the associated homogeneous Cauchy--Euler equation.
+    \item Divide by the leading coefficient to put the equation in standard form.
+    \item Use variation of parameters to find $y_p$.
+\end{enumerate}
+
+\subsection{Solving Systems of Linear Differential Equations by Elimination}
+
+\defn{Solution of a System}{
+    A solution of a system of differential equations is a set of sufficiently
+    differentiable functions, such as
+    \[
+        x=\Phi_1(t),\qquad y=\Phi_2(t),\qquad z=\Phi_3(t)
+    \]
+    that satisfies every equation in the system on a common interval $I$.
+}
+
+\paragraph{Procedure.}
+\begin{enumerate}
+    \item Rewrite the system using the differential operator $D$.
+    \item Apply operators to the equations so that one unknown can be eliminated.
+    \item Solve the resulting higher-order equation for one dependent variable.
+    \item Substitute back into one original equation to find the other variables.
+    \item Use the original system to relate the arbitrary constants.
+\end{enumerate}
+
+\section{Series Solutions of Linear Equations}
+
+\subsection{Review of Power Series}
+
+\defn{Power Series}{
+    A \emph{power series centered at $a$} is an infinite series of the form
+    \[
+        \sum_{n=0}^{\infty} c_n(x-a)^n
+        =
+        c_0+c_1(x-a)+c_2(x-a)^2+\cdots
+    \]
+}
+
+\paragraph{Convergence and Radius of Convergence.}
+A power series may converge for some values of $x$ and diverge for others. The set
+of all real numbers $x$ for which the series converges is called its
+\emph{interval of convergence}. There is a number $R$, called the
+\emph{radius of convergence}, such that
+$
+    \sum_{n=0}^{\infty} c_n(x-a)^n
+    \text{converges for } |x-a|<R
+$
+and diverges for $|x-a|>R$. At the endpoints $x=a\pm R$, convergence must be
+checked separately.
+
+\paragraph{Ratio Test.}
+For a power series, the ratio test often gives the radius of convergence. If
+$
+    L
+    =
+    \lim_{n\to\infty}
+    \left|
+        \frac{c_{n+1}(x-a)^{n+1}}{c_n(x-a)^n}
+    \right|
+$
+then the series converges absolutely when $L<1$ and diverges when $L>1$.
+The test is inconclusive when $L=1$, which usually corresponds to the endpoints.
+
+\defn{Analytic Function}{
+    A function $f$ is \emph{analytic at $a$} if it can be represented by a power
+    series centered at $a$ with $R>0$:
+    \[
+        f(x)=\sum_{n=0}^{\infty} c_n(x-a)^n
+    \]
+}
+
+\prop{
+    If $\sum_{n=0}^{\infty} c_n(x-a)^n=0$ for all $x$ in some open interval around $a$, then every coefficient must be
+    zero: $c_n=0, n=0,1,2,\ldots$. This is called the \emph{identity property} of power series.
+}
+
+
+\subsection{Solutions About Ordinary Points}
+
+\defn{Ordinary and Singular Points}{
+    Consider the homogeneous linear second-order equation $a_2(x)y''+a_1(x)y'+a_0(x)y=0$. After division by $a_2(x)$, write it in standard form $y''+P(x)y'+Q(x)y=0$. A point $x=x_0$ is an \emph{ordinary point} if both $P(x)$ and $Q(x)$ are
+    analytic at $x_0$. Otherwise, $x=x_0$ is a \emph{singular point}.
+}
+
+\thmr{Existence of Power Series Solutions}{powerseriesordinary}{
+    If $x=x_0$ is an ordinary point of $a_2(x)y''+a_1(x)y'+a_0(x)y=0$ then the equation has two linearly independent solutions of the form $y=\sum_{n=0}^{\infty} c_n(x-x_0)^n$. Each power series solution converges at least for $|x-x_0|<R$ where $R$ is the distance from $x_0$ to the nearest singular point.
+}
+
+\paragraph{Procedure.}
+To find a power series solution about an ordinary point:
+\begin{enumerate}
+    \item Assume $ y=\sum_{n=0}^{\infty} c_n(x-x_0)^n$.
+    \item Differentiate term by term to find $y'$ and $y''$. Substitute $y,y',y''$ into the differential equation. Make all series use the same power of $x-x_0$. Set each coefficient equal to zero. Solve the resulting recurrence relation. 
+    \item Write the solution in terms of the arbitrary constants, usually $c_0$ and $c_1$.
+\end{enumerate}
+
+
+\subsection{Solutions About Singular Points}
+
+\defn{Regular and Irregular Singular Points}{
+    Suppose $x=x_0$ is a singular point of $y''+P(x)y'+Q(x)y=0$. Then $x=x_0$ is a \emph{regular singular point} if
+    \[
+        p(x)=(x-x_0)P(x),
+        \qquad
+        q(x)=(x-x_0)^2Q(x)
+    \]
+    are both analytic at $x_0$. A singular point that is not regular is called an
+    \emph{irregular singular point}.
+}
+
+\thmr{Frobenius' Theorem}{frobeniustheorem}{
+    If $x=x_0$ is a regular singular point of $a_2(x)y''+a_1(x)y'+a_0(x)y=0$, then there exists at least one solution of the following form  where $r$ is a constant determined by the differential equation
+    \[
+        y
+        =
+        \sum_{n=0}^{\infty} c_n(x-x_0)^{n+r}
+        =
+        (x-x_0)^r
+        \sum_{n=0}^{\infty} c_n(x-x_0)^n,
+        \qquad c_0\neq 0
+    \]
+}
+
+\paragraph{Indicial Equation.}
+For a regular singular point at $x=0$, write $ y''+P(x)y'+Q(x)y=0$, and define
+\[
+    p(x)=xP(x)=a_0+a_1x+a_2x^2+\cdots,
+    \qquad
+    q(x)=x^2Q(x)=b_0+b_1x+b_2x^2+\cdots
+\]
+Then the \emph{indicial equation} is $r(r-1)+a_0r+b_0=0$. Its roots are called the \emph{indicial roots}.
+
+\paragraph{Procedure.}
+To solve near a regular singular point $x=0$:
+\begin{enumerate}
+    \item Assume a Frobenius solution $y=\sum_{n=0}^{\infty} c_nx^{n+r},
+        c_0\neq 0$.
+    \item Compute $y'$ and $y''$. Substitute into the differential equation. Set the coefficient of the lowest power of $x$ equal to zero. This gives the indicial equation. Solve the recurrence relation for each indicial root.
+    \item Determine whether one or two linearly independent Frobenius series are obtained.
+\end{enumerate}
+
+\paragraph{Three Cases for Indicial Roots.}
+Assume $r_1$ and $r_2$ are real indicial roots with $r_1\ge r_2$.
+
+\begin{center}
+\begin{tabular}{c|c}
+Case & Form of solutions\\
+\hline
+$r_1-r_2\notin \mathbb{Z}_{>0}$ &
+Two Frobenius series usually exist\\[0.4em]
+$r_1-r_2\in \mathbb{Z}_{>0}$ &
+One Frobenius series always exists; the second may contain $\ln x$\\[0.4em]
+$r_1=r_2$ &
+Second solution contains $\ln x$
+\end{tabular}
+\end{center}
+More explicitly $ y_1=\sum_{n=0}^{\infty} c_nx^{n+r_1}, c_0\neq 0$. The second solution may have the form
+\[
+    y_2=C y_1\ln x+\sum_{n=0}^{\infty} b_nx^{n+r_2},
+    \qquad b_0\neq 0,
+\]
+where $C$ may be zero in the second case, but is nonzero in the repeated-root case.
+
+
+\section{The Laplace Transform}
+
+\subsection{Definition of the Laplace Transform}
+
+\defn{Laplace Transform}{
+    Let $f$ be defined for $t\ge 0$. The \emph{Laplace transform} of $f$ is
+    \[
+        \mathcal{L}\{f(t)\}=F(s)=\int_0^\infty e^{-st}f(t)\,dt 
+        =
+        \lim_{b\to\infty}\int_0^b e^{-st}f(t)\,dt
+    \]
+    The variable $t$ is the original variable, while $s$ is the transform variable.
+}
+
+\paragraph{Basic Transform Table.}
+For suitable values of $s$,
+\[
+\begin{array}{c|c}
+    f(t) & \mathcal{L}\{f(t)\}=F(s)\\
+    \hline
+    1 & \dfrac{1}{s}\\[0.7em]
+    t^n & \dfrac{n!}{s^{n+1}},\quad n=1,2,3,\ldots\\[0.7em]
+    e^{at} & \dfrac{1}{s-a}\\[0.7em]
+    \sin kt & \dfrac{k}{s^2+k^2}\\[0.7em]
+    \cos kt & \dfrac{s}{s^2+k^2}\\[0.7em]
+    \sinh kt & \dfrac{k}{s^2-k^2}\\[0.7em]
+    \cosh kt & \dfrac{s}{s^2-k^2}
+\end{array}
+\]
+
+\prop{
+    The Laplace transform is linear. If $\mathcal{L}\{f\}=F$ and
+    $\mathcal{L}\{g\}=G$, then
+    \[
+        \mathcal{L}\{\alpha f(t)+\beta g(t)\}
+        =
+        \alpha F(s)+\beta G(s)
+    \]
+}
+
+\defn{Piecewise Continuity and Exponential Order}{
+    A function $f$ is \emph{piecewise continuous} on $[0,\infty)$ if, on every finite
+    interval, it is continuous except possibly at finitely many points, and each
+    discontinuity is finite. A function $f$ is of \emph{exponential order} $c$ as $t\to\infty$ if there exist
+    constants $M>0$, $c>0$, and $T>0$ such that
+    \[
+        |f(t)|\le Me^{ct},\qquad t>T
+    \]
+}
+
+\thmr{Existence of the Laplace Transform}{laplaceexistence}{
+    If $f$ is piecewise continuous on $[0,\infty)$ and is of exponential order $c$,
+    then $\mathcal{L}\{f(t)\}$ exists for $s>c$.
+}
+
+\subsection{Inverse Transforms and Transforms of Derivatives}
+
+\defn{Inverse Laplace Transform}{
+    If $\mathcal{L}\{f(t)\}=F(s)$, then $f(t)$ is called the \emph{inverse Laplace
+    transform} of $F(s)$, written
+    \[
+        f(t)=\mathcal{L}^{-1}\{F(s)\}
+    \]
+}
+
+\paragraph{Partial Fractions.}
+For rational functions, first decompose into simpler fractions. Typical patterns are
+\[
+    \frac{P(s)}{(s-a)(s-b)}
+    =
+    \frac{A}{s-a}+\frac{B}{s-b}
+\]
+\[
+    \frac{P(s)}{(s-a)^m}
+    =
+    \frac{A_1}{s-a}+\frac{A_2}{(s-a)^2}+\cdots+
+    \frac{A_m}{(s-a)^m}
+\]
+
+
+\thmr{Transform of a Derivative}{transformderivative}{
+    Suppose the needed derivatives of $f$ are continuous or piecewise continuous
+    and of exponential order. If $\mathcal{L}\{f(t)\}=F(s)$, then
+    \[
+        \mathcal{L}\{f^{(n)}(t)\}
+        =
+        s^nF(s)-s^{n-1}f(0)-s^{n-2}f'(0)-\cdots-f^{(n-1)}(0)
+    \]
+    \[
+        \mathcal{L}\{f'(t)\}=sF(s)-f(0),
+        \qquad
+        \mathcal{L}\{f''(t)\}=s^2F(s)-sf(0)-f'(0)
+    \]
+}
+
+\paragraph{Solving Linear IVPs by Laplace Transform.}
+For a constant-coefficient linear initial-value problem:
+\begin{enumerate}
+    \item Take the Laplace transform of both sides. Use initial conditions through the derivative formulas.
+    \item Solve the algebraic equation for $Y(s)$. Decompose $Y(s)$ into recognizable pieces. Apply $\mathcal{L}^{-1}$ to obtain $y(t)$.
+\end{enumerate}
+
+\subsection{Operational Properties}
+
+\thmr{First Translation Theorem}{firsttranslation}{
+    If $\mathcal{L}\{f(t)\}=F(s)$, then
+    \[
+        \mathcal{L}\{e^{at}f(t)\}=F(s-a) \Leftrightarrow \mathcal{L}^{-1}\{F(s-a)\}=e^{at}f(t)
+    \]
+}
+
+\defn{Unit Step Function}{
+    The \emph{unit step function} at $a$ is
+    \[
+        U(t-a)=
+        \begin{cases}
+            0, & 0\le t<a,\\
+            1, & t\ge a
+        \end{cases}
+    \]
+}
+
+\thmr{Second Translation Theorem}{secondtranslation}{
+    If $\mathcal{L}\{f(t)\}=F(s)$ and $a>0$, then
+    \[
+        \mathcal{L}\{U(t-a)f(t-a)\}=e^{-as}F(s) \Leftrightarrow  \mathcal{L}^{-1}\{e^{-as}F(s)\}=U(t-a)f(t-a)
+    \]
+}
+
+\paragraph{Alternative Form.}
+For a term of the form $g(t)U(t-a)$, it is often easier to use
+\[
+    \mathcal{L}\{g(t)U(t-a)\}
+    =
+    e^{-as}\mathcal{L}\{g(t+a)\}
+\]
+
+\thmr{Derivatives of Transforms}{derivativesoftransforms}{
+    If $\mathcal{L}\{f(t)\}=F(s)$, then for $n=1,2,3,\ldots$,
+    \[
+        \mathcal{L}\{t^n f(t)\}
+        =
+        (-1)^n\frac{d^n}{ds^n}F(s)
+    \]
+    \[
+        \mathcal{L}\{t f(t)\}=-F'(s)
+    \]
+}
+
+\defn{Convolution}{
+    If $f$ and $g$ are piecewise continuous on $[0,\infty)$, their \emph{convolution}
+    is
+    \[
+        (f*g)(t)=\int_0^t f(\tau)g(t-\tau)\,d\tau
+    \]
+}
+
+\paragraph{Basic Properties of Convolution.}
+Convolution behaves like a generalized product:
+\[
+    f*g=g*f,
+    \qquad
+    (f*g)*h=f*(g*h),
+    \qquad
+    f*(g+h)=f*g+f*h
+\]
+
+\thmr{Convolution Theorem}{convolutiontheorem}{
+    If $\mathcal{L}\{f(t)\}=F(s)$ and $\mathcal{L}\{g(t)\}=G(s)$, then
+    \[
+        \mathcal{L}\{(f*g)(t)\}=F(s)G(s) \Leftrightarrow \mathcal{L}^{-1}\{F(s)G(s)\}=f*g
+    \]
+}
+
+\paragraph{Transform of an Integral.}
+Taking $g(t)=1$ in the convolution theorem gives
+\[
+    \mathcal{L}\left\{\int_0^t f(\tau)\,d\tau\right\}
+    =
+    \frac{F(s)}{s},
+    \qquad
+    F(s)=\mathcal{L}\{f(t)\}
+\]
+
+\defn{Volterra Integral Equation}{
+    An equation of the following form  is a \emph{Volterra integral equation}. The integral term is a convolution,
+    so Laplace transforms turn the equation into an algebraic equation for
+    $F(s)=\mathcal{L}\{f(t)\}$
+    \[
+        f(t)=g(t)+\int_0^t f(\tau)h(t-\tau)\,d\tau
+    \]
+}
+
+\thmr{Transform of a Periodic Function}{periodiclaplace}{
+    If $f$ is piecewise continuous on $[0,\infty)$ and periodic with period $T$, then
+    \[
+        \mathcal{L}\{f(t)\}
+        =
+        \frac{\displaystyle\int_0^T e^{-st}f(t)\,dt}{1-e^{-sT}}
+    \]
+}
+
+\subsection{The Dirac Delta Function}
+
+\paragraph{Unit Impulse.}
+A unit impulse models a force of very large magnitude acting over a very short time.
+A rectangular impulse centered near $t_0$ has total area $1$, and as its width tends
+to zero, it is idealized by the Dirac delta.
+
+\defn{Dirac Delta}{
+    The \emph{Dirac delta} $\delta(t-t_0)$ is not an ordinary function. It is a
+    generalized function characterized formally by
+    \[
+        \delta(t-t_0)=0\quad (t\ne t_0),
+        \qquad
+        \int_0^\infty \delta(t-t_0)\,dt=1
+    \]
+}
+
+\thmr{Transform of the Dirac Delta Function}{deltatransform}{
+    For $t_0>0$,
+    \[
+        \mathcal{L}\{\delta(t-t_0)\}=e^{-st_0}
+    \]
+}
+
+
+\section{Systems of Linear Differential Equations}
+
+\subsection{Theory of Linear Systems}
+
+\defn{First-Order System}{
+    A system of $n$ first-order differential equations has normal form
+    \[
+        \frac{dx_i}{dt}=g_i(t,x_1,x_2,\ldots,x_n),
+        \qquad i=1,2,\ldots,n
+    \]
+    If each $g_i$ is linear in the dependent variables, the system is linear.
+}
+
+\paragraph{Matrix Form.} If $\mathbf{F}(t)=\mathbf{0}$, the system is \emph{homogeneous}; otherwise it's \emph{nonhomogeneous}.
+\[
+    \mathbf{X}'=A(t)\mathbf{X}+\mathbf{F}(t), \qquad \mathbf{X}=\begin{pmatrix}x_1\\x_2\\\vdots\\x_n\end{pmatrix},
+    \qquad
+    \mathbf{F}(t)=\begin{pmatrix}f_1(t)\\f_2(t)\\\vdots\\f_n(t)\end{pmatrix}
+\]
+
+\rmk{
+    Any $n$th-order equation $ y^{(n)}=f(t,y,y',\ldots,y^{(n-1)})$ can be rewritten as a first-order system by setting $x_1=y, x_2=y',\ldots, x_n=y^{(n-1)}$. Then $ x_1'=x_2, x_2'=x_3,\ldots,x_{n-1}'=x_n,x_n'=f(t,x_1,x_2,\ldots,x_n)$
+}
+
+\defn{Solution Vector}{
+    A \emph{solution vector} on an interval $I$ is a column vector whose entries are differentiable and satisfy the system on $I$.
+    \[
+        \mathbf{X}(t)=
+        \begin{pmatrix}
+            x_1(t)\\x_2(t)\\\vdots\\x_n(t)
+        \end{pmatrix}
+    \]
+}
+
+\thmr{Existence and Uniqueness for Linear Systems}{linearsystemexistence}{
+    Suppose the entries of $A(t)$ and $\mathbf{F}(t)$ are continuous on an interval
+    $I$ containing $t_0$. Then the initial-value problem $\mathbf{X}'=A(t)\mathbf{X}+\mathbf{F}(t), \mathbf{X}(t_0)=\mathbf{X}_0$ has a unique solution on $I$. 
+}
+
+\thmr{Superposition for Homogeneous Systems}{systemsuperposition}{
+    If $\mathbf{X}_1,\ldots,\mathbf{X}_k$ are solution vectors of
+    $\mathbf{X}'=A(t)\mathbf{X}$ on $I$, then $ \mathbf{X}=c_1\mathbf{X}_1+\cdots+c_k\mathbf{X}_k$ is also a solution. 
+}
+
+\defn{Linear Independence of Solution Vectors}{
+    Solution vectors $\mathbf{X}_1,\ldots,\mathbf{X}_k$ are linearly dependent on
+    $I$ if there exist constants $c_1,
+    \ldots,c_k$, not all zero, such that
+    \[
+        c_1\mathbf{X}_1(t)+\cdots+c_k\mathbf{X}_k(t)=\mathbf{0}
+    \]
+    for every $t\in I$. Otherwise, they are linearly independent.
+}
+
+\paragraph{Fundamental Matrix.}
+For $n$ linearly independent solutions $\mathbf{X}_1,\ldots,\mathbf{X}_n$ (fundamental set of solutions), the matrix
+\[
+    \Phi(t)=
+    \begin{pmatrix}
+        | & | & & |\\
+        \mathbf{X}_1 & \mathbf{X}_2 & \cdots & \mathbf{X}_n\\
+        | & | & & |
+    \end{pmatrix}
+\]
+is called a \emph{fundamental matrix}. Its determinant is the Wronskian of the
+solution vectors. the set of solution vectors is linearly independent on I if and only if the Wronskian $W(X_1,X_2,\cdots,X_n)=|\Phi(t)| \neq 0 $ for every $t$ in the interval.
+
+\thmr{General Solution of a Homogeneous Linear System}{systemgeneralsolution}{
+    If $\Phi(t)$ is a fundamental matrix for $\mathbf{X}'=A(t)\mathbf{X}$, then the
+    general solution is $\mathbf{X}(t)=\Phi(t)\mathbf{C}$ where $\mathbf{C}$ is a constant column vector.
+}
+
+\thmr{General Solution of a Nonhomogeneous System}{nonhomog}{
+    Let $\mathbf{X}_p$ be a particular solution of $\mathbf{X}'=A(t)\mathbf{X}+\mathbf{F}(t)$, and let $\mathbf{X}_c=\Phi(t)\mathbf{C}$ be the general solution of the
+    associated homogeneous system $\mathbf{X}'=A(t)\mathbf{X}$. Then the general solution is $\mathbf{X}(t)=\mathbf{X}_c(t)+\mathbf{X}_p(t)$. 
+}
+
+\subsection{Homogeneous Linear Systems}
+
+\paragraph{Procedure} To solve $\mathbf{X}'=A\mathbf{X}$ use the following steps:
+\begin{enumerate}
+    \item Find the eigenvalues by solving $\det(A-\lambda I)=0$. 
+    \item For each eigenvalue $\lambda$, find eigenvectors by solving $ (A-\lambda I)\mathbf{K}=\mathbf{0}$.
+    \item If $A$ has $n$ linearly independent eigenvectors, form $n$ solutions $\mathbf{K}_i e^{\lambda_i t}$.
+    \item If an eigenvalue is repeated but has too few eigenvectors, find
+    generalized eigenvectors. If eigenvalues are complex, use the real and imaginary parts of
+    $\mathbf{K}e^{\lambda t}$ to form real-valued solutions.
+\end{enumerate}
+
+\paragraph{Distinct Real Eigenvalues}{distinctrealeigenvalues}{
+    If $A$ has $n$ distinct real eigenvalues $\lambda_1,\lambda_2,\ldots,\lambda_n$ with corresponding eigenvectors $\mathbf{K}_1,\mathbf{K}_2,\ldots,\mathbf{K}_n$, then the general solution of $ \mathbf{X}'=A\mathbf{X}$ is
+    \[
+        \mathbf{X}(t)
+        =
+        c_1\mathbf{K}_1e^{\lambda_1 t}
+        +
+        c_2\mathbf{K}_2e^{\lambda_2 t}
+        +\cdots+
+        c_n\mathbf{K}_ne^{\lambda_n t}
+    \]
+}
+
+\paragraph{Repeated Eigenvalues: Enough Eigenvectors.}
+Suppose $\lambda$ is an eigenvalue with algebraic multiplicity $m$. If there are
+$m$ linearly independent eigenvectors $\mathbf{K}_1,\mathbf{K}_2,\ldots,\mathbf{K}_m$, then the corresponding part of the general solution is
+\[
+    c_1\mathbf{K}_1e^{\lambda t}
+    +
+    c_2\mathbf{K}_2e^{\lambda t}
+    +\cdots+
+    c_m\mathbf{K}_me^{\lambda t}
+\]
+
+
+\paragraph{Multiplicity Two with One Eigenvector.}
+Suppose $\lambda$ has algebraic multiplicity $2$ but only one eigenvector
+$\mathbf{K}$. The first solution is $\mathbf{X}_1=\mathbf{K}e^{\lambda t}$. To find a second solution, solve for a generalized eigenvector $\mathbf{P}$: $ (A-\lambda I)\mathbf{P}=\mathbf{K}$. Then a second linearly independent solution is $\mathbf{X}_2=(t\mathbf{K}+\mathbf{P})e^{\lambda t}$. 
+
+\paragraph{Multiplicity Three with One Eigenvector.}
+Suppose $\lambda$ has algebraic multiplicity $3$ but only one eigenvector
+$\mathbf{K}$. First solve $(A-\lambda I)\mathbf{K}=\mathbf{0}$. Then find generalized eigenvectors $\mathbf{P}$ and $\mathbf{Q}$ satisfying $(A-\lambda I)\mathbf{P}=\mathbf{K},  (A-\lambda I)\mathbf{Q}=\mathbf{P}$. The three linearly independent solutions are
+\[
+\begin{cases}
+    \mathbf{X}_1=\mathbf{K}e^{\lambda t} \\
+    \mathbf{X}_2=(t\mathbf{K}+\mathbf{P})e^{\lambda t} \\
+    \mathbf{X}_3=
+    \left(
+        \frac{t^2}{2}\mathbf{K}
+        +
+        t\mathbf{P}
+        +
+        \mathbf{Q}
+    \right)e^{\lambda t} 
+\end{cases}
+\]
+
+\paragraph{General Repeated Eigenvalue with One Eigenvector}
+Suppose $\lambda$ has algebraic multiplicity $m$ but only one eigenvector. We first
+find a generalized eigenvector chain $(A-\lambda I)\mathbf{K}_1=\mathbf{0}, (A-\lambda I)\mathbf{K}_2=\mathbf{K}_1,(A-\lambda I)\mathbf{K}_3=\mathbf{K}_2,\cdots  (A-\lambda I)\mathbf{K}_m=\mathbf{K}_{m-1}$. Here $\mathbf{K}_1$ is the ordinary eigenvector, while
+$\mathbf{K}_2,\ldots,\mathbf{K}_m$ are generalized eigenvectors. Then $m$ linearly independent solutions are
+\[
+\begin{cases}
+    \mathbf{X}_1
+    =
+    \mathbf{K}_1 e^{\lambda t} \\
+    \mathbf{X}_2
+    =
+    \left(
+        t\mathbf{K}_1+\mathbf{K}_2
+    \right)e^{\lambda t} \\
+     \mathbf{X}_3
+    =
+    \left(
+        \frac{t^2}{2!}\mathbf{K}_1
+        +
+        t\mathbf{K}_2
+        +
+        \mathbf{K}_3
+    \right)e^{\lambda t} \\
+    \cdots \\
+     \mathbf{X}_j
+    =
+    \left(
+        \frac{t^{j-1}}{(j-1)!}\mathbf{K}_1
+        +
+        \frac{t^{j-2}}{(j-2)!}\mathbf{K}_2
+        +
+        \cdots
+        +
+        t\mathbf{K}_{j-1}
+        +
+        \mathbf{K}_j
+    \right)e^{\lambda t},
+    \qquad
+    j=1,2,\ldots,m
+\end{cases}
+\]
+
+
+
+
+
+\paragraph{Complex Eigenvalues.}
+Suppose $A$ has real entries and has a complex eigenvalue $ \lambda=\alpha+i\beta, \beta>0$. The conjugate $\overline{\lambda}=\alpha-i\beta$ is also an eigenvalue. Let the eigenvector corresponding to $\lambda=\alpha+i\beta$ be $\mathbf{K}=\mathbf{B}+i\mathbf{C}$, where $\mathbf{B}$ is the real part of $\mathbf{K}$ and $\mathbf{C}$ is the imaginary part of $\mathbf{K}$. Then two real linearly independent solutions are
+\[
+\begin{cases}
+     \mathbf{X}_1
+    =
+    e^{\alpha t}
+    \left(
+        \mathbf{B}\cos\beta t
+        -
+        \mathbf{C}\sin\beta t
+    \right) \\
+    \mathbf{X}_2
+    =
+    e^{\alpha t}
+    \left(
+        \mathbf{B}\sin\beta t
+        +
+        \mathbf{C}\cos\beta t
+    \right)
+\end{cases}
+\]
+
+\paragraph{Summary of Cases.}
+For $\mathbf{X}'=A\mathbf{X}$ the form of the general solution:
+\[
+\begin{array}{c|c}
+\text{Case} & \text{Solution Form}\\
+\hline
+\text{Distinct real eigenvalues}
+&
+\mathbf{K}_i e^{\lambda_i t}
+\\[6pt]
+\text{Repeated eigenvalue with enough eigenvectors}
+&
+\mathbf{K}_1e^{\lambda t},\ldots,\mathbf{K}_me^{\lambda t}
+\\[6pt]
+\text{Multiplicity two with one eigenvector}
+&
+\mathbf{K}e^{\lambda t},\quad
+(t\mathbf{K}+\mathbf{P})e^{\lambda t}
+\\[6pt]
+\text{Multiplicity three with one eigenvector}
+&
+\mathbf{K}e^{\lambda t},\quad
+(t\mathbf{K}+\mathbf{P})e^{\lambda t},\quad
+\left(\frac{t^2}{2}\mathbf{K}+t\mathbf{P}+\mathbf{Q}\right)e^{\lambda t}
+\\[6pt]
+\text{General repeated eigenvalue with one eigenvector}
+&
+\mathbf{X}_j
+=
+\left(
+    \frac{t^{j-1}}{(j-1)!}\mathbf{K}_1
+    +
+    \frac{t^{j-2}}{(j-2)!}\mathbf{K}_2
+    +
+    \cdots
+    +
+    t\mathbf{K}_{j-1}
+    +
+    \mathbf{K}_j
+\right)e^{\lambda t}
+\\[10pt]
+\text{Complex eigenvalues } \alpha\pm i\beta
+&
+e^{\alpha t}(\mathbf{B}\cos\beta t-\mathbf{C}\sin\beta t),\quad
+e^{\alpha t}(\mathbf{B}\sin\beta t+\mathbf{C}\cos\beta t)
+\end{array}
+\]
+
+
+
+\subsection{Nonhomogeneous Linear Systems}
+
+\paragraph{General Form.}
+A nonhomogeneous linear system has the form $\mathbf{X}'=A\mathbf{X}+\mathbf{F}(t)$. Its general solution is $\mathbf{X}=\mathbf{X}_c+\mathbf{X}_p$ where $\mathbf{X}_c$ solves the associated homogeneous system and
+$\mathbf{X}_p$ is one particular solution.
+
+\paragraph{Undetermined Coefficients.}
+For constant $A$, the method of undetermined coefficients applies when the entries
+of $\mathbf{F}(t)$ are finite combinations of constants, polynomials,
+exponentials, sines, and cosines.
+
+\paragraph{Procedure.}
+\begin{enumerate}
+    \item Solve the associated homogeneous system $\mathbf{X}'=A\mathbf{X}$.
+    \item Guess the form of $\mathbf{X}_p$ from the form of $\mathbf{F}(t)$.
+    \item Substitute $\mathbf{X}_p$ into $\mathbf{X}'=A\mathbf{X}+\mathbf{F}(t)$.
+    \item Solve the resulting algebraic equations for the unknown coefficients.
+    \item Write $\mathbf{X}=\mathbf{X}_c+\mathbf{X}_p$.
+\end{enumerate}
+
+\paragraph{Variation of Parameters for Systems.}
+Let $\Phi(t)$ be a fundamental matrix for the homogeneous system
+$\mathbf{X}'=A(t)\mathbf{X}$.
+\[
+    \mathbf{X}(t)=\Phi(t)\mathbf{C}
+    +
+    \Phi(t)\int \Phi^{-1}(t)\mathbf{F}(t)\,dt
+\]
+
+\subsection{Matrix Exponential}
+
+\defn{Matrix Exponential}{
+    For an $n\times n$ matrix $A$, the \emph{matrix exponential} is defined by
+    \[
+        e^{At}
+        =
+        I+At+\frac{A^2t^2}{2!}+\frac{A^3t^3}{3!}+\cdots
+        =
+        \sum_{k=0}^{\infty}\frac{A^kt^k}{k!}
+    \]
+}
+
+\paragraph{Derivative and Initial Value.}
+The matrix exponential behaves like the scalar exponential:
+\[
+    \frac{d}{dt}e^{At}=Ae^{At}=e^{At}A,
+    \qquad
+    e^{A\cdot 0}=I
+\]
+
+\thmr{Homogeneous Solution Using the Matrix Exponential}{matrixexphomogeneous}{
+    The solution of $\mathbf{X}'=A\mathbf{X},
+        \mathbf{X}(0)=\mathbf{X}_0$
+    is
+    \[
+        \mathbf{X}(t)=e^{At}\mathbf{X}_0
+    \]
+    More generally, the general solution is
+    \[
+        \mathbf{X}(t)=e^{At}\mathbf{C}
+    \]
+}
+
+\paragraph{Nonhomogeneous Solution.}
+For constant $A$,$
+    \mathbf{X}'=A\mathbf{X}+\mathbf{F}(t),
+    \mathbf{X}(t_0)=\mathbf{X}_0,
+$
+we have
+\[
+    \mathbf{X}(t)
+    =
+    e^{A(t-t_0)}\mathbf{X}_0
+    +
+    \int_{t_0}^{t}e^{A(t-s)}\mathbf{F}(s)\,ds
+\]
+
+\paragraph{Computing $e^{At}$ by Diagonalization.}
+If $A=PDP^{-1}$, where $ D=\operatorname{diag}(\lambda_1,\ldots,\lambda_n)$ then
+\[
+    e^{At}=Pe^{Dt}P^{-1},
+    \qquad
+    e^{Dt}=\operatorname{diag}(e^{\lambda_1t},\ldots,e^{\lambda_nt})
+\]
+
+\paragraph{Computing $e^{At}$ by Laplace Transform.}
+
+\[
+    \mathcal{L}\{e^{At}\}=(sI-A)^{-1},
+    \qquad
+    e^{At}=\mathcal{L}^{-1}\{(sI-A)^{-1}\}
+\]
+
+% \input{linear_algebra_chapter.tex}
 
 \end{document}
 
