@@ -2,6 +2,8 @@ build/*
 !build/
 !build/*.pdf
 
+reference/
+
 *.aux
 *.bbl
 *.bcf

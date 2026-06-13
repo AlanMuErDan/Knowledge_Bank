@@ -1,0 +1,1816 @@
+\documentclass[oneside]{book}
+
+% ------------------------------------------------------------------------------
+% Packages
+% ------------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{mathtools}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems, skins, breakable}
+
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+\usepackage{multicol}
+\setlength{\columnsep}{1.2em}
+
+\usepackage{graphicx}
+
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% ------------------------------------------------------------------------------
+% Page Setup
+% ------------------------------------------------------------------------------
+
+\geometry{
+    top=0.8in,
+    bottom=0.8in,
+    left=0.7in,
+    right=0.7in,
+    headheight=12pt,
+    headsep=20pt,
+    footskip=25pt
+}
+
+\setstretch{1.15}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=MidnightBlue,
+    urlcolor=RoyalBlue,
+    citecolor=ForestGreen
+}
+
+% ------------------------------------------------------------------------------
+% Variables
+% ------------------------------------------------------------------------------
+
+\def\notetitle{Computer Science: The Part They Expect You to Just Know}
+\def\notesubtitle{Python, Data Structures, and Algorithms for When the Interview Is Tomorrow}
+\def\noteauthor{Alan Li}
+\def\noteinstitution{New York University}
+
+% ------------------------------------------------------------------------------
+% Theorem System and User Commands
+% ------------------------------------------------------------------------------
+
+\input{theorems.tex}
+\input{commands.tex}
+
+% ------------------------------------------------------------------------------
+% Code Listing Style
+% ------------------------------------------------------------------------------
+
+\lstdefinestyle{python}{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{MidnightBlue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{ForestGreen!80!black},
+    numberstyle=\tiny\color{gray},
+    showstringspaces=false,
+    breaklines=true,
+    frame=none,
+    xleftmargin=2em,
+    numbers=none,
+    tabsize=4,
+}
+
+\lstset{style=python}
+
+\newcommand{\pyinline}[1]{\lstinline[style=python]{#1}}
+
+% Code block using tcolorbox
+\newtcolorbox{codebox}[1][]{
+    enhanced,
+    breakable,
+    frame hidden,
+    colback=black!3!white,
+    borderline west={1.2mm}{0pt}{black!25},
+    sharp corners,
+    boxsep=0pt,
+    left=4mm,
+    right=4mm,
+    top=3mm,
+    bottom=3mm,
+    before skip=8pt,
+    after skip=10pt,
+    #1
+}
+
+% Pseudocode styling
+\algrenewcommand\algorithmicprocedure{\textbf{procedure}}
+\algrenewcommand\algorithmicfunction{\textbf{function}}
+
+% Column type for tables
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+% Complexity shortcuts
+\newcommand{\bigO}[1]{$O(#1)$}
+\newcommand{\bigOmega}[1]{$\Omega(#1)$}
+\newcommand{\bigTheta}[1]{$\Theta(#1)$}
+
+% ------------------------------------------------------------------------------
+% Document
+% ------------------------------------------------------------------------------
+
+\begin{document}
+
+% ------------------------------------------------------------------------------
+% Title Page
+% ------------------------------------------------------------------------------
+
+\begin{titlepage}
+    \centering
+
+    \vspace*{2.2cm}
+
+    {\Huge\bfseries \notetitle \par}
+
+    \vspace{0.9cm}
+
+    \resizebox{0.88\textwidth}{!}{%
+        \itshape \notesubtitle
+    }
+
+    \vspace{2.4cm}
+
+    \vspace{1.2cm}
+
+    {\large \noteauthor \par}
+
+    \vspace{0.25cm}
+
+    {\large \noteinstitution \par}
+
+    \vfill
+\end{titlepage}
+
+% ------------------------------------------------------------------------------
+% Front Matter
+% ------------------------------------------------------------------------------
+
+\frontmatter
+\setcounter{tocdepth}{1}
+\tableofcontents
+\newpage
+
+% ------------------------------------------------------------------------------
+% Main Matter
+% ------------------------------------------------------------------------------
+
+\mainmatter
+
+% ==============================================================================
+\part{Programming Language}
+% ==============================================================================
+
+\chapter{Python}
+
+Python is a high-level, interpreted, dynamically-typed language. This chapter
+is a structured reference for core language features, organized for quick
+lookup. Code examples use Python 3.
+
+% ------------------------------------------------------------------------------
+\section{Data Types \& Representation}
+% ------------------------------------------------------------------------------
+
+\subsection*{Primitive Types}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{llXl}
+\toprule
+\textbf{Type} & \textbf{Keyword} & \textbf{Description} & \textbf{Example} \\
+\midrule
+Integer    & \texttt{int}     & Arbitrary precision whole number       & \texttt{42}, \texttt{-7}, \texttt{0b1010}, \texttt{0xFF} \\
+Float      & \texttt{float}   & 64-bit IEEE 754 double                 & \texttt{3.14}, \texttt{2.5e-3} \\
+Complex    & \texttt{complex} & Real + imaginary part                  & \texttt{3+4j}, \texttt{complex(1,2)} \\
+Boolean    & \texttt{bool}    & Subclass of \texttt{int}; \texttt{True}=1, \texttt{False}=0 & \texttt{True}, \texttt{False} \\
+String     & \texttt{str}     & Immutable Unicode sequence             & \texttt{"hello"}, \texttt{'world'} \\
+NoneType   & \texttt{None}    & Null/absence of value                  & \texttt{None} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{Integers in Python have arbitrary precision — no integer overflow. Booleans
+are a subclass of \texttt{int}: \texttt{True + True == 2}.}
+
+\subsection*{Type Conversion Functions}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Function} & \textbf{Converts to} & \textbf{Notes} \\
+\midrule
+\texttt{int(x)}       & Integer   & \texttt{int(3.9)} $\to$ \texttt{3} (truncates); \texttt{int("42")} $\to$ \texttt{42} \\
+\texttt{float(x)}     & Float     & \texttt{float("3.14")} $\to$ \texttt{3.14} \\
+\texttt{str(x)}       & String    & \texttt{str(42)} $\to$ \texttt{"42"} \\
+\texttt{bool(x)}      & Boolean   & \texttt{False} for: \texttt{0}, \texttt{""}, \texttt{[]}, \texttt{\{\}}, \texttt{None} \\
+\texttt{complex(r,i)} & Complex   & \texttt{complex(3,4)} $\to$ \texttt{(3+4j)} \\
+\texttt{bin(n)}       & Binary string  & \texttt{bin(10)} $\to$ \texttt{"0b1010"} \\
+\texttt{hex(n)}       & Hex string     & \texttt{hex(255)} $\to$ \texttt{"0xff"} \\
+\texttt{ord(c)}       & Unicode int    & \texttt{ord("A")} $\to$ \texttt{65} \\
+\texttt{chr(n)}       & Character      & \texttt{chr(65)} $\to$ \texttt{"A"} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Data Representation}
+
+\defn{Bit Width}{
+    An $n$-bit value can represent $2^n$ distinct states.
+
+    \begin{center}
+    \begin{tabular}{lll}
+    \toprule
+    \textbf{Bits} & \textbf{Range (unsigned)} & \textbf{Common use} \\
+    \midrule
+    1   & 0–1             & boolean flag \\
+    8   & 0–255           & byte, ASCII char \\
+    16  & 0–65\,535       & short integer \\
+    32  & 0–4\,294\,967\,295 & int (C) \\
+    64  & 0–$2^{64}-1$    & long, float (Python) \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+}
+
+% ------------------------------------------------------------------------------
+\section{Operators \& Expressions}
+% ------------------------------------------------------------------------------
+
+\subsection*{Arithmetic Operators}
+
+\begin{center}
+\begin{tabular}{cll}
+\toprule
+\textbf{Op} & \textbf{Name} & \textbf{Example} \\
+\midrule
+\texttt{+}  & Addition           & \texttt{3 + 4} $\to$ \texttt{7} \\
+\texttt{-}  & Subtraction        & \texttt{7 - 3} $\to$ \texttt{4} \\
+\texttt{*}  & Multiplication     & \texttt{3 * 4} $\to$ \texttt{12} \\
+\texttt{/}  & True division      & \texttt{7 / 2} $\to$ \texttt{3.5} \\
+\texttt{//} & Floor division     & \texttt{7 // 2} $\to$ \texttt{3}; \texttt{-7 // 2} $\to$ \texttt{-4} \\
+\texttt{\%} & Modulo             & \texttt{7 \% 3} $\to$ \texttt{1} \\
+\texttt{**} & Exponentiation     & \texttt{2 ** 3} $\to$ \texttt{8} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Comparison \& Logical Operators}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{clX}
+\toprule
+\textbf{Op} & \textbf{Name} & \textbf{Notes} \\
+\midrule
+\texttt{==}     & Equal              & Value equality \\
+\texttt{!=}     & Not equal          & \\
+\texttt{<}      & Less than          & \\
+\texttt{>}      & Greater than       & \\
+\texttt{<=}     & Less than or equal & \\
+\texttt{>=}     & Greater than or equal & \\
+\texttt{and}    & Logical AND        & Short-circuit: returns first falsy value or last value \\
+\texttt{or}     & Logical OR         & Short-circuit: returns first truthy value or last value \\
+\texttt{not}    & Logical NOT        & Unary; \texttt{not True} $\to$ \texttt{False} \\
+\texttt{in}     & Membership         & \texttt{"a" in "abc"} $\to$ \texttt{True} \\
+\texttt{not in} & Non-membership     & \\
+\texttt{is}     & Identity           & Same object in memory (not same value) \\
+\texttt{is not} & Non-identity       & Use \texttt{is} for \texttt{None} checks: \texttt{x is None} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Compound Assignment Operators}
+
+\begin{center}
+\begin{tabular}{cll}
+\toprule
+\textbf{Op} & \textbf{Equivalent} & \textbf{Op} \\
+\midrule
+\texttt{x += n}  & \texttt{x = x + n}  & \texttt{x //= n} \; $\equiv$ \; \texttt{x = x // n} \\
+\texttt{x -= n}  & \texttt{x = x - n}  & \texttt{x \%= n} \; $\equiv$ \; \texttt{x = x \% n} \\
+\texttt{x *= n}  & \texttt{x = x * n}  & \texttt{x **= n} \; $\equiv$ \; \texttt{x = x ** n} \\
+\texttt{x /= n}  & \texttt{x = x / n}  & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\rmkb{\textbf{Operator precedence} (high to low): \texttt{**} $>$ unary \texttt{-/+} $>$
+\texttt{* / // \%} $>$ \texttt{+ -} $>$ \texttt{< > <= >=} $>$ \texttt{== !=} $>$
+\texttt{not} $>$ \texttt{and} $>$ \texttt{or}. Use parentheses when in doubt.}
+
+% ------------------------------------------------------------------------------
+\section{Control Flow}
+% ------------------------------------------------------------------------------
+
+\subsection*{Conditionals}
+
+\begin{codebox}
+\begin{lstlisting}
+if condition:
+    ...
+elif another_condition:
+    ...
+else:
+    ...
+
+# Ternary expression
+value = x if condition else y
+\end{lstlisting}
+\end{codebox}
+
+\subsection*{While Loop}
+
+\begin{codebox}
+\begin{lstlisting}
+while condition:
+    ...
+    if some_case:
+        break       # exit loop immediately
+    if other_case:
+        continue    # skip to next iteration
+else:
+    ...             # runs if loop completed without break
+\end{lstlisting}
+\end{codebox}
+
+\subsection*{For Loop}
+
+\begin{codebox}
+\begin{lstlisting}
+for item in iterable:
+    ...
+
+for i in range(start, stop, step):   # range(5) = 0,1,2,3,4
+    ...
+
+for i, val in enumerate(seq, start=0):
+    ...
+
+for a, b in zip(seq1, seq2):          # parallel iteration
+    ...
+\end{lstlisting}
+\end{codebox}
+
+\subsection*{Comprehensions}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Type} & \textbf{Syntax} & \textbf{Returns} \\
+\midrule
+List   & \texttt{[expr for x in iter if cond]}    & \texttt{list} \\
+Dict   & \texttt{\{k: v for x in iter if cond\}}  & \texttt{dict} \\
+Set    & \texttt{\{expr for x in iter if cond\}}  & \texttt{set} \\
+Generator & \texttt{(expr for x in iter if cond)} & generator (lazy) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\ex{
+\texttt{squares = [x**2 for x in range(10)]} $\to$ \texttt{[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]}
+
+\texttt{even\_sq = \{x**2 for x in range(10) if x \% 2 == 0\}} $\to$ \texttt{\{0, 4, 16, 36, 64\}}
+}
+
+% ------------------------------------------------------------------------------
+\section{Functions}
+% ------------------------------------------------------------------------------
+
+\defn{Function}{
+    A reusable, named block of code defined with \texttt{def}. Returns
+    \texttt{None} implicitly if no \texttt{return} statement is reached.
+    Multiple values can be returned as a tuple.
+}
+
+\subsection*{Parameter Types}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Type} & \textbf{Syntax} & \textbf{Example call} \\
+\midrule
+Positional              & \texttt{def f(a, b)}          & \texttt{f(1, 2)} \\
+Default value           & \texttt{def f(a, b=0)}        & \texttt{f(1)} \\
+Variable positional     & \texttt{def f(*args)}         & \texttt{f(1,2,3)} $\Rightarrow$ \texttt{args=(1,2,3)} \\
+Variable keyword        & \texttt{def f(**kwargs)}      & \texttt{f(x=1,y=2)} $\Rightarrow$ \texttt{kwargs=\{'x':1,'y':2\}} \\
+Keyword-only            & \texttt{def f(*, a)}          & \texttt{f(a=1)} (must be named) \\
+Positional-only         & \texttt{def f(a, b, /)}       & \texttt{f(1, 2)} (cannot be named) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{Order of parameters: positional $\to$ default $\to$ \texttt{*args} $\to$ keyword-only $\to$ \texttt{**kwargs}.}
+
+\subsection*{Scope: LEGB Rule}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Level} & \textbf{Description} & \textbf{Example} \\
+\midrule
+\textbf{L}ocal     & Inside the current function              & variable defined in \texttt{def} \\
+\textbf{E}nclosing & Outer function in nested functions       & closure variable \\
+\textbf{G}lobal    & Module-level (top of file)               & \texttt{global x} to write \\
+\textbf{B}uilt-in  & Python's pre-defined names               & \texttt{len}, \texttt{print}, \texttt{range} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Lambda Functions}
+
+\begin{codebox}
+\begin{lstlisting}
+f = lambda x, y: x + y          # anonymous function, single expression
+sorted(items, key=lambda x: x[1])
+\end{lstlisting}
+\end{codebox}
+
+% ------------------------------------------------------------------------------
+\section{Strings}
+% ------------------------------------------------------------------------------
+
+Strings are \emph{immutable} sequences of Unicode characters. Indexing uses
+\texttt{s[i]} (0-based); slicing uses \texttt{s[start:stop:step]}.
+
+\subsection*{String Methods — Case}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Method} & \textbf{Description} & \textbf{Example} \\
+\midrule
+\texttt{.lower()}       & All lowercase            & \texttt{"Hello".lower()} $\to$ \texttt{"hello"} \\
+\texttt{.upper()}       & All uppercase            & \texttt{"hello".upper()} $\to$ \texttt{"HELLO"} \\
+\texttt{.title()}       & Title Case               & \texttt{"hello world".title()} $\to$ \texttt{"Hello World"} \\
+\texttt{.capitalize()}  & Capitalize first char    & \texttt{"hello".capitalize()} $\to$ \texttt{"Hello"} \\
+\texttt{.swapcase()}    & Swap all cases           & \texttt{"Hello".swapcase()} $\to$ \texttt{"hELLO"} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{String Methods — Search \& Check}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Method} & \textbf{Description} & \textbf{Returns} \\
+\midrule
+\texttt{.find(s)}       & Index of first \texttt{s}; $-1$ if not found & \texttt{int} \\
+\texttt{.rfind(s)}      & Index of last \texttt{s}                     & \texttt{int} \\
+\texttt{.index(s)}      & Like \texttt{find} but raises \texttt{ValueError}  & \texttt{int} \\
+\texttt{.count(s)}      & Count non-overlapping occurrences of \texttt{s}    & \texttt{int} \\
+\texttt{.startswith(s)} & True if string starts with \texttt{s}        & \texttt{bool} \\
+\texttt{.endswith(s)}   & True if string ends with \texttt{s}          & \texttt{bool} \\
+\texttt{.isdigit()}     & All chars are digits                         & \texttt{bool} \\
+\texttt{.isalpha()}     & All chars are letters                        & \texttt{bool} \\
+\texttt{.isalnum()}     & All chars are letters or digits              & \texttt{bool} \\
+\texttt{.isspace()}     & All chars are whitespace                     & \texttt{bool} \\
+\texttt{.isupper()}     & All cased chars are uppercase                & \texttt{bool} \\
+\texttt{.islower()}     & All cased chars are lowercase                & \texttt{bool} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{String Methods — Strip \& Replace}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Method} & \textbf{Description} \\
+\midrule
+\texttt{.strip()}               & Remove leading and trailing whitespace \\
+\texttt{.lstrip()}              & Remove leading whitespace \\
+\texttt{.rstrip()}              & Remove trailing whitespace \\
+\texttt{.strip(chars)}          & Remove any chars in \texttt{chars} from both ends \\
+\texttt{.replace(old, new)}     & Replace all occurrences of \texttt{old} with \texttt{new} \\
+\texttt{.replace(old, new, n)}  & Replace at most \texttt{n} occurrences \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{String Methods — Split \& Join}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Method} & \textbf{Description} & \textbf{Example} \\
+\midrule
+\texttt{.split()}           & Split on whitespace              & \texttt{"a b c".split()} $\to$ \texttt{['a','b','c']} \\
+\texttt{.split(sep)}        & Split on \texttt{sep}            & \texttt{"a,b".split(",")} $\to$ \texttt{['a','b']} \\
+\texttt{.split(sep, n)}     & Split at most \texttt{n} times   & \\
+\texttt{.rsplit(sep)}       & Split from right                 & \\
+\texttt{.splitlines()}      & Split on line boundaries         & \\
+\texttt{sep.join(iter)}     & Join iterable with \texttt{sep}  & \texttt{", ".join(['a','b'])} $\to$ \texttt{"a, b"} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{String Formatting}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{llX}
+\toprule
+\textbf{Style} & \textbf{Syntax} & \textbf{Example} \\
+\midrule
+\texttt{\%} formatting  & \texttt{"\%s is \%d" \% (name, age)}      & \texttt{"Alice is 25"} \\
+\texttt{.format()}      & \texttt{"\{\} is \{\}".format(name, age)} & \texttt{"Alice is 25"} \\
+f-string (3.6+)         & \texttt{f"\{name\} is \{age\}"}            & \texttt{"Alice is 25"} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Format spec} & \textbf{Meaning} & \textbf{Example} \\
+\midrule
+\texttt{:.2f}   & 2 decimal places & \texttt{f"\{3.14159:.2f\}"} $\to$ \texttt{"3.14"} \\
+\texttt{:10}    & Width 10         & \texttt{f"\{42:10\}"} $\to$ \texttt{"        42"} \\
+\texttt{:<10}   & Left-align width 10 & \texttt{f"\{42:<10\}"} $\to$ \texttt{"42        "} \\
+\texttt{:\textasciicircum{}10}   & Center width 10  & \\
+\texttt{:,}     & Thousands separator & \texttt{f"\{1000000:,\}"} $\to$ \texttt{"1,000,000"} \\
+\texttt{:e}     & Scientific notation & \texttt{f"\{0.001:e\}"} $\to$ \texttt{"1.000000e-03"} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ------------------------------------------------------------------------------
+\section{Lists \& Tuples}
+% ------------------------------------------------------------------------------
+
+\defn{List}{
+    An ordered, \emph{mutable} sequence. Elements can be of mixed types.
+    Backed by a dynamic array; random access in $O(1)$, append in amortized $O(1)$.
+}
+
+\subsection*{List Methods}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXc}
+\toprule
+\textbf{Method} & \textbf{Description} & \textbf{Time} \\
+\midrule
+\texttt{.append(x)}          & Add \texttt{x} to end                       & $O(1)^*$ \\
+\texttt{.extend(iter)}       & Add all items from iterable                 & $O(k)$ \\
+\texttt{.insert(i, x)}       & Insert \texttt{x} at index \texttt{i}       & $O(n)$ \\
+\texttt{.remove(x)}          & Remove first occurrence of \texttt{x}       & $O(n)$ \\
+\texttt{.pop()}              & Remove and return last element              & $O(1)^*$ \\
+\texttt{.pop(i)}             & Remove and return element at index \texttt{i} & $O(n)$ \\
+\texttt{.index(x)}           & Index of first occurrence of \texttt{x}     & $O(n)$ \\
+\texttt{.count(x)}           & Count occurrences of \texttt{x}             & $O(n)$ \\
+\texttt{.sort(key, reverse)} & Sort in place (Timsort)                     & $O(n \log n)$ \\
+\texttt{.reverse()}          & Reverse in place                            & $O(n)$ \\
+\texttt{.copy()}             & Shallow copy                                & $O(n)$ \\
+\texttt{.clear()}            & Remove all items                            & $O(n)$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{$^*$ Amortized. Use \texttt{sorted(lst)} to get a new sorted list without modifying the original.
+\texttt{lst[start:stop:step]} slices return a new list.}
+
+\subsection*{List vs.\ Tuple}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXX}
+\toprule
+\textbf{Feature} & \textbf{List} & \textbf{Tuple} \\
+\midrule
+Syntax           & \texttt{[1, 2, 3]}   & \texttt{(1, 2, 3)} \\
+Mutable          & Yes                  & No \\
+Hashable         & No                   & Yes (if all elements hashable) \\
+Performance      & Slightly slower      & Slightly faster \\
+Typical use      & Mutable collections  & Fixed records, dict keys, multiple return values \\
+Methods          & 11 methods           & Only \texttt{.count()}, \texttt{.index()} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{A single-element tuple requires a trailing comma: \texttt{(1,)} not \texttt{(1)}.}
+
+% ------------------------------------------------------------------------------
+\section{Dictionaries \& Sets}
+% ------------------------------------------------------------------------------
+
+\defn{Dictionary}{
+    An unordered (insertion-ordered since Python 3.7) mapping of
+    \emph{hashable} keys to values. Implemented as a hash table;
+    average $O(1)$ access, insertion, and deletion.
+}
+
+\subsection*{Dictionary Methods}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Method / Operation} & \textbf{Description} \\
+\midrule
+\texttt{d[key]}                     & Access value; raises \texttt{KeyError} if absent \\
+\texttt{d.get(key)}                 & Access value; returns \texttt{None} if absent \\
+\texttt{d.get(key, default)}        & Access value with fallback \\
+\texttt{d[key] = val}               & Set or update key \\
+\texttt{del d[key]}                 & Delete key \\
+\texttt{key in d}                   & Membership test for key \\
+\texttt{d.keys()}                   & View of all keys \\
+\texttt{d.values()}                 & View of all values \\
+\texttt{d.items()}                  & View of all (key, value) pairs \\
+\texttt{d.update(other)}            & Merge \texttt{other} dict into \texttt{d} \\
+\texttt{d.pop(key)}                 & Remove key and return its value \\
+\texttt{d.pop(key, default)}        & Remove key with fallback \\
+\texttt{d.popitem()}                & Remove and return last (key, val) pair \\
+\texttt{d.setdefault(key, default)} & Get value; set to default if key absent \\
+\texttt{d.clear()}                  & Remove all items \\
+\texttt{d.copy()}                   & Shallow copy \\
+\texttt{d | other}                  & Merge (Python 3.9+); creates new dict \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\defn{Set}{
+    An unordered collection of unique, hashable elements. Backed by a hash
+    table; average $O(1)$ insertion, deletion, and membership test.
+    \texttt{set()} creates an empty set; \texttt{\{\}} creates an empty \emph{dict}.
+}
+
+\subsection*{Set Operations}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{llX}
+\toprule
+\textbf{Operator} & \textbf{Method} & \textbf{Description} \\
+\midrule
+\texttt{A | B}    & \texttt{A.union(B)}                & All elements in $A$ or $B$ \\
+\texttt{A \& B}   & \texttt{A.intersection(B)}         & Elements in both $A$ and $B$ \\
+\texttt{A - B}    & \texttt{A.difference(B)}           & Elements in $A$ but not $B$ \\
+\texttt{A \^{} B} & \texttt{A.symmetric\_difference(B)}& Elements in exactly one of $A$, $B$ \\
+\texttt{A <= B}   & \texttt{A.issubset(B)}             & $A \subseteq B$ \\
+\texttt{A >= B}   & \texttt{A.issuperset(B)}           & $A \supseteq B$ \\
+\texttt{A < B}    & —                                  & $A \subsetneq B$ (proper subset) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Set Methods}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Method} & \textbf{Description} \\
+\midrule
+\texttt{.add(x)}          & Add \texttt{x}; no-op if already present \\
+\texttt{.remove(x)}       & Remove \texttt{x}; raises \texttt{KeyError} if absent \\
+\texttt{.discard(x)}      & Remove \texttt{x}; no-op if absent \\
+\texttt{.pop()}           & Remove and return an arbitrary element \\
+\texttt{.update(iter)}    & Add all elements from iterable \\
+\texttt{.clear()}         & Remove all elements \\
+\texttt{.copy()}          & Shallow copy \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ------------------------------------------------------------------------------
+\section{File I/O \& Exceptions}
+% ------------------------------------------------------------------------------
+
+\subsection*{File Modes}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{clX}
+\toprule
+\textbf{Mode} & \textbf{Name} & \textbf{Behaviour} \\
+\midrule
+\texttt{'r'}  & Read     & Default. Fails if file doesn't exist. \\
+\texttt{'w'}  & Write    & Creates file or truncates existing. \\
+\texttt{'a'}  & Append   & Creates file or appends to existing. \\
+\texttt{'x'}  & Create   & Creates file; raises \texttt{FileExistsError} if it exists. \\
+\texttt{'b'}  & Binary   & Modifier; e.g.\ \texttt{'rb'}, \texttt{'wb'}. \\
+\texttt{'+'}  & Read+Write & Modifier; e.g.\ \texttt{'r+'}, \texttt{'w+'}. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{File Methods}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Method} & \textbf{Description} \\
+\midrule
+\texttt{.read()}            & Read entire file as one string \\
+\texttt{.read(n)}           & Read at most \texttt{n} characters \\
+\texttt{.readline()}        & Read one line (including \texttt{\textbackslash n}) \\
+\texttt{.readlines()}       & Read all lines into a list \\
+\texttt{.write(s)}          & Write string \texttt{s}; returns number of chars written \\
+\texttt{.writelines(lines)} & Write list of strings (no newlines added) \\
+\texttt{.close()}           & Close the file (always call or use \texttt{with}) \\
+\texttt{.seek(pos)}         & Move file pointer to byte position \\
+\texttt{.tell()}            & Return current file pointer position \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{Use the \texttt{with} statement — it guarantees the file is closed even if an
+exception occurs: \texttt{with open("file.txt") as f: ...}}
+
+\subsection*{Exception Handling}
+
+\begin{codebox}
+\begin{lstlisting}
+try:
+    risky_operation()
+except ValueError as e:         # catch specific exception
+    handle(e)
+except (TypeError, KeyError):   # catch multiple types
+    ...
+except Exception as e:          # catch all (avoid)
+    ...
+else:
+    ...                         # runs only if NO exception was raised
+finally:
+    ...                         # always runs (cleanup)
+\end{lstlisting}
+\end{codebox}
+
+\subsection*{Common Built-in Exceptions}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Exception} & \textbf{Raised when} \\
+\midrule
+\texttt{ValueError}         & Correct type but invalid value (\texttt{int("abc")}) \\
+\texttt{TypeError}          & Wrong type (\texttt{"1" + 1}) \\
+\texttt{IndexError}         & Sequence index out of range \\
+\texttt{KeyError}           & Dict key not found \\
+\texttt{AttributeError}     & Object has no such attribute \\
+\texttt{NameError}          & Variable or name not defined \\
+\texttt{ZeroDivisionError}  & Division or modulo by zero \\
+\texttt{FileNotFoundError}  & File or directory not found \\
+\texttt{ImportError}        & Module cannot be imported \\
+\texttt{StopIteration}      & Iterator is exhausted \\
+\texttt{RecursionError}     & Maximum recursion depth exceeded \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ------------------------------------------------------------------------------
+\section{Built-in Functions \& Modules}
+% ------------------------------------------------------------------------------
+
+\subsection*{Frequently Used Built-ins}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Function} & \textbf{Description} & \textbf{Example} \\
+\midrule
+\texttt{len(x)}              & Length of sequence/collection           & \texttt{len([1,2,3])} $\to$ \texttt{3} \\
+\texttt{range(stop)}         & Range \texttt{[0, stop)}                & \texttt{range(5)} \\
+\texttt{range(start,stop,step)} & Range with step                      & \texttt{range(0,10,2)} \\
+\texttt{type(x)}             & Type of \texttt{x}                      & \texttt{type(42)} $\to$ \texttt{<class 'int'>} \\
+\texttt{isinstance(x, T)}    & Check if \texttt{x} is instance of \texttt{T} & \texttt{isinstance(42, int)} \\
+\texttt{abs(x)}              & Absolute value                          & \texttt{abs(-5)} $\to$ \texttt{5} \\
+\texttt{round(x, n)}         & Round to \texttt{n} decimal places      & \texttt{round(3.14159, 2)} $\to$ \texttt{3.14} \\
+\texttt{min(*args)}          & Minimum value                           & \texttt{min(3,1,2)} $\to$ \texttt{1} \\
+\texttt{max(*args)}          & Maximum value                           & \texttt{max(3,1,2)} $\to$ \texttt{3} \\
+\texttt{sum(iter)}           & Sum of iterable                         & \texttt{sum([1,2,3])} $\to$ \texttt{6} \\
+\texttt{sorted(iter)}        & New sorted list                         & \texttt{sorted([3,1,2])} $\to$ \texttt{[1,2,3]} \\
+\texttt{reversed(iter)}      & Reversed iterator                       & \\
+\texttt{enumerate(iter)}     & \texttt{(index, value)} pairs           & \\
+\texttt{zip(*iters)}         & Parallel iteration tuples               & \\
+\texttt{map(f, iter)}        & Apply \texttt{f} to each element        & \\
+\texttt{filter(f, iter)}     & Elements where \texttt{f} is truthy     & \\
+\texttt{any(iter)}           & True if any element is truthy           & \\
+\texttt{all(iter)}           & True if all elements are truthy         & \\
+\texttt{id(x)}               & Memory address of object                & \\
+\texttt{hash(x)}             & Hash value (for hashable objects)       & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{\texttt{math} Module}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Name} & \textbf{Description} & \textbf{Value / Example} \\
+\midrule
+\texttt{math.pi}          & $\pi$                        & $\approx 3.14159$ \\
+\texttt{math.e}           & $e$                          & $\approx 2.71828$ \\
+\texttt{math.inf}         & Positive infinity            & \\
+\texttt{math.sqrt(x)}     & $\sqrt{x}$                   & \texttt{math.sqrt(9)} $\to$ \texttt{3.0} \\
+\texttt{math.floor(x)}    & $\lfloor x \rfloor$          & \texttt{math.floor(3.9)} $\to$ \texttt{3} \\
+\texttt{math.ceil(x)}     & $\lceil x \rceil$            & \texttt{math.ceil(3.1)} $\to$ \texttt{4} \\
+\texttt{math.log(x)}      & $\ln x$                      & natural log \\
+\texttt{math.log(x, b)}   & $\log_b x$                   & \texttt{math.log(8, 2)} $\to$ \texttt{3.0} \\
+\texttt{math.log2(x)}     & $\log_2 x$                   & \\
+\texttt{math.log10(x)}    & $\log_{10} x$                & \\
+\texttt{math.exp(x)}      & $e^x$                        & \\
+\texttt{math.pow(x, y)}   & $x^y$ (returns float)        & \\
+\texttt{math.factorial(n)} & $n!$                        & \texttt{math.factorial(5)} $\to$ \texttt{120} \\
+\texttt{math.gcd(a, b)}   & Greatest common divisor      & \texttt{math.gcd(12, 8)} $\to$ \texttt{4} \\
+\texttt{math.cos/sin/tan(x)} & Trig functions (radians)  & \\
+\texttt{math.degrees(r)}  & Radians $\to$ degrees        & \\
+\texttt{math.radians(d)}  & Degrees $\to$ radians        & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{\texttt{random} Module}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Function} & \textbf{Description} \\
+\midrule
+\texttt{random.random()}          & Float in $[0.0, 1.0)$ \\
+\texttt{random.uniform(a, b)}     & Float in $[a, b]$ \\
+\texttt{random.randint(a, b)}     & Integer in $[a, b]$ (inclusive both ends) \\
+\texttt{random.randrange(n)}      & Integer in $[0, n)$ \\
+\texttt{random.choice(seq)}       & Random element from non-empty sequence \\
+\texttt{random.choices(seq, k=n)} & $n$ random elements with replacement \\
+\texttt{random.sample(seq, k)}    & $k$ unique random elements without replacement \\
+\texttt{random.shuffle(seq)}      & Shuffle sequence in place \\
+\texttt{random.seed(n)}           & Set random seed for reproducibility \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ==============================================================================
+\part{Data Structures \& Algorithms}
+% ==============================================================================
+
+\chapter{Foundations}
+
+% ------------------------------------------------------------------------------
+\section{Algorithm Analysis \& Asymptotic Notation}
+% ------------------------------------------------------------------------------
+
+\defn{Asymptotic Upper Bound ($O$)}{
+    $f(n) = O(g(n))$ if there exist constants $c > 0$ and $n_0 \geq 1$ such
+    that for all $n \geq n_0$:
+    \[
+        f(n) \leq c \cdot g(n)
+    \]
+    Informally: $f$ grows \emph{no faster} than $g$ asymptotically.
+}
+
+\defn{Asymptotic Lower Bound ($\Omega$)}{
+    $f(n) = \Omega(g(n))$ if there exist constants $c > 0$ and $n_0 \geq 1$
+    such that for all $n \geq n_0$:
+    \[
+        f(n) \geq c \cdot g(n)
+    \]
+    Informally: $f$ grows \emph{at least as fast} as $g$.
+}
+
+\defn{Tight Bound ($\Theta$)}{
+    $f(n) = \Theta(g(n))$ if $f(n) = O(g(n))$ and $f(n) = \Omega(g(n))$.
+    Informally: $f$ and $g$ have the \emph{same} asymptotic growth rate.
+}
+
+\subsection*{Complexity Hierarchy}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Class} & \textbf{Name} & \textbf{Example algorithm} \\
+\midrule
+$O(1)$           & Constant       & Array access, hash table lookup \\
+$O(\log n)$      & Logarithmic    & Binary search \\
+$O(n)$           & Linear         & Linear scan, linear search \\
+$O(n \log n)$    & Linearithmic   & Merge sort, Heap sort \\
+$O(n^2)$         & Quadratic      & Insertion sort (worst), Bubble sort \\
+$O(n^3)$         & Cubic          & Naive matrix multiplication, Floyd-Warshall \\
+$O(2^n)$         & Exponential    & Brute-force subset enumeration \\
+$O(n!)$          & Factorial      & Brute-force TSP \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\rmkb{Growth order: $1 \ll \log n \ll \sqrt{n} \ll n \ll n\log n \ll n^2 \ll n^3 \ll 2^n \ll n!$}
+
+\subsection*{Rules for Computing Complexity}
+
+\begin{itemize}
+    \item \textbf{Sum rule}: $O(f) + O(g) = O(\max(f, g))$ — keep the dominant term.
+    \item \textbf{Product rule}: $O(f) \cdot O(g) = O(f \cdot g)$ — nested loops multiply.
+    \item \textbf{Drop constants}: $O(5n) = O(n)$.
+    \item \textbf{Drop lower-order terms}: $O(n^2 + n) = O(n^2)$.
+    \item \textbf{Logarithm base}: $O(\log_a n) = O(\log_b n)$ — base doesn't matter.
+\end{itemize}
+
+% ------------------------------------------------------------------------------
+\section{Recursion}
+% ------------------------------------------------------------------------------
+
+\defn{Recurrence Relation}{
+    An equation defining $T(n)$ in terms of $T$ on smaller inputs.
+    Typically $T(n) = aT(n/b) + f(n)$ for divide-and-conquer algorithms, where
+    $a$ = number of subproblems, $b$ = factor by which input shrinks,
+    $f(n)$ = cost outside recursive calls.
+}
+
+\thm{Master Theorem}{
+    Let $T(n) = aT(n/b) + f(n)$ with $a \geq 1$, $b > 1$. Let $d = \log_b a$.
+    \begin{enumerate}
+        \item If $f(n) = O(n^{d-\epsilon})$ for some $\epsilon > 0$: \quad $T(n) = \Theta(n^d)$
+        \item If $f(n) = \Theta(n^d)$: \quad $T(n) = \Theta(n^d \log n)$
+        \item If $f(n) = \Omega(n^{d+\epsilon})$ and regularity holds: \quad $T(n) = \Theta(f(n))$
+    \end{enumerate}
+}
+
+\ex{
+    \textbf{Merge Sort}: $T(n) = 2T(n/2) + O(n)$. Here $a=2$, $b=2$, $d = \log_2 2 = 1$.
+    Since $f(n) = O(n) = O(n^1) = \Theta(n^d)$, Case 2 applies: $T(n) = \Theta(n \log n)$.
+
+    \medskip
+    \textbf{Binary Search}: $T(n) = T(n/2) + O(1)$. Here $a=1$, $b=2$, $d = \log_2 1 = 0$.
+    Since $f(n) = O(1) = \Theta(n^0) = \Theta(n^d)$, Case 2 applies: $T(n) = \Theta(\log n)$.
+}
+
+% ==============================================================================
+\chapter{Core Data Structures}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\section{Arrays}
+% ------------------------------------------------------------------------------
+
+\defn{Array}{
+    A contiguous block of memory storing elements of the same type.
+    Supports $O(1)$ random access via index arithmetic.
+    Python's \texttt{list} is a \emph{dynamic array}.
+}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXcc}
+\toprule
+\textbf{Operation} & \textbf{Description} & \textbf{Static} & \textbf{Dynamic} \\
+\midrule
+Access \texttt{a[i]}   & Read/write by index     & $O(1)$ & $O(1)$ \\
+Search                 & Find element (unsorted) & $O(n)$ & $O(n)$ \\
+Insert at end          & Append                  & N/A    & $O(1)^*$ \\
+Insert at index $i$    & Shift elements right    & $O(n)$ & $O(n)$ \\
+Delete at end          & Pop                     & N/A    & $O(1)^*$ \\
+Delete at index $i$    & Shift elements left     & $O(n)$ & $O(n)$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{$^*$ Amortized. A dynamic array doubles its capacity when full, costing $O(n)$ occasionally,
+but the amortized cost per append is $O(1)$.}
+
+% ------------------------------------------------------------------------------
+\section{Stacks}
+% ------------------------------------------------------------------------------
+
+\defn{Stack}{
+    A LIFO (Last-In, First-Out) abstract data type supporting:
+    \textbf{push} (add to top), \textbf{pop} (remove from top), \textbf{peek} (read top).
+    All operations in $O(1)$. Implemented with a list in Python.
+}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Operation} & \textbf{Python} & \textbf{Time} \\
+\midrule
+Push       & \texttt{s.append(x)}  & $O(1)^*$ \\
+Pop        & \texttt{s.pop()}      & $O(1)^*$ \\
+Peek       & \texttt{s[-1]}        & $O(1)$ \\
+Is empty   & \texttt{len(s) == 0}  & $O(1)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\rmkb{Classic applications: function call stack, expression parsing (balanced parentheses),
+DFS, undo/redo, monotonic stack problems.}
+
+% ------------------------------------------------------------------------------
+\section{Queues}
+% ------------------------------------------------------------------------------
+
+\defn{Queue}{
+    A FIFO (First-In, First-Out) ADT supporting:
+    \textbf{enqueue} (add to back), \textbf{dequeue} (remove from front), \textbf{peek}.
+    Use \texttt{collections.deque} in Python — $O(1)$ both ends.
+    Using a plain \texttt{list} gives $O(n)$ dequeue.
+}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Operation} & \textbf{Python (\texttt{deque})} & \textbf{Time} \\
+\midrule
+Enqueue    & \texttt{q.append(x)}       & $O(1)$ \\
+Dequeue    & \texttt{q.popleft()}       & $O(1)$ \\
+Peek front & \texttt{q[0]}              & $O(1)$ \\
+Peek back  & \texttt{q[-1]}             & $O(1)$ \\
+Push left  & \texttt{q.appendleft(x)}   & $O(1)$ \\
+Pop right  & \texttt{q.pop()}           & $O(1)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\rmkb{Applications: BFS, task scheduling, sliding window problems (monotonic deque).
+\texttt{collections.deque} is a doubly-linked list under the hood.}
+
+% ------------------------------------------------------------------------------
+\section{Linked Lists}
+% ------------------------------------------------------------------------------
+
+\defn{Linked List}{
+    A sequence of \emph{nodes}, each storing a value and a pointer to the
+    next node. No random access; traversal is $O(n)$.
+}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXcc}
+\toprule
+\textbf{Operation} & \textbf{Description} & \textbf{Singly} & \textbf{Doubly} \\
+\midrule
+Access by index      & Traverse from head        & $O(n)$ & $O(n)$ \\
+Search               & Linear scan               & $O(n)$ & $O(n)$ \\
+Insert at head       & Update head pointer       & $O(1)$ & $O(1)$ \\
+Insert at tail       & Requires tail pointer     & $O(1)^*$ & $O(1)$ \\
+Insert at position   & Traverse then insert      & $O(n)$ & $O(n)$ \\
+Delete at head       & Update head pointer       & $O(1)$ & $O(1)$ \\
+Delete at tail       & Traverse to second-to-last & $O(n)$ & $O(1)$ \\
+Delete given node    & Unlink from neighbours    & $O(n)^\dagger$ & $O(1)$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{$^*$ Requires a maintained tail pointer. $^\dagger$ Need to find predecessor;
+in a doubly linked list, given the node, deletion is $O(1)$.}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXX}
+\toprule
+\textbf{Feature} & \textbf{Array} & \textbf{Linked List} \\
+\midrule
+Access by index  & $O(1)$  & $O(n)$ \\
+Insert/delete head & $O(n)$ & $O(1)$ \\
+Insert/delete middle & $O(n)$ & $O(n)$ search + $O(1)$ \\
+Memory           & Contiguous     & Non-contiguous (pointer overhead) \\
+Cache friendly   & Yes            & No \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ------------------------------------------------------------------------------
+\section{Trees}
+% ------------------------------------------------------------------------------
+
+\defn{Binary Tree}{
+    A rooted tree where each node has at most two children (left and right).
+    Height $h$ of a tree is the length of the longest root-to-leaf path.
+    A \emph{complete} binary tree has all levels full except possibly the last.
+    A \emph{full} binary tree has every node with 0 or 2 children.
+}
+
+\defn{Binary Search Tree (BST)}{
+    A binary tree where for every node $v$:
+    \begin{itemize}
+        \item all keys in the \emph{left} subtree are \textbf{less than} $v$.\textit{key}
+        \item all keys in the \emph{right} subtree are \textbf{greater than} $v$.\textit{key}
+    \end{itemize}
+    Average case: $O(\log n)$ for search, insert, delete. Worst case (skewed): $O(n)$.
+}
+
+\subsection*{Tree Traversals}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{llXl}
+\toprule
+\textbf{Traversal} & \textbf{Order} & \textbf{Visit pattern} & \textbf{Common use} \\
+\midrule
+Inorder    & L $\to$ N $\to$ R & Left, root, right    & BST sorted output \\
+Preorder   & N $\to$ L $\to$ R & Root, left, right    & Copy tree, prefix expr \\
+Postorder  & L $\to$ R $\to$ N & Left, right, root    & Delete tree, postfix expr \\
+Level-order & by depth          & BFS row by row        & Level-by-level processing \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{BST Operations}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Operation} & \textbf{Average} & \textbf{Worst (skewed)} \\
+\midrule
+Search     & $O(\log n)$ & $O(n)$ \\
+Insert     & $O(\log n)$ & $O(n)$ \\
+Delete     & $O(\log n)$ & $O(n)$ \\
+Min / Max  & $O(\log n)$ & $O(n)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\rmkb{Self-balancing BSTs (AVL, Red-Black) guarantee $O(\log n)$ worst case.
+Python's \texttt{heapq} implements a min-heap (complete binary tree stored as array).}
+
+% ==============================================================================
+\chapter{Sorting}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\section{Comparison-Based Sorting Algorithms}
+% ------------------------------------------------------------------------------
+
+\subsection*{Insertion Sort}
+
+\defn{Insertion Sort}{
+    Build a sorted prefix one element at a time. For each element, shift it
+    leftward into its correct position in the sorted portion.
+}
+
+\begin{algorithm}[H]
+\caption{Insertion Sort}
+\begin{algorithmic}[1]
+\For{$i = 1$ to $n-1$}
+    \State $key \gets A[i]$
+    \State $j \gets i - 1$
+    \While{$j \geq 0$ and $A[j] > key$}
+        \State $A[j+1] \gets A[j]$
+        \State $j \gets j - 1$
+    \EndWhile
+    \State $A[j+1] \gets key$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\subsection*{Merge Sort}
+
+\defn{Merge Sort}{
+    Divide array in half, recursively sort each half, merge the two sorted halves.
+    Recurrence: $T(n) = 2T(n/2) + O(n) \Rightarrow T(n) = O(n \log n)$.
+}
+
+\begin{algorithm}[H]
+\caption{Merge Sort}
+\begin{algorithmic}[1]
+\Procedure{MergeSort}{$A, l, r$}
+    \If{$l < r$}
+        \State $m \gets \lfloor (l+r)/2 \rfloor$
+        \State \Call{MergeSort}{$A, l, m$}
+        \State \Call{MergeSort}{$A, m+1, r$}
+        \State \Call{Merge}{$A, l, m, r$}
+    \EndIf
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\rmkb{\textbf{Merge} takes two sorted subarrays and combines them in $O(n)$ by comparing
+elements front-to-back. Requires $O(n)$ auxiliary space.}
+
+\subsection*{Quick Sort}
+
+\defn{Quick Sort}{
+    Choose a \emph{pivot}, partition the array so all elements $\leq$ pivot
+    are to its left and all $>$ pivot to its right, then recurse on each side.
+}
+
+\begin{algorithm}[H]
+\caption{Quick Sort}
+\begin{algorithmic}[1]
+\Procedure{QuickSort}{$A, l, r$}
+    \If{$l < r$}
+        \State $p \gets$ \Call{Partition}{$A, l, r$}
+        \State \Call{QuickSort}{$A, l, p-1$}
+        \State \Call{QuickSort}{$A, p+1, r$}
+    \EndIf
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\rmkb{Partition (Lomuto scheme): pick last element as pivot; maintain index of
+``smaller'' region. Average $O(n \log n)$; worst case (already sorted) $O(n^2)$.
+Randomised pivot makes worst case extremely unlikely.}
+
+\subsection*{Heap Sort}
+
+\defn{Heap Sort}{
+    Build a max-heap from the array ($O(n)$), then repeatedly extract the
+    maximum and place it at the end ($O(n \log n)$).
+    Total: $O(n \log n)$, in-place, \emph{not} stable.
+}
+
+\subsection*{Selection Sort}
+
+Find the minimum of the unsorted portion and swap it to the front.
+Always $O(n^2)$, regardless of input. \emph{Not} stable.
+
+% ------------------------------------------------------------------------------
+\section{Lower Bound for Comparison Sorting}
+% ------------------------------------------------------------------------------
+
+\thm{$\Omega(n \log n)$ Lower Bound}{
+    Any comparison-based sorting algorithm requires $\Omega(n \log n)$
+    comparisons in the worst case.
+}
+
+\pf{
+    Model any comparison sort as a \emph{decision tree}: each internal node
+    is a comparison $A[i] \leq A[j]$ (yes/no), and each leaf is a permutation
+    of the sorted output. A correct algorithm must be able to produce all $n!$
+    orderings, so the decision tree has $\geq n!$ leaves. A binary tree of
+    height $h$ has at most $2^h$ leaves, so $2^h \geq n!$, giving
+    $h \geq \log_2(n!) = \Omega(n \log n)$ (by Stirling's approximation).
+}
+
+% ------------------------------------------------------------------------------
+\section{Sorting Algorithms Summary}
+% ------------------------------------------------------------------------------
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lccccl}
+\toprule
+\textbf{Algorithm} & \textbf{Best} & \textbf{Average} & \textbf{Worst} & \textbf{Space} & \textbf{Stable} \\
+\midrule
+Insertion Sort & $O(n)$         & $O(n^2)$       & $O(n^2)$       & $O(1)$      & Yes \\
+Selection Sort & $O(n^2)$       & $O(n^2)$       & $O(n^2)$       & $O(1)$      & No \\
+Merge Sort     & $O(n\log n)$   & $O(n\log n)$   & $O(n\log n)$   & $O(n)$      & Yes \\
+Quick Sort     & $O(n\log n)$   & $O(n\log n)$   & $O(n^2)$       & $O(\log n)$ & No \\
+Heap Sort      & $O(n\log n)$   & $O(n\log n)$   & $O(n\log n)$   & $O(1)$      & No \\
+Counting Sort  & $O(n+k)$       & $O(n+k)$       & $O(n+k)$       & $O(k)$      & Yes \\
+Radix Sort     & $O(d(n+k))$    & $O(d(n+k))$    & $O(d(n+k))$    & $O(n+k)$    & Yes \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{Counting and Radix Sort are \emph{not} comparison-based; they beat the $\Omega(n\log n)$ lower bound by exploiting key structure. $k$ = key range, $d$ = number of digits.}
+
+% ==============================================================================
+\chapter{Graph Algorithms}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\section{Graph Basics}
+% ------------------------------------------------------------------------------
+
+\defn{Graph}{
+    $G = (V, E)$ where $V$ is a set of vertices and $E \subseteq V \times V$ is
+    a set of edges. A graph is \emph{directed} (digraph) if edges have orientation,
+    \emph{undirected} otherwise.
+    $n = |V|$, $m = |E|$.
+}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXcc}
+\toprule
+\textbf{Representation} & \textbf{Description} & \textbf{Space} & \textbf{Edge check} \\
+\midrule
+Adjacency Matrix & $n \times n$ boolean matrix; \texttt{M[u][v]=1} if edge exists  & $O(n^2)$ & $O(1)$ \\
+Adjacency List   & Array of lists; \texttt{adj[u]} = list of neighbours of $u$     & $O(n+m)$ & $O(\deg u)$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{Use adjacency lists for sparse graphs ($m \ll n^2$), adjacency matrix for dense
+graphs or when $O(1)$ edge queries are required.}
+
+% ------------------------------------------------------------------------------
+\section{Breadth-First Search (BFS)}
+% ------------------------------------------------------------------------------
+
+\defn{BFS}{
+    Explore all vertices at distance $d$ from source before distance $d+1$.
+    Uses a queue. Computes shortest-path distances (unweighted) from source.
+}
+
+\begin{algorithm}[H]
+\caption{BFS}
+\begin{algorithmic}[1]
+\Procedure{BFS}{$G, s$}
+    \State Mark all vertices unvisited; \texttt{dist}[$s$] $\gets 0$
+    \State $Q \gets$ empty queue; enqueue $s$; mark $s$ visited
+    \While{$Q$ not empty}
+        \State $u \gets Q$.\textsc{Dequeue}()
+        \For{each neighbour $v$ of $u$}
+            \If{$v$ not visited}
+                \State mark $v$ visited; \texttt{dist}[$v$] $\gets$ \texttt{dist}[$u$] + 1
+                \State $Q$.\textsc{Enqueue}($v$)
+            \EndIf
+        \EndFor
+    \EndWhile
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+Time: $O(n + m)$. Space: $O(n)$ for queue and visited array.
+
+% ------------------------------------------------------------------------------
+\section{Depth-First Search (DFS) \& Applications}
+% ------------------------------------------------------------------------------
+
+\defn{DFS}{
+    Explore as deep as possible before backtracking. Uses a stack (or recursion).
+    Produces DFS tree with \emph{tree}, \emph{back}, \emph{forward}, and \emph{cross} edges (directed graphs).
+}
+
+\begin{algorithm}[H]
+\caption{DFS}
+\begin{algorithmic}[1]
+\Procedure{DFS-Visit}{$G, u$}
+    \State mark $u$ visited; push $u$ onto stack (for topological order)
+    \For{each neighbour $v$ of $u$}
+        \If{$v$ not visited}
+            \State \Call{DFS-Visit}{$G, v$}
+        \EndIf
+    \EndFor
+    \State record finish time of $u$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+Time: $O(n + m)$.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Edge type} & \textbf{Meaning} \\
+\midrule
+Tree edge   & $v$ first discovered via $u$ \\
+Back edge   & $v$ is an ancestor of $u$ (indicates a cycle in directed graphs) \\
+Forward edge & $v$ is a descendant of $u$ but not through tree edge \\
+Cross edge  & $v$ is in a different subtree \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ------------------------------------------------------------------------------
+\section{Topological Sort}
+% ------------------------------------------------------------------------------
+
+\defn{Topological Sort}{
+    A linear ordering of vertices of a \emph{DAG} (directed acyclic graph) such
+    that for every edge $(u, v)$, $u$ appears before $v$.
+}
+
+\textbf{DFS-based algorithm}: Run DFS; output vertices in decreasing finish time.
+$O(n + m)$.
+
+\textbf{Kahn's algorithm (BFS-based)}: Repeatedly remove vertices with in-degree 0.
+$O(n + m)$.
+
+\rmkb{A directed graph has a topological sort \emph{if and only if} it is a DAG
+(no back edges in DFS).}
+
+% ------------------------------------------------------------------------------
+\section{Strongly Connected Components (SCC)}
+% ------------------------------------------------------------------------------
+
+\defn{SCC}{
+    A maximal set of vertices $C \subseteq V$ such that every vertex in $C$
+    is reachable from every other vertex in $C$.
+}
+
+\textbf{Kosaraju's Algorithm} ($O(n + m)$):
+\begin{enumerate}
+    \item Run DFS on $G$; record finish times.
+    \item Compute $G^T$ (transpose: reverse all edges).
+    \item Run DFS on $G^T$ in decreasing finish-time order; each DFS tree is one SCC.
+\end{enumerate}
+
+\textbf{Tarjan's Algorithm} ($O(n + m)$): Single DFS with a stack; uses
+\emph{discovery times} and \emph{low-link values} to identify SCCs.
+
+% ------------------------------------------------------------------------------
+\section{Minimum Spanning Trees (MST)}
+% ------------------------------------------------------------------------------
+
+\defn{Minimum Spanning Tree}{
+    Given a connected, undirected, weighted graph $G = (V, E, w)$, an MST is
+    a spanning tree $T \subseteq E$ that minimises $\sum_{e \in T} w(e)$.
+    Any spanning tree has exactly $n-1$ edges.
+}
+
+\subsection*{Kruskal's Algorithm}
+
+Sort all edges by weight; add each edge if it doesn't form a cycle (use Union-Find).
+
+\begin{algorithm}[H]
+\caption{Kruskal's MST}
+\begin{algorithmic}[1]
+\State Sort edges: $e_1 \leq e_2 \leq \cdots \leq e_m$
+\State $T \gets \emptyset$; initialise Union-Find on $V$
+\For{each edge $(u, v)$ in sorted order}
+    \If{\textsc{Find}$(u) \neq$ \textsc{Find}$(v)$}
+        \State $T \gets T \cup \{(u,v)\}$
+        \State \textsc{Union}$(u, v)$
+    \EndIf
+\EndFor
+\State \Return $T$
+\end{algorithmic}
+\end{algorithm}
+
+Time: $O(m \log m)$ dominated by sorting (or $O(m \alpha(n))$ with path compression).
+
+\subsection*{Prim's Algorithm}
+
+Grow the MST greedily from a starting vertex; always add the minimum-weight
+edge crossing the cut between tree and non-tree vertices.
+
+Time: $O(m \log n)$ with a binary heap; $O(m + n \log n)$ with a Fibonacci heap.
+
+% ------------------------------------------------------------------------------
+\section{Shortest Paths}
+% ------------------------------------------------------------------------------
+
+\subsection*{Single-Source Shortest Paths}
+
+\defn{Dijkstra's Algorithm}{
+    Greedy SSSP for graphs with \emph{non-negative} edge weights.
+    Maintains a priority queue of (distance, vertex) pairs.
+    Time: $O((n + m) \log n)$ with a binary heap.
+}
+
+\begin{algorithm}[H]
+\caption{Dijkstra's Algorithm}
+\begin{algorithmic}[1]
+\State \texttt{dist}[$s$] $\gets 0$; \texttt{dist}[$v$] $\gets \infty$ for all $v \neq s$
+\State Priority queue $PQ \gets \{(0, s)\}$
+\While{$PQ$ not empty}
+    \State $(d, u) \gets PQ$.\textsc{ExtractMin}()
+    \If{$d >$ \texttt{dist}[$u$]} \textbf{continue} \EndIf
+    \For{each edge $(u, v, w)$}
+        \If{\texttt{dist}[$u$] $+ w <$ \texttt{dist}[$v$]}
+            \State \texttt{dist}[$v$] $\gets$ \texttt{dist}[$u$] $+ w$
+            \State $PQ$.\textsc{Insert}$(($ \texttt{dist}[$v$], $v))$
+        \EndIf
+    \EndFor
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+\defn{Bellman-Ford}{
+    SSSP for graphs with \emph{negative} edge weights (no negative cycles).
+    Relax all $m$ edges $n-1$ times. Time: $O(nm)$.
+    Detects negative cycles: if any edge can be relaxed after $n-1$ rounds,
+    a negative cycle is reachable from $s$.
+}
+
+\subsection*{All-Pairs Shortest Paths}
+
+\defn{Floyd-Warshall}{
+    Computes shortest paths between \emph{all} pairs of vertices.
+    DP approach: $d^{(k)}[i][j]$ = shortest path from $i$ to $j$ using
+    only vertices $\{1, \ldots, k\}$ as intermediates.
+    \[
+        d^{(k)}[i][j] = \min\!\left(d^{(k-1)}[i][j],\; d^{(k-1)}[i][k] + d^{(k-1)}[k][j]\right)
+    \]
+    Time: $O(n^3)$. Space: $O(n^2)$.
+}
+
+\begin{center}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Algorithm} & \textbf{Scope} & \textbf{Weights} & \textbf{Time} & \textbf{Space} \\
+\midrule
+BFS            & SSSP & Unweighted        & $O(n+m)$   & $O(n)$ \\
+Dijkstra       & SSSP & $\geq 0$          & $O((n+m)\log n)$ & $O(n)$ \\
+Bellman-Ford   & SSSP & Any (no neg cycle)& $O(nm)$    & $O(n)$ \\
+Floyd-Warshall & APSP & Any (no neg cycle)& $O(n^3)$   & $O(n^2)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ==============================================================================
+\chapter{Algorithm Design Paradigms}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\section{Divide \& Conquer}
+% ------------------------------------------------------------------------------
+
+\defn{Divide \& Conquer}{
+    Recursively break a problem into $a$ subproblems of size $n/b$, solve each,
+    then combine. Cost: $T(n) = aT(n/b) + f(n)$.
+}
+
+\subsection*{Closest Pair of Points}
+
+\textbf{Problem}: Given $n$ points in the plane, find the pair with minimum Euclidean distance.
+Naive brute-force: $O(n^2)$.
+
+\textbf{Algorithm} ($O(n \log n)$):
+\begin{enumerate}
+    \item Sort points by $x$-coordinate.
+    \item Divide at median $x$; recursively find $\delta_L$ and $\delta_R$.
+    \item Let $\delta = \min(\delta_L, \delta_R)$.
+    \item \textbf{Combine}: Consider the vertical strip of width $2\delta$ around the
+          dividing line. For each point in the strip (sorted by $y$), check at most
+          \textbf{7} subsequent points — the geometry bounds the density.
+    \item Return $\min(\delta, \delta_{\text{strip}})$.
+\end{enumerate}
+
+\thm{Closest Pair Complexity}{
+    $T(n) = 2T(n/2) + O(n) \Rightarrow T(n) = O(n \log n)$ by Master Theorem Case 2.
+}
+
+% ------------------------------------------------------------------------------
+\section{Greedy Algorithms}
+% ------------------------------------------------------------------------------
+
+\defn{Greedy Algorithm}{
+    Make the locally optimal choice at each step, hoping to reach a global optimum.
+    Correctness requires an \emph{exchange argument} or \emph{greedy stays ahead} proof.
+}
+
+\subsection*{Interval Scheduling}
+
+\textbf{Problem}: Given $n$ intervals $[s_i, f_i]$, select the maximum number of
+non-overlapping intervals.
+
+\textbf{Algorithm}: Sort by finish time $f_i$; greedily add intervals that start
+after the last selected one finishes.
+
+\thm{Interval Scheduling Greedy is Optimal}{
+    \textbf{Proof (Exchange argument)}: Let $G = \{g_1, g_2, \ldots, g_k\}$ be greedy solution,
+    $O = \{o_1, o_2, \ldots, o_m\}$ an optimal solution, both sorted by finish time.
+    Show by induction: $f(g_i) \leq f(o_i)$ for all $i$. Since greedy finishes
+    no later than optimal at each step, it can always fit at least as many intervals.
+    Hence $k \geq m$, so $k = m$.
+}
+
+\subsection*{Huffman Coding}
+
+\textbf{Problem}: Build an optimal prefix-free binary code minimising total encoded length,
+given symbol frequencies.
+
+\textbf{Algorithm}: Use a min-heap; repeatedly merge the two nodes with lowest frequency
+into a new node with their combined frequency.
+
+Time: $O(n \log n)$.
+
+\rmkb{Huffman coding is provably optimal for prefix-free codes.}
+
+% ------------------------------------------------------------------------------
+\section{Dynamic Programming}
+% ------------------------------------------------------------------------------
+
+\defn{Dynamic Programming}{
+    Solve a problem by breaking it into overlapping subproblems, storing results
+    (\emph{memoisation} or bottom-up table), and combining.
+    Applicable when the problem has:
+    (1) \textbf{Optimal substructure}: optimal solution contains optimal sub-solutions.
+    (2) \textbf{Overlapping subproblems}: subproblems recur.
+}
+
+\subsection*{Longest Common Subsequence (LCS)}
+
+\textbf{Problem}: Given strings $X[1..m]$ and $Y[1..n]$, find the longest subsequence
+common to both.
+
+\textbf{Recurrence}:
+\[
+    \text{dp}[i][j] =
+    \begin{cases}
+        0                           & \text{if } i = 0 \text{ or } j = 0 \\
+        \text{dp}[i-1][j-1] + 1     & \text{if } X[i] = Y[j] \\
+        \max(\text{dp}[i-1][j],\, \text{dp}[i][j-1]) & \text{otherwise}
+    \end{cases}
+\]
+
+Time: $O(mn)$. Space: $O(mn)$ (reducible to $O(\min(m,n))$).
+
+\subsection*{0/1 Knapsack}
+
+\textbf{Problem}: $n$ items each with weight $w_i$ and value $v_i$; knapsack capacity $W$.
+Maximise total value with total weight $\leq W$.
+
+\textbf{Recurrence}:
+\[
+    \text{dp}[i][w] =
+    \begin{cases}
+        0 & \text{if } i = 0 \text{ or } w = 0 \\
+        \text{dp}[i-1][w] & \text{if } w_i > w \\
+        \max\!\left(\text{dp}[i-1][w],\; v_i + \text{dp}[i-1][w-w_i]\right) & \text{otherwise}
+    \end{cases}
+\]
+
+Time: $O(nW)$. Space: $O(nW)$ (reducible to $O(W)$).
+
+\rmkb{This is \emph{pseudo-polynomial}: exponential in the input size (bits of $W$) but
+polynomial in the \emph{value} $W$.}
+
+\subsection*{Weighted Interval Scheduling (Interval DP)}
+
+\textbf{Problem}: Select non-overlapping intervals to maximise total weight.
+
+Sort intervals by finish time. Let $p(i)$ = largest $j < i$ with $f_j \leq s_i$.
+\[
+    \text{dp}[i] = \max\!\left(\text{dp}[i-1],\; w_i + \text{dp}[p(i)]\right)
+\]
+
+Time: $O(n \log n)$ (binary search for $p(i)$).
+
+% ------------------------------------------------------------------------------
+\section{Matching}
+% ------------------------------------------------------------------------------
+
+\subsection*{Bipartite Matching}
+
+\defn{Bipartite Graph}{
+    $G = (U \cup V, E)$ where all edges go between $U$ and $V$.
+    A \emph{matching} $M \subseteq E$ is a set of edges with no shared endpoints.
+    A \emph{maximum matching} maximises $|M|$.
+}
+
+\textbf{Algorithm} (Augmenting Paths, Hopcroft-Karp): Find shortest augmenting
+paths (paths from unmatched $U$ to unmatched $V$ alternating matched/unmatched edges).
+Time: $O(\sqrt{n} \cdot m)$.
+
+\subsection*{Stable Matching (Gale-Shapley)}
+
+\textbf{Problem}: Given $n$ men and $n$ women each with preference rankings,
+find a stable matching (no blocking pair: a man-woman pair who both prefer each other
+over current partners).
+
+\begin{algorithm}[H]
+\caption{Gale-Shapley (Propose-and-Reject)}
+\begin{algorithmic}[1]
+\While{any man is unmatched}
+    \State $m$ proposes to his highest-ranked woman $w$ not yet proposed to
+    \If{$w$ is unmatched}
+        \State tentatively match $(m, w)$
+    \ElsIf{$w$ prefers $m$ over current partner $m'$}
+        \State unmatch $m'$; tentatively match $(m, w)$
+    \EndIf
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+\thm{Gale-Shapley Correctness}{
+    The algorithm terminates in $O(n^2)$ and produces a \emph{stable} matching.
+    The result is \textbf{man-optimal} (each man gets his best stable partner)
+    and \textbf{woman-pessimal} (each woman gets her worst stable partner).
+}
+
+% ==============================================================================
+\chapter{Computability \& Complexity}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\section{Computability}
+% ------------------------------------------------------------------------------
+
+\defn{Turing Machine}{
+    A mathematical model of computation consisting of an infinite tape,
+    a read/write head, a finite set of states, and a transition function.
+    Defines what is \emph{computable} in principle.
+}
+
+\defn{Decidable Language}{
+    A language $L$ is \emph{decidable} (recursive) if there exists a Turing machine
+    that \emph{always halts} and correctly accepts $x \in L$ and rejects $x \notin L$.
+}
+
+\defn{Recognisable Language}{
+    A language $L$ is \emph{recognisable} (recursively enumerable) if there exists a
+    Turing machine that accepts $x \in L$ (but may loop on $x \notin L$).
+}
+
+\thm{Halting Problem is Undecidable}{
+    Let $\textsc{Halt} = \{\langle M, x \rangle \mid M \text{ halts on input } x\}$.
+    \textsc{Halt} is not decidable.
+}
+
+\pf[Proof sketch]{
+    Assume for contradiction a decider $H$ for \textsc{Halt} exists. Construct $D$:
+    on input $\langle M \rangle$, run $H(\langle M, \langle M \rangle \rangle)$;
+    if $H$ accepts (i.e.\ $M$ halts on $\langle M \rangle$), then $D$ loops;
+    if $H$ rejects, $D$ halts. Evaluate $D$ on $\langle D \rangle$: contradiction
+    in both cases. Hence $H$ cannot exist.
+}
+
+% ------------------------------------------------------------------------------
+\section{NP-Completeness}
+% ------------------------------------------------------------------------------
+
+\defn{Complexity Classes}{
+    \begin{itemize}
+        \item $\mathbf{P}$: Decision problems solvable in polynomial time.
+        \item $\mathbf{NP}$: Decision problems with solutions \emph{verifiable} in
+              polynomial time. Equivalently, solvable by a nondeterministic TM in
+              polynomial time.
+        \item \textbf{NP-hard}: At least as hard as every problem in NP (via
+              polynomial-time many-one reductions). Need not be in NP.
+        \item \textbf{NP-complete}: In NP \emph{and} NP-hard.
+    \end{itemize}
+}
+
+\rmkb{$\mathbf{P} \subseteq \mathbf{NP}$. Whether $\mathbf{P} = \mathbf{NP}$ is the
+central open problem of computer science.}
+
+\defn{Polynomial-Time Reduction}{
+    $A \leq_p B$ (``$A$ reduces to $B$'') if there exists a polynomial-time
+    computable function $f$ such that $x \in A \iff f(x) \in B$.
+    If $B \in P$ then $A \in P$; contrapositively, if $A \notin P$ then $B \notin P$.
+}
+
+\thm{Cook-Levin Theorem}{
+    \textsc{3-SAT} is NP-complete. (Every NP problem reduces to \textsc{3-SAT}.)
+}
+
+\subsection*{Classic NP-Complete Problems}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Problem} & \textbf{Description} \\
+\midrule
+\textsc{3-SAT}          & Boolean formula in 3-CNF; satisfying assignment? \\
+\textsc{Independent Set} & Graph $G$, integer $k$; independent set of size $\geq k$? \\
+\textsc{Clique}          & Graph $G$, integer $k$; clique of size $\geq k$? \\
+\textsc{Vertex Cover}    & Graph $G$, integer $k$; vertex cover of size $\leq k$? \\
+\textsc{3-Coloring}      & Can vertices of $G$ be colored with 3 colors, no adjacent same? \\
+\textsc{Hamiltonian Path} & Does $G$ have a path visiting every vertex exactly once? \\
+\textsc{TSP (decision)}  & Tour visiting all cities with total cost $\leq k$? \\
+\textsc{Subset Sum}      & Integers $S$, target $t$; subset summing to exactly $t$? \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Key Reductions}
+
+\subsubsection*{\textsc{3-SAT} $\leq_p$ \textsc{Independent Set}}
+
+\textbf{Construction}: Given a 3-CNF formula with $k$ clauses, build graph $G$:
+\begin{itemize}
+    \item For each clause, create a \emph{triangle} (3 nodes, one per literal).
+    \item Add an edge between any two nodes in different triangles representing
+          \emph{complementary} literals ($x$ and $\bar{x}$).
+\end{itemize}
+
+\thm{Reduction correctness}{
+    $\phi$ is satisfiable $\iff$ $G$ has an independent set of size $k$.
+    \begin{itemize}
+        \item ($\Rightarrow$) A satisfying assignment selects one true literal per clause;
+              these $k$ nodes form an independent set (no edges within a triangle since
+              we pick one; no inter-triangle edges since complementary literals can't
+              both be true).
+        \item ($\Leftarrow$) An independent set of size $k$ picks exactly one node per triangle;
+              assign those literals true (no contradiction since complement pairs are excluded).
+    \end{itemize}
+}
+
+\subsubsection*{\textsc{Independent Set} $\leq_p$ \textsc{Vertex Cover}}
+
+\thm{Complement duality}{
+    $S$ is an independent set of size $k$ in $G$ $\iff$ $V \setminus S$ is a
+    vertex cover of size $n - k$.
+}
+
+\pf{
+    ($\Rightarrow$) For any edge $(u,v)$: since $S$ is independent, not both $u,v \in S$,
+    so at least one of $u,v \in V\setminus S$. Hence $V\setminus S$ covers every edge.
+
+    ($\Leftarrow$) Suppose $u,v \in S$. Then neither is in $V\setminus S$, but edge $(u,v)$
+    is uncovered — contradiction. So $S$ is independent.
+}
+
+\subsubsection*{\textsc{3-SAT} $\leq_p$ \textsc{3-Coloring}}
+
+\textbf{Construction}: Build a graph with a \emph{palette} gadget (3 nodes: \texttt{T}, \texttt{F}, \texttt{B}
+pairwise connected) and a \emph{clause gadget} for each clause that forces at least one literal to
+match \texttt{T}. The reduction preserves satisfiability.
+
+\subsection*{Coping with NP-Completeness}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Strategy} & \textbf{Description} \\
+\midrule
+Special cases        & Some NP-complete problems are poly-time on restricted inputs (e.g.\ 2-SAT, planar graphs) \\
+Approximation        & Guarantee solution within factor $\alpha$ of optimal \\
+FPT algorithms       & Exponential only in a small parameter $k$ (e.g.\ $O(2^k \cdot n)$) \\
+Heuristics / Local search & No guarantee, but fast in practice \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\end{document}

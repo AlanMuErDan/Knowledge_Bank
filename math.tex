@@ -24,6 +24,14 @@
 
 \usepackage{graphicx}
 
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
 % ------------------------------------------------------------------------------
 % Page Setup
 % ------------------------------------------------------------------------------
@@ -3650,6 +3658,686 @@ If $A=PDP^{-1}$, where $ D=\operatorname{diag}(\lambda_1,\ldots,\lambda_n)$ then
 \]
 
 % \input{linear_algebra_chapter.tex}
+
+% ==============================================================================
+\chapter{Probability \& Statistics}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\section{Probability Fundamentals}
+% ------------------------------------------------------------------------------
+
+\defn{Probability Space}{
+    A triple $(\Omega, \mathcal{F}, P)$ where $\Omega$ is the \emph{sample space}
+    (all possible outcomes), $\mathcal{F}$ is a $\sigma$-algebra of events, and
+    $P: \mathcal{F} \to [0,1]$ is a probability measure satisfying the
+    \textbf{Kolmogorov axioms}:
+    \begin{enumerate}
+        \item $P(A) \geq 0$ for all $A \in \mathcal{F}$
+        \item $P(\Omega) = 1$
+        \item If $A_1, A_2, \ldots$ are mutually exclusive: $P\!\left(\bigcup_{i=1}^\infty A_i\right) = \sum_{i=1}^\infty P(A_i)$
+    \end{enumerate}
+}
+
+\subsection*{Derived Rules}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Rule} & \textbf{Statement} \\
+\midrule
+Complement         & $P(A^c) = 1 - P(A)$ \\
+Inclusion-Exclusion & $P(A \cup B) = P(A) + P(B) - P(A \cap B)$ \\
+Addition (general) & $P(A \cup B \cup C) = P(A)+P(B)+P(C) - P(A\cap B) - P(A\cap C) - P(B\cap C) + P(A\cap B\cap C)$ \\
+Monotonicity       & $A \subseteq B \Rightarrow P(A) \leq P(B)$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Conditional Probability \& Independence}
+
+\defn{Conditional Probability}{
+    For $P(B) > 0$:
+    \[
+        P(A \mid B) = \frac{P(A \cap B)}{P(B)}
+    \]
+    Events $A$ and $B$ are \textbf{independent} if $P(A \cap B) = P(A)P(B)$,
+    equivalently $P(A \mid B) = P(A)$.
+}
+
+\thm{Law of Total Probability}{
+    Let $\{B_1, \ldots, B_n\}$ be a partition of $\Omega$ with $P(B_i) > 0$. Then:
+    \[
+        P(A) = \sum_{i=1}^n P(A \mid B_i)\, P(B_i)
+    \]
+}
+
+\thm{Bayes' Theorem}{
+    \[
+        P(B_i \mid A) = \frac{P(A \mid B_i)\, P(B_i)}{\sum_{j} P(A \mid B_j)\, P(B_j)}
+    \]
+}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Term} & \textbf{Notation} & \textbf{Meaning} \\
+\midrule
+Prior       & $P(B_i)$         & Belief about $B_i$ before seeing data \\
+Likelihood  & $P(A \mid B_i)$  & Probability of data given $B_i$ \\
+Posterior   & $P(B_i \mid A)$  & Updated belief after seeing data $A$ \\
+Evidence    & $P(A)$           & Normalising constant (denominator) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ------------------------------------------------------------------------------
+\section{Random Variables \& Distributions}
+% ------------------------------------------------------------------------------
+
+\defn{Random Variable}{
+    A function $X: \Omega \to \mathbb{R}$ that assigns a numerical value to each outcome.
+    \begin{itemize}
+        \item \textbf{Discrete}: $X$ takes countably many values; characterised by the
+              probability mass function (PMF) $p(x) = P(X = x)$.
+        \item \textbf{Continuous}: $X$ takes uncountably many values; characterised by the
+              probability density function (PDF) $f(x)$ where $P(a \leq X \leq b) = \int_a^b f(x)\,dx$.
+    \end{itemize}
+    The cumulative distribution function (CDF) is $F(x) = P(X \leq x)$.
+}
+
+\subsection*{Expectation, Variance, and Moments}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXX}
+\toprule
+\textbf{Quantity} & \textbf{Discrete} & \textbf{Continuous} \\
+\midrule
+Mean $\mu = E[X]$        & $\sum_x x\, p(x)$        & $\int_{-\infty}^\infty x\, f(x)\,dx$ \\
+$E[g(X)]$                & $\sum_x g(x)\, p(x)$     & $\int_{-\infty}^\infty g(x)\, f(x)\,dx$ \\
+Variance $\sigma^2 = \mathrm{Var}(X)$ & \multicolumn{2}{l}{$E[(X-\mu)^2] = E[X^2] - (E[X])^2$} \\
+$k$-th moment            & \multicolumn{2}{l}{$E[X^k]$} \\
+$k$-th central moment    & \multicolumn{2}{l}{$E[(X-\mu)^k]$; skewness $= E[(X-\mu)^3]/\sigma^3$; kurtosis $= E[(X-\mu)^4]/\sigma^4$} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\defn{Moment Generating Function (MGF)}{
+    $M_X(t) = E[e^{tX}]$, defined in a neighbourhood of $t = 0$.
+    The $k$-th moment is $E[X^k] = M_X^{(k)}(0)$.
+    The MGF uniquely determines the distribution (when it exists).
+}
+
+\subsection*{Common Distributions}
+
+\begin{center}
+\begin{longtable}{llll}
+\toprule
+\textbf{Distribution} & \textbf{PMF / PDF} & \textbf{Mean} & \textbf{Variance} \\
+\midrule
+\endhead
+\multicolumn{4}{l}{\textit{Discrete}} \\
+\midrule
+Bernoulli$(p)$   & $p^x(1-p)^{1-x}$, $x\in\{0,1\}$                     & $p$       & $p(1-p)$ \\
+Binomial$(n,p)$  & $\binom{n}{x}p^x(1-p)^{n-x}$, $x=0,\ldots,n$        & $np$      & $np(1-p)$ \\
+Geometric$(p)$   & $(1-p)^{x-1}p$, $x=1,2,\ldots$                       & $1/p$     & $(1-p)/p^2$ \\
+Poisson$(\lambda)$ & $e^{-\lambda}\lambda^x/x!$, $x=0,1,\ldots$         & $\lambda$ & $\lambda$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Continuous}} \\
+\midrule
+Uniform$(a,b)$   & $\dfrac{1}{b-a}$, $x\in[a,b]$                        & $\dfrac{a+b}{2}$ & $\dfrac{(b-a)^2}{12}$ \\[6pt]
+Normal$(\mu,\sigma^2)$ & $\dfrac{1}{\sigma\sqrt{2\pi}}e^{-(x-\mu)^2/2\sigma^2}$ & $\mu$ & $\sigma^2$ \\[6pt]
+Exponential$(\lambda)$ & $\lambda e^{-\lambda x}$, $x\geq 0$            & $1/\lambda$ & $1/\lambda^2$ \\[6pt]
+Gamma$(\alpha,\beta)$ & $\dfrac{\beta^\alpha x^{\alpha-1}e^{-\beta x}}{\Gamma(\alpha)}$, $x>0$ & $\alpha/\beta$ & $\alpha/\beta^2$ \\[6pt]
+Beta$(\alpha,\beta)$ & $\dfrac{x^{\alpha-1}(1-x)^{\beta-1}}{B(\alpha,\beta)}$, $x\in(0,1)$ & $\dfrac{\alpha}{\alpha+\beta}$ & $\dfrac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}$ \\[6pt]
+$t_\nu$          & Complex; $\nu$ degrees of freedom                     & $0$ ($\nu>1$) & $\nu/(\nu-2)$ ($\nu>2$) \\[4pt]
+$\chi^2_\nu$     & Gamma$(\nu/2, 1/2)$                                   & $\nu$     & $2\nu$ \\[4pt]
+$F_{\nu_1,\nu_2}$ & Ratio of $\chi^2$ r.v.'s; $\nu_1,\nu_2$ df         & $\dfrac{\nu_2}{\nu_2-2}$ ($\nu_2>2$) & \small complex \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\rmkb{Key relationships: $\chi^2_\nu = $ Gamma$(\nu/2, 1/2)$;
+if $Z \sim N(0,1)$ and $V \sim \chi^2_\nu$ independently, then $Z/\sqrt{V/\nu} \sim t_\nu$;
+if $U \sim \chi^2_{\nu_1}$ and $V \sim \chi^2_{\nu_2}$ independently, then $(U/\nu_1)/(V/\nu_2) \sim F_{\nu_1,\nu_2}$.}
+
+% ------------------------------------------------------------------------------
+\section{Joint Distributions \& Limit Theorems}
+% ------------------------------------------------------------------------------
+
+\defn{Joint Distribution}{
+    For two random variables $X, Y$:
+    \begin{itemize}
+        \item \textbf{Joint PMF}: $p(x,y) = P(X=x, Y=y)$
+        \item \textbf{Joint PDF}: $f(x,y)$ s.t.\ $P((X,Y)\in A) = \iint_A f(x,y)\,dx\,dy$
+        \item \textbf{Marginal}: $f_X(x) = \int_{-\infty}^\infty f(x,y)\,dy$
+        \item \textbf{Conditional}: $f_{Y|X}(y\mid x) = f(x,y)/f_X(x)$
+        \item $X \perp Y$ iff $f(x,y) = f_X(x)\,f_Y(y)$
+    \end{itemize}
+}
+
+\defn{Covariance \& Correlation}{
+    \[
+        \mathrm{Cov}(X,Y) = E[(X-\mu_X)(Y-\mu_Y)] = E[XY] - E[X]E[Y]
+    \]
+    \[
+        \rho_{XY} = \frac{\mathrm{Cov}(X,Y)}{\sigma_X \sigma_Y} \in [-1, 1]
+    \]
+    $X \perp Y \Rightarrow \mathrm{Cov}(X,Y) = 0$, but not conversely.
+    $\rho = \pm 1 \iff$ $Y = aX + b$ a.s.\ for some constants $a \neq 0$, $b$.
+}
+
+\thm{Law of Large Numbers (LLN)}{
+    Let $X_1, X_2, \ldots$ be i.i.d.\ with $E[X_i] = \mu < \infty$.
+    \begin{itemize}
+        \item \textbf{Weak LLN}: $\bar{X}_n \xrightarrow{P} \mu$ (convergence in probability)
+        \item \textbf{Strong LLN}: $\bar{X}_n \xrightarrow{a.s.} \mu$ (almost sure convergence)
+    \end{itemize}
+}
+
+\thm{Central Limit Theorem (CLT)}{
+    Let $X_1, \ldots, X_n$ be i.i.d.\ with $E[X_i] = \mu$ and $\mathrm{Var}(X_i) = \sigma^2 < \infty$. Then:
+    \[
+        \sqrt{n}\,\frac{\bar{X}_n - \mu}{\sigma} \xrightarrow{d} N(0,1) \quad \text{as } n \to \infty
+    \]
+    Equivalently, $\bar{X}_n \approx N(\mu,\, \sigma^2/n)$ for large $n$.
+}
+
+\rmkb{The CLT holds regardless of the shape of the underlying distribution —
+this is why the normal distribution is so central to statistics.
+A common rule of thumb: $n \geq 30$ is ``large enough'' for the approximation.}
+
+% ------------------------------------------------------------------------------
+\section{Statistical Inference: Estimation}
+% ------------------------------------------------------------------------------
+
+\defn{Estimator}{
+    A function $\hat{\theta} = T(X_1, \ldots, X_n)$ of the sample used to estimate
+    an unknown parameter $\theta$. Properties:
+    \begin{itemize}
+        \item \textbf{Bias}: $\mathrm{Bias}(\hat\theta) = E[\hat\theta] - \theta$;
+              \textbf{unbiased} if $= 0$.
+        \item \textbf{Consistency}: $\hat\theta \xrightarrow{P} \theta$ as $n \to \infty$.
+        \item \textbf{MSE}: $\mathrm{MSE}(\hat\theta) = \mathrm{Var}(\hat\theta) + \mathrm{Bias}(\hat\theta)^2$.
+    \end{itemize}
+}
+
+\subsection*{Method of Moments (MOM)}
+
+Set the first $k$ sample moments equal to the corresponding population moments and solve for $\theta$:
+\[
+    \frac{1}{n}\sum_{i=1}^n X_i^j = E[X^j;\theta], \quad j = 1, \ldots, k.
+\]
+
+\subsection*{Maximum Likelihood Estimation (MLE)}
+
+\defn{MLE}{
+    Given data $x_1, \ldots, x_n$, the \textbf{likelihood function} is
+    \[
+        L(\theta) = \prod_{i=1}^n f(x_i; \theta).
+    \]
+    The MLE $\hat\theta_{\mathrm{MLE}} = \arg\max_\theta L(\theta)$.
+    In practice, maximise the \textbf{log-likelihood} $\ell(\theta) = \sum_i \log f(x_i; \theta)$
+    (strictly equivalent since $\log$ is monotone).
+}
+
+\ex{
+    \textbf{Normal MLE}: $X_i \sim N(\mu, \sigma^2)$.
+    $\ell(\mu,\sigma^2) = -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum(x_i - \mu)^2$.
+    Setting $\partial\ell/\partial\mu = 0$ gives $\hat\mu = \bar{x}$.
+    Setting $\partial\ell/\partial\sigma^2 = 0$ gives $\hat\sigma^2 = \frac{1}{n}\sum(x_i-\bar{x})^2$
+    (biased; divide by $n-1$ for the unbiased sample variance $S^2$).
+}
+
+\subsection*{Theoretical Properties of MLE}
+
+\defn{Fisher Information}{
+    \[
+        \mathcal{I}(\theta) = E\!\left[\left(\frac{\partial \log f(X;\theta)}{\partial \theta}\right)^2\right]
+        = -E\!\left[\frac{\partial^2 \log f(X;\theta)}{\partial \theta^2}\right]
+    \]
+    Measures the amount of information $X$ carries about $\theta$.
+    For $n$ i.i.d.\ observations: $\mathcal{I}_n(\theta) = n\,\mathcal{I}(\theta)$.
+}
+
+\thm{Cramér-Rao Lower Bound}{
+    For any unbiased estimator $\hat\theta$ of $\theta$:
+    \[
+        \mathrm{Var}(\hat\theta) \geq \frac{1}{\mathcal{I}_n(\theta)} = \frac{1}{n\,\mathcal{I}(\theta)}
+    \]
+    An estimator achieving this bound is called \textbf{efficient}.
+}
+
+\thm{Asymptotic Normality of MLE}{
+    Under regularity conditions, as $n \to \infty$:
+    \[
+        \sqrt{n}(\hat\theta_{\mathrm{MLE}} - \theta_0) \xrightarrow{d} N\!\left(0,\, \frac{1}{\mathcal{I}(\theta_0)}\right)
+    \]
+    Hence MLE is consistent and asymptotically efficient.
+}
+
+\subsection*{Sufficient Statistics}
+
+\defn{Sufficient Statistic}{
+    $T(X_1,\ldots,X_n)$ is \textbf{sufficient} for $\theta$ if the conditional distribution
+    of the sample given $T$ does not depend on $\theta$.
+    \textbf{Factorization theorem}: $T$ is sufficient for $\theta$ iff
+    \[
+        \prod_{i=1}^n f(x_i;\theta) = g(T(\mathbf{x}), \theta) \cdot h(\mathbf{x})
+    \]
+    for some functions $g$ and $h$.
+}
+
+% ------------------------------------------------------------------------------
+\section{Confidence Intervals \& Hypothesis Testing}
+% ------------------------------------------------------------------------------
+
+\subsection*{Confidence Intervals}
+
+\defn{Confidence Interval}{
+    A $100(1-\alpha)\%$ CI for $\theta$ is a random interval $[L, U]$ satisfying
+    $P(L \leq \theta \leq U) \geq 1 - \alpha$.
+    The \textbf{pivot} approach: find a function of data and $\theta$
+    whose distribution is known and free of $\theta$.
+}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Setting} & \textbf{CI for $\mu$} & \textbf{Pivot} \\
+\midrule
+Known $\sigma$, any $n$ (large) & $\bar{X} \pm z_{\alpha/2}\, \dfrac{\sigma}{\sqrt{n}}$ & $Z = \dfrac{\bar{X}-\mu}{\sigma/\sqrt{n}} \sim N(0,1)$ \\[10pt]
+Unknown $\sigma$, normal pop. & $\bar{X} \pm t_{n-1,\alpha/2}\, \dfrac{S}{\sqrt{n}}$ & $T = \dfrac{\bar{X}-\mu}{S/\sqrt{n}} \sim t_{n-1}$ \\[10pt]
+Proportion $p$ (large $n$) & $\hat{p} \pm z_{\alpha/2}\sqrt{\dfrac{\hat{p}(1-\hat{p})}{n}}$ & CLT approximation \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Hypothesis Testing Framework}
+
+\defn{Hypothesis Test}{
+    \textbf{Null hypothesis} $H_0$ vs.\ \textbf{alternative} $H_1$.
+    A test statistic $T$ is computed; the null is rejected if $T$ falls in the
+    \textbf{rejection region} (critical region).
+    \begin{itemize}
+        \item \textbf{Type I error} ($\alpha$): reject $H_0$ when $H_0$ is true.
+        \item \textbf{Type II error} ($\beta$): fail to reject $H_0$ when $H_1$ is true.
+        \item \textbf{Power} $= 1 - \beta$: probability of correctly rejecting a false $H_0$.
+        \item \textbf{$p$-value}: smallest $\alpha$ at which $H_0$ would be rejected; reject $H_0$ if $p < \alpha$.
+    \end{itemize}
+}
+
+\subsection*{Common Tests Reference Table}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lllXl}
+\toprule
+\textbf{Test} & \textbf{$H_0$} & \textbf{Statistic} & \textbf{Distribution} & \textbf{Use} \\
+\midrule
+One-sample $t$       & $\mu = \mu_0$     & $\dfrac{\bar{X}-\mu_0}{S/\sqrt{n}}$ & $t_{n-1}$ & Single mean \\[8pt]
+Two-sample $t$       & $\mu_1 = \mu_2$   & $\dfrac{\bar{X}_1-\bar{X}_2}{S_p\sqrt{1/n_1+1/n_2}}$ & $t_{n_1+n_2-2}$ & Two independent means \\[8pt]
+Paired $t$           & $\mu_D = 0$       & $\dfrac{\bar{D}}{S_D/\sqrt{n}}$ & $t_{n-1}$ & Matched pairs \\[8pt]
+$\chi^2$ goodness-of-fit & Specified dist. & $\sum \dfrac{(O-E)^2}{E}$ & $\chi^2_{k-1}$ & Categorical fit \\[8pt]
+$\chi^2$ independence & $X \perp Y$      & $\sum \dfrac{(O-E)^2}{E}$ & $\chi^2_{(r-1)(c-1)}$ & Contingency table \\[8pt]
+$F$-test (ANOVA)     & $\sigma_1^2 = \sigma_2^2$ & $S_1^2/S_2^2$ & $F_{n_1-1,n_2-1}$ & Variance equality \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ------------------------------------------------------------------------------
+\section{Linear Regression}
+% ------------------------------------------------------------------------------
+
+\subsection*{Simple OLS}
+
+\defn{Simple Linear Regression}{
+    Model: $Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i$, where $\varepsilon_i \sim (0, \sigma^2)$ i.i.d.
+
+    OLS estimators minimise $\sum_{i=1}^n (Y_i - \beta_0 - \beta_1 X_i)^2$:
+    \[
+        \hat\beta_1 = \frac{\sum(X_i - \bar{X})(Y_i - \bar{Y})}{\sum(X_i - \bar{X})^2}
+        = \frac{S_{XY}}{S_{XX}}, \qquad
+        \hat\beta_0 = \bar{Y} - \hat\beta_1 \bar{X}
+    \]
+}
+
+\subsection*{Multiple OLS — Matrix Form}
+
+\defn{Multiple Linear Regression}{
+    Model: $\mathbf{Y} = X\boldsymbol{\beta} + \boldsymbol{\varepsilon}$,
+    where $\mathbf{Y} \in \mathbb{R}^n$, $X \in \mathbb{R}^{n\times p}$ (design matrix),
+    $\boldsymbol{\beta} \in \mathbb{R}^p$.
+
+    OLS estimator (assuming $X$ has full column rank):
+    \[
+        \hat{\boldsymbol{\beta}} = (X^\top X)^{-1} X^\top \mathbf{Y}
+    \]
+    This is precisely the least-squares solution from the Linear Algebra chapter.
+}
+
+\thm{Gauss-Markov Theorem}{
+    Under the classical assumptions (linearity, strict exogeneity $E[\varepsilon|X]=0$,
+    homoskedasticity, no perfect multicollinearity), OLS is \textbf{BLUE}:
+    the Best Linear Unbiased Estimator — it has the smallest variance among all
+    linear unbiased estimators.
+}
+
+\subsection*{Regression Inference \& Fit}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Quantity} & \textbf{Definition / Interpretation} \\
+\midrule
+$R^2 = 1 - \mathrm{SSR}/\mathrm{SST}$    & Fraction of variance in $Y$ explained by $X$; $\in [0,1]$ \\
+Adjusted $\bar{R}^2$                       & $1 - \frac{(1-R^2)(n-1)}{n-p}$; penalises extra predictors \\
+$t$-test on $\hat\beta_j$                  & $H_0: \beta_j = 0$; statistic $= \hat\beta_j / \mathrm{SE}(\hat\beta_j) \sim t_{n-p}$ \\
+$F$-test (joint)                           & $H_0: \beta_1 = \cdots = \beta_{p-1} = 0$; statistic $\sim F_{p-1, n-p}$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Common Regression Problems}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Problem} & \textbf{Description} & \textbf{Consequence} \\
+\midrule
+Multicollinearity & Predictors highly correlated & Large $\mathrm{SE}(\hat\beta)$; unstable estimates \\
+Heteroskedasticity & $\mathrm{Var}(\varepsilon_i)$ varies with $X$ & OLS inefficient; SEs biased \\
+Endogeneity & $E[\varepsilon|X] \neq 0$ (omitted variable, simultaneity) & $\hat\beta$ biased and inconsistent \\
+Omitted variable bias & Relevant variable excluded from model & OVB = $\hat\beta_{\text{omitted}}^{\text{true}} \times$ coeff.\ in auxiliary regression \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ------------------------------------------------------------------------------
+\section{Causal Inference}
+% ------------------------------------------------------------------------------
+
+\defn{Potential Outcomes Framework (Rubin Causal Model)}{
+    For each unit $i$, define potential outcomes:
+    \begin{itemize}
+        \item $Y_i(1)$: outcome if treated ($D_i = 1$)
+        \item $Y_i(0)$: outcome if untreated ($D_i = 0$)
+    \end{itemize}
+    \textbf{Fundamental problem}: only one potential outcome is observed.
+    \textbf{SUTVA}: no interference between units; no hidden versions of treatment.
+
+    Key estimands:
+    \[
+        \text{ATE} = E[Y_i(1) - Y_i(0)], \quad
+        \text{ATT} = E[Y_i(1) - Y_i(0) \mid D_i = 1]
+    \]
+}
+
+\subsection*{Randomized Controlled Trials (RCT)}
+
+\defn{RCT}{
+    Random assignment $D_i \perp (Y_i(0), Y_i(1))$ ensures the treatment group
+    and control group are comparable in expectation.
+
+    \textbf{Identification}: $\text{ATE} = E[Y \mid D=1] - E[Y \mid D=0]$,
+    estimated by the difference in sample means.
+}
+
+\rmkb{Without randomisation, the difference in means conflates the treatment effect
+with \textbf{selection bias}: $E[Y|D=1] - E[Y|D=0] = \text{ATE} + \underbrace{E[Y_i(0)|D=1] - E[Y_i(0)|D=0]}_{\text{selection bias}}$.}
+
+\subsection*{Control Variables (Selection on Observables)}
+
+\defn{Conditional Independence Assumption (CIA)}{
+    $(Y_i(0), Y_i(1)) \perp D_i \mid X_i$ — after conditioning on observables $X_i$,
+    assignment is ``as good as random''. Then:
+    \[
+        \text{ATE} = E_X\!\left[E[Y \mid D=1, X] - E[Y \mid D=0, X]\right]
+    \]
+    In practice: add $X_i$ as control variables in OLS regression.
+}
+
+\subsection*{Instrumental Variables (IV / 2SLS)}
+
+\defn{Instrumental Variable}{
+    An instrument $Z$ satisfies three conditions:
+    \begin{enumerate}
+        \item \textbf{Relevance}: $Z$ is correlated with the endogenous variable $D$: $\mathrm{Cov}(Z, D) \neq 0$
+        \item \textbf{Exogeneity}: $Z$ is uncorrelated with the error: $\mathrm{Cov}(Z, \varepsilon) = 0$
+        \item \textbf{Exclusion restriction}: $Z$ affects $Y$ only through $D$
+    \end{enumerate}
+}
+
+\textbf{Wald Estimator} (binary $Z$, binary $D$):
+\[
+    \hat\beta_{\text{IV}} = \frac{E[Y \mid Z=1] - E[Y \mid Z=0]}{E[D \mid Z=1] - E[D \mid Z=0]}
+    = \frac{\text{Reduced Form}}{\text{First Stage}}
+\]
+
+\textbf{Two-Stage Least Squares (2SLS)}:
+\begin{enumerate}
+    \item \textbf{First stage}: regress $D$ on $Z$ (and controls); get $\hat{D}$.
+    \item \textbf{Second stage}: regress $Y$ on $\hat{D}$ (and controls); coefficient on $\hat{D}$ is $\hat\beta_{\text{2SLS}}$.
+\end{enumerate}
+
+\rmkb{IV estimates the \textbf{Local Average Treatment Effect (LATE)}: the ATE for
+\emph{compliers} — units who change treatment status because of $Z$.}
+
+\subsection*{Regression Discontinuity (RD)}
+
+\defn{Sharp RD}{
+    Treatment is deterministically assigned based on a \textbf{running variable} $X$
+    crossing a cutoff $c$: $D_i = \mathbf{1}[X_i \geq c]$.
+    Identification: units just below and just above $c$ are approximately comparable.
+    \[
+        \tau_{\text{RD}} = \lim_{x \downarrow c} E[Y \mid X=x] - \lim_{x \uparrow c} E[Y \mid X=x]
+    \]
+}
+
+\defn{Fuzzy RD}{
+    Treatment \emph{probability} jumps at $c$ but is not deterministic.
+    Estimates a LATE using the discontinuity as an instrument:
+    \[
+        \tau_{\text{Fuzzy RD}} = \frac{\text{Jump in }E[Y \mid X]}{\text{Jump in }E[D \mid X]} \Bigg|_{X=c}
+    \]
+}
+
+\subsection*{Difference-in-Differences (DiD)}
+
+\defn{DiD}{
+    Two groups (treated, control) observed in two periods (pre, post).
+    \textbf{Parallel trends assumption}: in the absence of treatment, the two groups
+    would have followed parallel time trends: $E[Y_{it}(0) \mid G=1] - E[Y_{it}(0) \mid G=0]$ is constant in $t$.
+}
+
+\textbf{2$\times$2 DiD Estimator}:
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+                & Pre ($t=0$) & Post ($t=1$) & Difference \\
+\midrule
+Treated ($G=1$) & $\bar{Y}_{10}$ & $\bar{Y}_{11}$ & $\bar{Y}_{11} - \bar{Y}_{10}$ \\
+Control ($G=0$) & $\bar{Y}_{00}$ & $\bar{Y}_{01}$ & $\bar{Y}_{01} - \bar{Y}_{00}$ \\
+\midrule
+DiD             & & & $(\bar{Y}_{11} - \bar{Y}_{10}) - (\bar{Y}_{01} - \bar{Y}_{00})$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Regression form: $Y_{it} = \alpha + \beta_1 G_i + \beta_2 \mathbf{1}[t=1] + \delta\,(G_i \cdot \mathbf{1}[t=1]) + \varepsilon_{it}$;
+the DiD estimate is $\hat\delta$.
+
+\rmkb{\textbf{Event study}: in panels with multiple periods, plot coefficients on
+period-$\times$-treatment interaction dummies. Pre-trends should be flat (parallel trends test).}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Method} & \textbf{Key assumption} & \textbf{Estimates} \\
+\midrule
+RCT         & Random assignment                              & ATE \\
+OLS + controls & CIA (selection on observables)             & ATE (under CIA) \\
+IV / 2SLS   & Instrument relevance + exogeneity + exclusion & LATE (compliers) \\
+Sharp RD    & Continuity of potential outcomes at cutoff    & LATE at cutoff \\
+DiD         & Parallel trends                               & ATT \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ------------------------------------------------------------------------------
+\section{Time Series}
+% ------------------------------------------------------------------------------
+
+\defn{Stationarity}{
+    A time series $\{X_t\}$ is \textbf{(weakly) stationary} if:
+    \begin{enumerate}
+        \item $E[X_t] = \mu$ (constant mean)
+        \item $\mathrm{Cov}(X_t, X_{t+h}) = \gamma(h)$ depends only on lag $h$, not on $t$
+    \end{enumerate}
+    \textbf{Strict stationarity}: the joint distribution of $(X_{t_1},\ldots,X_{t_k})$ is
+    invariant to time shifts.
+}
+
+\subsection*{ACF and PACF}
+
+\defn{Autocovariance \& Autocorrelation}{
+    \[
+        \gamma(h) = \mathrm{Cov}(X_t, X_{t+h}), \qquad
+        \rho(h) = \frac{\gamma(h)}{\gamma(0)} = \mathrm{Corr}(X_t, X_{t+h})
+    \]
+    The \textbf{autocorrelation function (ACF)} plots $\rho(h)$ vs.\ $h$.
+    The \textbf{partial ACF (PACF)} measures the correlation of $X_t$ and $X_{t+h}$
+    after removing the linear effect of $X_{t+1}, \ldots, X_{t+h-1}$.
+}
+
+\subsection*{Core Models}
+
+\defn{White Noise}{
+    $\{e_t\}$ is white noise if $E[e_t] = 0$, $\mathrm{Var}(e_t) = \sigma^2$,
+    and $\mathrm{Cov}(e_t, e_s) = 0$ for $t \neq s$.
+    ACF: $\rho(h) = 0$ for all $h \neq 0$.
+}
+
+\defn{AR($p$) — Autoregressive Model}{
+    \[
+        X_t = \phi_1 X_{t-1} + \phi_2 X_{t-2} + \cdots + \phi_p X_{t-p} + e_t
+    \]
+    \textbf{Stationarity condition}: all roots of $\phi(z) = 1 - \phi_1 z - \cdots - \phi_p z^p = 0$
+    lie \emph{outside} the unit circle.
+
+    \textbf{Yule-Walker equations}: $\boldsymbol{\gamma} = \Gamma \boldsymbol{\phi}$
+    (linear system relating ACF values to AR coefficients).
+
+    \textbf{ACF}: decays to zero (exponentially or oscillating). \textbf{PACF}: cuts off after lag $p$.
+}
+
+\defn{MA($q$) — Moving Average Model}{
+    \[
+        X_t = e_t + \theta_1 e_{t-1} + \cdots + \theta_q e_{t-q}
+    \]
+    Always stationary. \textbf{Invertibility condition}: roots of $\theta(z) = 1 + \theta_1 z + \cdots + \theta_q z^q = 0$
+    lie outside the unit circle.
+
+    \textbf{ACF}: cuts off after lag $q$. \textbf{PACF}: decays to zero.
+}
+
+\defn{ARMA($p$, $q$)}{
+    \[
+        X_t = \phi_1 X_{t-1} + \cdots + \phi_p X_{t-p} + e_t + \theta_1 e_{t-1} + \cdots + \theta_q e_{t-q}
+    \]
+    In backshift operator notation: $\phi(B) X_t = \theta(B) e_t$.
+    Both ACF and PACF decay gradually to zero (no clean cutoff).
+}
+
+\defn{ARIMA($p$, $d$, $q$)}{
+    If $X_t$ is nonstationary but $\nabla^d X_t = (1-B)^d X_t$ is stationary ARMA($p$,$q$),
+    then $X_t$ is ARIMA($p$,$d$,$q$). Most practical series use $d=1$ (one differencing).
+}
+
+\subsection*{Box-Jenkins Methodology}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{clX}
+\toprule
+\textbf{Step} & \textbf{Name} & \textbf{Action} \\
+\midrule
+1 & Identification  & Test stationarity (ADF test); difference if needed; use ACF/PACF to suggest $(p,q)$ \\
+2 & Estimation      & Estimate $\phi, \theta$ by MLE or conditional least squares \\
+3 & Diagnostic      & Check residuals: should resemble white noise (Ljung-Box test on residual ACF) \\
+4 & Forecasting     & Compute $h$-step-ahead forecast $\hat{X}_{T+h|T} = E[X_{T+h} \mid X_T, X_{T-1}, \ldots]$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{ACF/PACF Pattern Guide}
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Model} & \textbf{ACF} & \textbf{PACF} & \textbf{Identify by} \\
+\midrule
+AR($p$)      & Decays    & Cuts off at $p$  & PACF cutoff \\
+MA($q$)      & Cuts off at $q$ & Decays    & ACF cutoff \\
+ARMA($p$,$q$) & Decays   & Decays           & Both taper off \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Forecast Intervals}
+
+For an ARIMA model, the $h$-step-ahead forecast $\hat{X}_{T+h}$ has forecast error
+$X_{T+h} - \hat{X}_{T+h|T}$. A $95\%$ forecast interval is:
+\[
+    \hat{X}_{T+h|T} \;\pm\; 1.96\, \hat\sigma_h
+\]
+where $\hat\sigma_h^2$ is the forecast error variance (grows with $h$; constant for stationary AR/MA).
+
+\subsection*{ARCH / GARCH — Conditional Heteroskedasticity}
+
+\defn{ARCH($q$)}{
+    Autoregressive Conditional Heteroskedasticity (Engle, 1982):
+    \[
+        e_t = \sigma_t z_t, \quad z_t \sim \text{i.i.d.}\ N(0,1)
+    \]
+    \[
+        \sigma_t^2 = \omega + \alpha_1 e_{t-1}^2 + \cdots + \alpha_q e_{t-q}^2
+    \]
+    The conditional variance $\sigma_t^2$ depends on past squared residuals.
+    Captures \textbf{volatility clustering}: large shocks tend to be followed by large shocks.
+}
+
+\defn{GARCH($p$, $q$)}{
+    Generalised ARCH (Bollerslev, 1986):
+    \[
+        \sigma_t^2 = \omega + \sum_{i=1}^q \alpha_i e_{t-i}^2 + \sum_{j=1}^p \beta_j \sigma_{t-j}^2
+    \]
+    Adds lagged conditional variances $\sigma_{t-j}^2$. GARCH(1,1) is the workhorse model:
+    \[
+        \sigma_t^2 = \omega + \alpha_1 e_{t-1}^2 + \beta_1 \sigma_{t-1}^2
+    \]
+    \textbf{Stationarity}: $\alpha_1 + \beta_1 < 1$.
+    Parameters estimated by Maximum Likelihood.
+}
+
+\rmkb{ARCH/GARCH are standard in financial time series (e.g.\ daily stock returns).
+The GARCH(1,1) with $\alpha_1 + \beta_1 \approx 1$ implies \textbf{integrated GARCH (IGARCH)}:
+volatility shocks are very persistent.}
+
+\subsection*{Model Selection Criteria}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Criterion} & \textbf{Formula} & \textbf{Notes} \\
+\midrule
+AIC  & $-2\ell(\hat\theta) + 2k$               & Akaike; tends to overfit \\
+BIC  & $-2\ell(\hat\theta) + k\ln n$            & Bayesian; heavier penalty; consistent \\
+AICC & $-2\ell(\hat\theta) + \dfrac{2kn}{n-k-1}$ & AIC corrected for small samples; use when $n/k < 40$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\rmkb{$k$ = number of estimated parameters, $\ell(\hat\theta)$ = maximised log-likelihood.
+Lower values are better. AICC $\to$ AIC as $n \to \infty$.}
 
 \end{document}
 
