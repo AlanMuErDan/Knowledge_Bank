@@ -12,6 +12,7 @@
 | **Mathematics for the Slightly Rusty but Still Ambitious** | Linear Algebra · Multivariable Calculus · ODEs · Probability & Statistics | [math.pdf](./build/math.pdf) |
 | **Machine Learning: A Field Guide for the Perpetually Confused** | Supervised & Unsupervised Learning · Theory · Interview Review | [ml.pdf](./build/ml.pdf) |
 | **Computer Science: The Part They Expect You to Just Know** | Python · Data Structures · Algorithms · NP-Completeness | [cs.pdf](./build/cs.pdf) |
+| **LeetCode: Problems Worth Remembering** | Algorithmic patterns — organized by technique, not by number | [lc.pdf](./build/lc.pdf) |
 
 ---
 
@@ -21,6 +22,7 @@
 math.tex   — Mathematics
 ml.tex     — Machine Learning
 cs.tex     — Computer Science
+lc.tex     — LeetCode
 ```
 
 Shared template components:
@@ -39,6 +41,7 @@ latexmkrc      — Build configuration (output → build/)
 latexmk -pdf math.tex
 latexmk -pdf ml.tex
 latexmk -pdf cs.tex
+latexmk -pdf lc.tex
 ```
 
 Compiled PDFs are written to [`build/`](./build/).
