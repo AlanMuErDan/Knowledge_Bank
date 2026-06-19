@@ -1813,4 +1813,793 @@ Heuristics / Local search & No guarantee, but fast in practice \\
 \end{tabularx}
 \end{center}
 
+
+% ==============================================================================
+\part{Computer Systems}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\chapter{Digital Foundations}
+% ------------------------------------------------------------------------------
+
+\section{Binary \& Number Systems}
+
+\defn{Bit and Byte}{
+    A \textbf{bit} (binary digit) is the smallest unit of information, taking value 0
+    or 1.  Eight bits form one \textbf{byte}.  Common multiples: 1\,KB $= 2^{10}$ bytes,
+    1\,MB $= 2^{20}$ bytes, 1\,GB $= 2^{30}$ bytes.
+}
+
+Computers represent all data---numbers, text, images, programs---as sequences of
+bits.  A group of $n$ bits can encode $2^n$ distinct values.
+
+\subsection*{Positional Notation}
+
+Every integer can be written in any base.  The \textbf{binary} (base-2) and
+\textbf{hexadecimal} (base-16) systems are most common in computing.
+
+\begin{center}
+\begin{tabularx}{0.72\linewidth}{lX}
+\toprule
+\textbf{Base} & \textbf{Example: the number 42} \\
+\midrule
+Decimal (10)     & $42$ \\
+Binary (2)       & $101010_2 = 1\cdot2^5+0\cdot2^4+1\cdot2^3+0\cdot2^2+1\cdot2^1+0\cdot2^0$ \\
+Hexadecimal (16) & $\texttt{2A}_{16} = 2\cdot16^1 + 10\cdot16^0$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{Hex is a compact shorthand for binary: each hex digit maps to exactly four
+bits (\texttt{0}$\to$\texttt{0000}, \ldots, \texttt{F}$\to$\texttt{1111}).  Memory
+addresses and color codes (\#FF5733) are almost always written in hex.}
+
+\subsection*{Integer Encoding}
+
+Modern machines use 32-bit or 64-bit integers.  A 32-bit \emph{unsigned} integer
+can represent $0$ to $2^{32}-1 \approx 4.3\times10^9$.  \emph{Signed} integers use
+\textbf{two's complement}: flip all bits and add 1 to negate; the most significant
+bit is a sign bit.
+
+\ex{In 8-bit two's complement: $+5 = 00000101$, $-5 = 11111011$.
+    Range: $-128$ to $127$.}
+
+% --------------------------------------------------------------------------
+\section{Boolean Algebra \& Logic Gates}
+% --------------------------------------------------------------------------
+
+\subsection*{Historical Context}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Who} & \textbf{Contribution} \\
+\midrule
+Aristotle ($\sim$300 BC) & Formal logic — rules for valid reasoning \\
+G.\ Leibniz ($\sim$1670s) & Stepped Reckoner; envisioned mechanical calculation \\
+G.\ Boole (1854) & \emph{An Investigation of the Laws of Thought} — algebra on True/False \\
+C.\ Shannon (1938) & Showed Boolean algebra maps one-to-one to electrical circuits; defined the ``bit'' \\
+A.\ Turing (1937) & Turing machine — theoretical model of computation \\
+J.\ von Neumann ($\sim$1945) & Physical computer architecture; ENIAC (1945), Mac/PC (1980s) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\defn{Boolean Variable}{
+    A variable that can only be \textbf{True} (1) or \textbf{False} (0).  Boolean
+    \emph{operators} combine Boolean variables into expressions.
+}
+
+\subsection*{Basic Operators and Truth Tables}
+
+Three \emph{primitive} operators suffice to express any Boolean function:
+
+\begin{center}
+\begin{tabularx}{0.55\linewidth}{lll}
+\toprule
+\textbf{Operator} & \textbf{Symbol} & \textbf{Rule} \\
+\midrule
+NOT & $\overline{A}$ & Flip the bit \\
+AND & $A \cdot B$ & 1 only if both are 1 \\
+OR  & $A + B$ & 1 if at least one is 1 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Derived operators frequently appear in hardware:
+
+\begin{center}
+\begin{tabularx}{0.72\linewidth}{llX}
+\toprule
+\textbf{Gate} & \textbf{Expression} & \textbf{Outputs 1 when\ldots} \\
+\midrule
+XOR  & $A \oplus B$              & inputs differ \\
+NAND & $\overline{A \cdot B}$    & NOT (A AND B) — universal gate \\
+NOR  & $\overline{A + B}$        & NOT (A OR B) — universal gate \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{NAND and NOR are each \emph{universal}: any Boolean function can be built
+from NAND gates alone (or NOR gates alone).  Modern chips are designed almost
+entirely with NAND gates.}
+
+\ex{Truth table for XOR ($A \oplus B$):
+\[
+\begin{array}{cc|c}
+A & B & A\oplus B \\\hline
+0 & 0 & 0 \\
+0 & 1 & 1 \\
+1 & 0 & 1 \\
+1 & 1 & 0 \\
+\end{array}
+\]}
+
+\subsection*{From Algebra to Transistors}
+
+Shannon's 1938 insight: a high-voltage electrical signal = 1, low voltage = 0.
+Transistors act as switches: a \emph{control} voltage opens or closes the path for
+current, implementing NOT, AND, OR in silicon.  Modern CPUs contain billions of
+transistors.
+
+% --------------------------------------------------------------------------
+\section{Basic Circuits}
+% --------------------------------------------------------------------------
+
+\subsection*{Combinational Circuits}
+
+Circuits whose output depends only on \emph{current} inputs (no memory).
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Circuit} & \textbf{Function} \\
+\midrule
+Half adder & Adds two bits; outputs Sum $= A \oplus B$, Carry $= A \cdot B$ \\
+Full adder & Adds two bits plus a carry-in; chains to build $n$-bit adders \\
+Multiplexer (MUX) & Selector: outputs one of $n$ inputs based on a control signal \\
+Decoder & Maps $N$ inputs to $2^N$ outputs; exactly one output is active (lookup table) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Sequential Circuits and Memory}
+
+Sequential circuits \emph{store state}: output depends on input \emph{and} past state.
+
+\defn{Flip-Flop}{
+    A circuit built from two D-latches sharing a clock signal (CLK).  On each
+    rising clock edge it captures its input $D$ and holds the value until the
+    next edge.  A \textbf{register} is a bank of flip-flops sharing one CLK,
+    storing a multi-bit value (e.g., a 64-bit register holds one machine word).
+}
+
+\rmkb{The clock signal oscillates between 0 and 1 at a fixed frequency
+(e.g., 4\,GHz = $4\times10^9$ cycles/second), giving every circuit component a
+shared sense of ``time.''  A higher clock speed means more operations per second,
+but also more heat and power consumption.}
+
+% ==============================================================================
+\chapter{Computer Organization}
+% ==============================================================================
+
+\section{A Brief History of Computing}
+
+Two independent intellectual threads merged in the 1940s to create the modern
+computer:
+
+\textbf{Thread 1 — Logic \& Circuits} (Aristotle $\to$ Leibniz $\to$ Boole $\to$
+Shannon): showed that logical reasoning can be reduced to mathematical operations
+and that those operations can be performed by electrical circuits.
+
+\textbf{Thread 2 — Theory of Computation} (Hilbert $\to$ Turing): asked whether
+mathematics is decidable.  Turing's answer (1937) was ``not entirely,'' and his
+proof introduced the \textbf{Turing machine} --- the theoretical blueprint for
+any computer.
+
+\defn{Turing Machine}{
+    An abstract device with:
+    \begin{itemize}
+        \item an infinitely long \textbf{tape} divided into cells (each stores a symbol);
+        \item a \textbf{read/write head} that can read the current cell, write a new
+              symbol, and move one step left or right;
+        \item a \textbf{state table} (program) mapping (current state, symbol read)
+              $\to$ (new state, symbol to write, direction to move).
+    \end{itemize}
+    Despite its simplicity, a Turing machine can compute anything computable.
+}
+
+\rmkb{\textbf{Turing completeness}: a system is Turing-complete if it can simulate
+a Turing machine.  Python is Turing-complete (a list acts as the tape; the
+interpreter is the head).  The \textbf{halting problem} (can a program predict
+whether any given program will halt?) is \emph{undecidable} --- Turing's most
+important result.}
+
+% --------------------------------------------------------------------------
+\section{The Von Neumann Model}
+% --------------------------------------------------------------------------
+
+\defn{Von Neumann Architecture}{
+    A physical computer that realises the Turing machine using electrical circuits.
+    The mapping:
+    \[
+        \text{Tape} \;\longrightarrow\; \text{Memory} \qquad
+        \text{Head} \;\longrightarrow\; \text{CPU} \qquad
+        \text{State table} \;\longrightarrow\; \text{Programs (stored in memory)}
+    \]
+    Key principle: \textbf{stored-program} --- code and data share the same memory.
+}
+
+\begin{center}
+\begin{tabularx}{0.85\linewidth}{lX}
+\toprule
+\textbf{Component} & \textbf{Role} \\
+\midrule
+Control Unit (CU)           & Fetches and decodes instructions; coordinates all other units \\
+Arithmetic/Logic Unit (ALU) & Executes arithmetic ($+,-,\times,\div$) and logic (AND, OR, NOT, compare) \\
+Registers                   & Tiny, fastest storage inside the CPU; hold operands and results \\
+Memory (RAM)                & Stores both the running program and its data \\
+Input / Output              & Keyboard, display, network interface, storage devices \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% --------------------------------------------------------------------------
+\section{Registers, ALU, and the Instruction Cycle}
+% --------------------------------------------------------------------------
+
+\subsection*{Registers}
+
+Registers are the CPU's working scratchpad --- typically 16 to 32 general-purpose
+registers, each 64 bits wide on modern processors.  Special registers include the
+\textbf{Program Counter (PC)}, which holds the address of the \emph{next}
+instruction to execute, and the \textbf{Stack Pointer (SP)}.
+
+\subsection*{The Instruction Cycle}
+
+Every program reduces to a repeated three-step cycle:
+
+\begin{center}
+\begin{tabularx}{0.72\linewidth}{lX}
+\toprule
+\textbf{Stage} & \textbf{What happens} \\
+\midrule
+\textbf{Fetch}   & CU reads the instruction at address PC from memory; PC $\mathrel{+}= 1$ \\
+\textbf{Decode}  & CU interprets the instruction's opcode and operands \\
+\textbf{Execute} & ALU performs the operation; result written to register or memory \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{Modern CPUs execute millions of instructions per second by \emph{pipelining}
+(overlapping fetch/decode/execute for different instructions) and running multiple
+cores in parallel.  A 3.5\,GHz quad-core chip can complete tens of billions of
+simple operations per second.}
+
+% ==============================================================================
+\chapter{Memory Hierarchy}
+% ==============================================================================
+
+\section{Memory Types}
+
+\subsection*{Primary Memory (directly CPU-accessible)}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{llX}
+\toprule
+\textbf{Type} & \textbf{Volatile?} & \textbf{Notes} \\
+\midrule
+RAM (Random Access Memory) & Yes & Working memory; OS and programs load here at run time \\
+ROM (Read-Only Memory)     & No  & Stores firmware (BIOS/UEFI); survives power-off \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Secondary Memory (not CPU-accessible directly)}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{llX}
+\toprule
+\textbf{Type} & \textbf{Technology} & \textbf{Characteristics} \\
+\midrule
+HDD (Hard Disk Drive) & Magnetic platters     & Cheap, high capacity ($\sim$TB), slow ($\sim$10\,ms seek) \\
+SSD (Solid State Drive) & NAND flash memory   & Much faster than HDD, higher cost per GB, no moving parts \\
+USB / Flash drive      & NAND flash           & Portable; slower than SSD; not reliable for long-term archiving \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{center}
+\begin{tabularx}{0.82\linewidth}{lll}
+\toprule
+ & \textbf{RAM} & \textbf{Hard Disk} \\
+\midrule
+Capacity    & $\sim$GB          & $\sim$TB (1000$\times$ larger) \\
+Cost        & $\sim$\$8/GB      & $\sim$\$0.04/GB (200$\times$ cheaper) \\
+Access time & $\sim$100\,ns     & $\sim$10\,ms (100,000$\times$ slower) \\
+Volatility  & Volatile          & Non-volatile \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% --------------------------------------------------------------------------
+\section{The Memory Hierarchy and Cache}
+% --------------------------------------------------------------------------
+
+\defn{Memory Hierarchy}{
+    Storage is organised in layers trading off \emph{speed}, \emph{cost}, and
+    \emph{capacity}.  Closer to the CPU $\Rightarrow$ faster \& smaller \& more expensive.
+}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{llll}
+\toprule
+\textbf{Level} & \textbf{Size} & \textbf{Latency} & \textbf{Managed by} \\
+\midrule
+CPU Registers      & $< 1$\,KB  & $\sim$1 cycle       & Compiler / CPU \\
+L1 Cache           & 32--64\,KB & $\sim$4 cycles      & CPU hardware \\
+L2 Cache           & 256\,KB--1\,MB & $\sim$10 cycles & CPU hardware \\
+L3 Cache (shared)  & 4--32\,MB  & 40--75 cycles       & CPU hardware \\
+Main Memory (DRAM) & 4--64\,GB  & $\sim$60\,ns        & OS \\
+SSD                & 256\,GB--2\,TB & $\sim$100\,$\mu$s & OS / FS \\
+HDD                & 1--10\,TB  & $\sim$10\,ms        & OS / FS \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{From 1980 to 2010, CPU speed improved roughly $1000\times$ while DRAM speed
+improved only $\sim$$8\times$.  This \emph{processor--memory gap} is why caches
+are indispensable.}
+
+\subsection*{Locality Principles}
+
+Cache effectiveness relies on two empirical observations:
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Principle} & \textbf{Meaning} \\
+\midrule
+Temporal locality  & A recently accessed address is likely to be accessed again soon
+                     (e.g., a loop variable) \\
+Spatial locality   & Addresses near a recently accessed address are likely to be
+                     accessed soon (e.g., array elements) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+When the CPU requests data:
+\begin{itemize}
+    \item \textbf{Cache hit}: data is in the cache $\to$ served in a few cycles.
+    \item \textbf{Cache miss}: data must be fetched from the next level
+          $\to$ significant stall (potentially hundreds of cycles for DRAM).
+\end{itemize}
+
+% --------------------------------------------------------------------------
+\section{Why This Matters for ML/DS}
+% --------------------------------------------------------------------------
+
+\rmkb{Memory hierarchy is not just a hardware detail --- it directly governs the
+speed of data-intensive workloads:}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Scenario} & \textbf{Implication} \\
+\midrule
+Loading a dataset  & Reading from disk to RAM is the typical I/O bottleneck; SSDs
+                     help significantly; memory-mapped files avoid redundant copies \\
+NumPy / pandas     & Row-major (C) vs.\ column-major (Fortran) layout affects which
+                     access pattern gets cache-friendly sequential reads \\
+Batch size (DL)    & Larger batches keep the GPU's memory hierarchy busy; too small
+                     and overhead dominates; too large and you overflow GPU VRAM \\
+GPU memory         & GPUs have their own hierarchy: registers $\to$ shared memory
+                     $\to$ L1/L2 $\to$ global VRAM; optimising tensor layouts for
+                     spatial locality is the core of GPU kernel tuning \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ==============================================================================
+\part{Computer Networking}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\chapter{Network Fundamentals}
+% ------------------------------------------------------------------------------
+
+\section{The Internet and Packet Switching}
+
+\defn{The Internet}{
+    A global \emph{network of networks}: billions of devices (end hosts) connected
+    through a mesh of routers.  No single entity owns or controls it.
+}
+
+\subsection*{Two Forwarding Paradigms}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXX}
+\toprule
+ & \textbf{Circuit Switching} & \textbf{Packet Switching} \\
+\midrule
+How it works & A dedicated path is reserved for the entire conversation (e.g., old telephone) &
+              Data is split into independent \textbf{packets}; each forwarded separately \\
+Resources    & Reserved (guaranteed bandwidth) & Shared (best-effort) \\
+Waste        & Idle circuits waste capacity & No reservation; efficient \\
+Used in      & PSTN telephony & The Internet (IP) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The Internet uses packet switching.  Each packet carries a \textbf{destination IP
+address}; routers inspect that address and forward the packet toward its destination.
+Because resources are shared, packets can be \emph{lost, delayed, reordered, or
+corrupted} --- higher-layer protocols (TCP) deal with these problems.
+
+% --------------------------------------------------------------------------
+\section{Layered Architecture}
+% --------------------------------------------------------------------------
+
+\defn{Layering}{
+    Each layer provides a well-defined \textbf{service} to the layer above via an
+    interface, hiding implementation details.  This separation of concerns allows
+    protocols to be changed without disturbing other layers.
+}
+
+\subsection*{TCP/IP Model}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{llll}
+\toprule
+\textbf{Layer} & \textbf{Protocols} & \textbf{Identifier} & \textbf{Unit} \\
+\midrule
+Application  & HTTP, DNS, SMTP, FTP, SSH & URL / hostname     & Message \\
+Transport    & TCP, UDP                  & Port number (16-bit)& Segment / Datagram \\
+Network      & IP (IPv4/IPv6), ICMP      & IP address (32/128-bit) & Packet \\
+Link         & Ethernet, Wi-Fi           & MAC address (48-bit)& Frame \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{\textbf{Encapsulation}: when data travels down the stack, each layer wraps the
+payload with its own header.  On the receiver side, each layer strips its header
+and passes the payload up.  Think of nested envelopes.}
+
+% ==============================================================================
+\chapter{Application Layer}
+% ==============================================================================
+
+\section{HTTP and the Web}
+
+\defn{HTTP (HyperText Transfer Protocol)}{
+    The protocol used by browsers and web servers to exchange web resources.
+    It is a \textbf{text-based, stateless, request--response} protocol that runs over
+    TCP (typically port 80 for HTTP, 443 for HTTPS).
+}
+
+\subsection*{Request and Response}
+
+An HTTP \textbf{request} has:
+\begin{itemize}
+    \item \textbf{Method}: \texttt{GET} (retrieve), \texttt{POST} (create/submit),
+          \texttt{PUT} (update), \texttt{DELETE} (remove), \texttt{PATCH} (partial update).
+    \item \textbf{URL}: identifies the resource (e.g., \texttt{/api/users/42}).
+    \item \textbf{Headers}: metadata (Content-Type, Authorization, Cookie, \ldots).
+    \item \textbf{Body} (optional): data sent with POST/PUT.
+\end{itemize}
+
+An HTTP \textbf{response} has:
+\begin{itemize}
+    \item \textbf{Status code}: \texttt{200 OK}, \texttt{201 Created}, \texttt{301 Moved
+          Permanently}, \texttt{400 Bad Request}, \texttt{401 Unauthorized},
+          \texttt{403 Forbidden}, \texttt{404 Not Found}, \texttt{500 Internal Server Error}.
+    \item \textbf{Headers}: Content-Type, Content-Length, Set-Cookie, \ldots
+    \item \textbf{Body}: HTML, JSON, binary data, \ldots
+\end{itemize}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Version} & \textbf{Key Feature} \\
+\midrule
+HTTP/1.0 & One TCP connection per request (non-persistent; high overhead) \\
+HTTP/1.1 & Persistent connections (keep-alive); pipelining \\
+HTTP/2   & Binary framing; multiplexing multiple streams on one connection \\
+HTTP/3   & Runs over QUIC (UDP-based); lower latency, especially on mobile \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{HTTPS = HTTP + \textbf{TLS} (Transport Layer Security).  TLS encrypts the
+payload so it cannot be read or tampered with by intermediate nodes.  It is
+triggered by the \texttt{https://} scheme; the server presents a \textbf{certificate}
+signed by a trusted Certificate Authority (CA).}
+
+\subsection*{REST APIs}
+
+In ML/DS practice, you interact with web services through REST APIs, which are
+simply HTTP services that follow a set of conventions:
+\begin{itemize}
+    \item Resources are identified by URLs (e.g., \texttt{/datasets/123}).
+    \item CRUD operations map to HTTP methods: Create $\to$ POST, Read $\to$ GET,
+          Update $\to$ PUT/PATCH, Delete $\to$ DELETE.
+    \item Responses are almost always \textbf{JSON}.
+    \item Stateless: each request is self-contained (auth token in every request).
+\end{itemize}
+
+% --------------------------------------------------------------------------
+\section{DNS}
+% --------------------------------------------------------------------------
+
+\defn{DNS (Domain Name System)}{
+    A distributed, hierarchical database that translates human-readable
+    \textbf{domain names} (e.g., \texttt{nyu.edu}) into \textbf{IP addresses}
+    (e.g., \texttt{128.122.119.209}).  Often called the ``phone book of the Internet.''
+}
+
+\subsection*{Resolution Process}
+
+\begin{enumerate}
+    \item Your application asks the OS for the IP of \texttt{www.example.com}.
+    \item The OS queries a \textbf{recursive resolver} (your ISP's or a public one
+          like \texttt{8.8.8.8}).
+    \item The resolver queries the \textbf{root name servers} ($\to$ finds TLD server
+          for \texttt{.com}).
+    \item The TLD server points to \texttt{example.com}'s \textbf{authoritative name
+          server}, which returns the IP.
+    \item The resolver caches the answer for a TTL (time-to-live) period and returns
+          the IP to your OS.
+\end{enumerate}
+
+\rmkb{DNS queries use \textbf{UDP} on port 53 (fast; queries are small).
+DNS \textbf{caching} at every level (resolver, OS, browser) reduces latency; TTL
+values control how long entries stay cached.}
+
+% ==============================================================================
+\chapter{Transport Layer}
+% ==============================================================================
+
+\section{TCP vs.\ UDP}
+
+\defn{Multiplexing via Ports}{
+    A \textbf{port} is a 16-bit number (0--65535) identifying a specific process on
+    a host.  Ports allow multiple applications to share one IP address simultaneously.
+    Well-known ports ($< 1024$) are reserved: HTTP=80, HTTPS=443, DNS=53, SSH=22,
+    FTP=21.  Client processes use ephemeral ports ($\geq 1024$).
+}
+
+Both TCP and UDP provide multiplexing and a basic checksum for error detection.
+Beyond that, they differ fundamentally:
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXX}
+\toprule
+ & \textbf{UDP} & \textbf{TCP} \\
+\midrule
+Full name    & User Datagram Protocol & Transmission Control Protocol \\
+Connection   & Connectionless & Connection-oriented (3-way handshake) \\
+Delivery     & Best-effort; packets may be lost, reordered & Reliable, in-order byte stream \\
+Error recovery & None (application must handle) & Retransmission, sequence numbers \\
+Flow control & None & Yes (prevents fast sender flooding slow receiver) \\
+Congestion control & None & Yes (backs off when network is congested) \\
+Overhead     & 8-byte header & 20-byte header (minimum) \\
+Use cases    & DNS, video streaming, gaming, VoIP & HTTP(S), email, SSH, file transfer \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{TCP Reliability Mechanisms}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Mechanism} & \textbf{Purpose} \\
+\midrule
+\textbf{3-way handshake} & Establish connection: SYN $\to$ SYN-ACK $\to$ ACK \\
+\textbf{Sequence numbers} & Number every byte; detect gaps and reorder out-of-order segments \\
+\textbf{Acknowledgements (ACK)} & Receiver confirms bytes received; sender retransmits on timeout \\
+\textbf{Checksum} & Detect bit errors in the header and payload \\
+\textbf{Flow control (window)} & Receiver advertises how much buffer space it has; sender respects it \\
+\textbf{Congestion control} & Sender reduces rate when it detects network congestion \\
+\textbf{4-way teardown} & FIN $\to$ ACK $\to$ FIN $\to$ ACK \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{The choice between TCP and UDP comes down to one question: does your
+application tolerate loss?  \emph{``Better never than late''} describes real-time
+video: a delayed video frame is useless, so dropping it (UDP) beats retransmitting
+it (TCP).  \emph{``Never lose a byte''} describes file downloads: TCP is correct.}
+
+% --------------------------------------------------------------------------
+\section{Ports and Sockets}
+% --------------------------------------------------------------------------
+
+\defn{Socket}{
+    A \textbf{socket} is one endpoint of a bidirectional communication link.
+    It is identified by the pair $(\text{IP address},\ \text{port number})$.
+    A TCP connection is identified by \emph{four values}:
+    (source IP, source port, destination IP, destination port).
+}
+
+\ex{When your browser loads \texttt{https://nyu.edu}: source = (your IP, 54321),
+    destination = (128.122.119.209, 443).  The server can handle thousands of
+    simultaneous connections because each has a unique source port.}
+
+In Python, the \texttt{socket} module provides low-level access; \texttt{requests}
+and \texttt{httpx} wrap it for HTTP; \texttt{urllib} is in the standard library.
+
+% ==============================================================================
+\chapter{Network Layer}
+% ==============================================================================
+
+\section{IP Addressing and Subnets}
+
+\defn{IPv4 Address}{
+    A \textbf{32-bit} number written in \textbf{dotted-quad} notation: four decimal
+    octets separated by dots (e.g., \texttt{192.168.1.42}).  $2^{32} \approx 4.3$
+    billion unique addresses.
+}
+
+An IPv4 address consists of two parts:
+\begin{itemize}
+    \item \textbf{Network prefix (netid)}: identifies the network.
+    \item \textbf{Host identifier (hostid)}: identifies the specific host within that network.
+\end{itemize}
+
+\defn{CIDR (Classless Inter-Domain Routing)}{
+    The prefix length is specified with \textbf{slash notation}: \texttt{a.b.c.d/n}
+    means the first $n$ bits are the network prefix.
+
+    Example: \texttt{192.168.1.0/24} is a network whose first 24 bits are fixed;
+    the last 8 bits identify hosts.  That network has $2^8 = 256$ addresses
+    (254 usable: all-zeros = network address, all-ones = broadcast address).
+}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{llll}
+\toprule
+\textbf{Prefix} & \textbf{Mask} & \textbf{Addresses} & \textbf{Usable hosts} \\
+\midrule
+\texttt{/8}  & 255.0.0.0     & $2^{24} \approx 16.8$M & large ISP / Class A \\
+\texttt{/16} & 255.255.0.0   & $2^{16} = 65536$       & university campus \\
+\texttt{/24} & 255.255.255.0 & $2^{8} = 256$          & small office LAN \\
+\texttt{/30} & 255.255.255.252 & 4                    & point-to-point link \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Special Addresses}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Range} & \textbf{Purpose} \\
+\midrule
+\texttt{127.0.0.0/8}     & Loopback (\texttt{127.0.0.1} = ``localhost'') \\
+\texttt{0.0.0.0}         & Unspecified (used before DHCP assigns an address) \\
+\texttt{255.255.255.255} & Limited broadcast \\
+\texttt{10.0.0.0/8}      & Private (RFC 1918); not routed on public Internet \\
+\texttt{172.16.0.0/12}   & Private (RFC 1918) \\
+\texttt{192.168.0.0/16}  & Private (RFC 1918) --- home routers use this \\
+\texttt{169.254.0.0/16}  & Link-local (auto-assigned when DHCP fails) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{\textbf{NAT (Network Address Translation)}: your home router assigns private
+addresses (\texttt{192.168.x.x}) to your devices and translates them to a single
+public IP when traffic leaves.  This is why you can have many devices sharing one
+ISP-assigned IP address.}
+
+% --------------------------------------------------------------------------
+\section{Routing Overview}
+% --------------------------------------------------------------------------
+
+\defn{Forwarding}{
+    Each router maintains a \textbf{forwarding table} that maps destination IP
+    prefixes to outgoing interfaces.  On receiving a packet, the router performs
+    \textbf{longest-prefix match}: it selects the most specific matching entry.
+}
+
+\ex{Forwarding table entry \texttt{12.34.158.0/21 $\to$ interface\,3} means any
+    packet whose destination IP starts with the 21-bit prefix \texttt{12.34.158}
+    (roughly) exits on interface 3.}
+
+Routing protocols compute these tables:
+
+\begin{center}
+\begin{tabularx}{\linewidth}{llX}
+\toprule
+\textbf{Protocol} & \textbf{Scope} & \textbf{Algorithm} \\
+\midrule
+RIP  & Intra-domain & Distance-vector (Bellman-Ford) \\
+OSPF & Intra-domain & Link-state (Dijkstra) \\
+BGP  & Inter-domain  & Path-vector; the ``glue'' of the Internet between ISPs \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{You do not need to implement routing protocols as an MLE/DS, but understanding
+prefixes and longest-prefix match explains why \texttt{traceroute} shows the path
+your packets take, and why cloud regions have different latencies.}
+
+% --------------------------------------------------------------------------
+\section{IPv6 Basics}
+% --------------------------------------------------------------------------
+
+IPv4 addresses ($2^{32} \approx 4.3 \times 10^9$) were officially exhausted by
+IANA in 2011.  \textbf{IPv6} solves this:
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lll}
+\toprule
+ & \textbf{IPv4} & \textbf{IPv6} \\
+\midrule
+Address size & 32 bits & 128 bits \\
+Total addresses & $\approx 4.3 \times 10^9$ & $\approx 3.4 \times 10^{38}$ \\
+Notation & Dotted-quad (\texttt{1.2.3.4}) & Hex groups (\texttt{2001:0db8::1}) \\
+Header size & 20 bytes (variable) & 40 bytes (fixed) \\
+NAT needed? & Yes (address exhaustion) & No \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ==============================================================================
+\chapter{Link Layer (Brief)}
+% ==============================================================================
+
+\section{MAC Addresses and Ethernet}
+
+\defn{MAC Address}{
+    A \textbf{48-bit} hardware address burned into a network interface card (NIC),
+    written in hex (e.g., \texttt{00:1A:2B:3C:4D:5E}).  Unlike IP addresses (logical,
+    reassignable), MAC addresses identify a specific physical interface.
+}
+
+The \textbf{link layer} is responsible for delivering \textbf{frames} between two
+nodes on the \emph{same} local network segment --- it does not cross routers.
+
+\textbf{Ethernet} is the dominant wired LAN technology:
+\begin{itemize}
+    \item Frames carry up to \textbf{1500 bytes} of payload (the Maximum Transmission
+          Unit, MTU).
+    \item Each frame has a source MAC, destination MAC, EtherType, payload, and CRC.
+    \item Higher speeds: 100\,Mbps (Fast Ethernet) $\to$ 1\,Gbps $\to$ 10\,Gbps $\to$
+          100\,Gbps (data centres).
+\end{itemize}
+
+\rmkb{Wi-Fi (IEEE 802.11) operates at the link layer too --- frames use MAC
+addresses, but the medium is radio rather than copper or fibre.  Switches forward
+frames based on MAC addresses within a LAN; \emph{routers} forward packets based
+on IP addresses across LANs.}
+
+% --------------------------------------------------------------------------
+\section{ARP and DHCP}
+% --------------------------------------------------------------------------
+
+\defn{ARP (Address Resolution Protocol)}{
+    Maps an \textbf{IP address} $\to$ \textbf{MAC address} within a LAN.
+    When host A wants to send to IP \texttt{192.168.1.5} but does not know its MAC,
+    A broadcasts: ``Who has \texttt{192.168.1.5}? Tell \texttt{AA:BB:...}''
+    The owner replies with its MAC, and A caches the mapping.
+}
+
+\defn{DHCP (Dynamic Host Configuration Protocol)}{
+    Automatically configures a new host with an \textbf{IP address}, subnet mask,
+    default gateway, and DNS server.  Uses UDP (server port 67, client port 68).
+    The four-step process:
+    \begin{enumerate}
+        \item \textbf{DHCP Discover} --- client broadcasts ``I need an IP address.''
+        \item \textbf{DHCP Offer} --- server offers an IP and lease duration.
+        \item \textbf{DHCP Request} --- client accepts the offer.
+        \item \textbf{DHCP ACK} --- server confirms; client configures itself.
+    \end{enumerate}
+}
+
+\rmkb{Every time you connect your laptop to a new Wi-Fi network, DHCP runs
+silently in the background: it sends \texttt{0.0.0.0} as source (no IP yet) and
+broadcasts to \texttt{255.255.255.255}.  Within milliseconds you have an IP,
+gateway, and DNS resolver --- ready to browse.}
+
 \end{document}

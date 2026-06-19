@@ -1,0 +1,1740 @@
+\documentclass[oneside]{book}
+
+% ------------------------------------------------------------------------------
+% Packages
+% ------------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{mathtools}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems, skins, breakable}
+
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+\usepackage{multicol}
+\setlength{\columnsep}{1.2em}
+
+\usepackage{graphicx}
+
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+% ------------------------------------------------------------------------------
+% Page Setup
+% ------------------------------------------------------------------------------
+
+\geometry{
+    top=0.8in,
+    bottom=0.8in,
+    left=0.7in,
+    right=0.7in,
+    headheight=12pt,
+    headsep=20pt,
+    footskip=25pt
+}
+
+\setstretch{1.15}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=MidnightBlue,
+    urlcolor=RoyalBlue,
+    citecolor=ForestGreen
+}
+
+% ------------------------------------------------------------------------------
+% Variables
+% ------------------------------------------------------------------------------
+
+\def\notetitle{Finance \& Economics: What They Expect You to Know}
+\def\notesubtitle{Micro, Macro, Accounting, Corporate Finance, Investments, Quant Finance, and Game Theory}
+\def\noteauthor{Alan Li}
+\def\noteinstitution{New York University}
+
+% ------------------------------------------------------------------------------
+% Theorem System and User Commands
+% ------------------------------------------------------------------------------
+
+\input{theorems.tex}
+\input{commands.tex}
+
+% ------------------------------------------------------------------------------
+% Document
+% ------------------------------------------------------------------------------
+
+\begin{document}
+
+% ------------------------------------------------------------------------------
+% Title Page
+% ------------------------------------------------------------------------------
+
+\begin{titlepage}
+    \centering
+
+    \vspace*{2.2cm}
+
+    {\Huge\bfseries \notetitle \par}
+
+    \vspace{0.9cm}
+
+    \resizebox{0.88\textwidth}{!}{%
+        \itshape \notesubtitle
+    }
+
+    \vspace{2.4cm}
+
+    \vspace{1.2cm}
+
+    {\large \noteauthor \par}
+
+    \vspace{0.25cm}
+
+    {\large \noteinstitution \par}
+
+    \vfill
+\end{titlepage}
+
+% ------------------------------------------------------------------------------
+% Front Matter
+% ------------------------------------------------------------------------------
+
+\frontmatter
+\setcounter{tocdepth}{1}
+\tableofcontents
+\newpage
+
+% ------------------------------------------------------------------------------
+% Main Matter
+% ------------------------------------------------------------------------------
+
+\mainmatter
+
+% ==============================================================================
+\part{Microeconomics}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\chapter{Consumer Theory}
+% ------------------------------------------------------------------------------
+
+\section{Preferences and Utility}
+
+\defn{Preference Relation}{
+    A preference relation $\succeq$ on a consumption set $X \subseteq \mathbb{R}^n_+$
+    satisfies:
+    \begin{itemize}
+        \item \textbf{Completeness}: for all $x, y \in X$, either $x \succeq y$ or
+              $y \succeq x$ (or both).
+        \item \textbf{Transitivity}: if $x \succeq y$ and $y \succeq z$, then $x \succeq z$.
+    \end{itemize}
+    We write $x \succ y$ (strict preference) if $x \succeq y$ but not $y \succeq x$, and
+    $x \sim y$ (indifference) if both $x \succeq y$ and $y \succeq x$.
+}
+
+\defn{Utility Function}{
+    A function $u: X \to \mathbb{R}$ \textbf{represents} the preference relation
+    $\succeq$ if for all $x, y \in X$:
+    \[
+        x \succeq y \iff u(x) \geq u(y).
+    \]
+    Utility is \textbf{ordinal}: any strictly increasing transformation $v = f(u)$
+    with $f' > 0$ represents the same preferences.
+}
+
+\rmkb{Common utility functions for two goods $(x_1, x_2)$:
+\begin{center}
+\begin{tabularx}{\linewidth}{lllX}
+\toprule
+\textbf{Type} & \textbf{$u(x_1,x_2)$} & \textbf{MRS} & \textbf{Substitutability} \\
+\midrule
+Cobb-Douglas & $x_1^\alpha x_2^\beta$ & $\frac{\alpha x_2}{\beta x_1}$ & Diminishing \\
+Perfect substitutes & $ax_1 + bx_2$ & $a/b$ (constant) & Perfect \\
+Perfect complements & $\min\{ax_1, bx_2\}$ & $0$ or $\infty$ & Zero \\
+Quasilinear & $v(x_1) + x_2$ & $v'(x_1)$ & No income effect on $x_1$ \\
+CES & $(x_1^\rho + x_2^\rho)^{1/\rho}$ & $(x_2/x_1)^{1-\rho}$ & $\sigma = 1/(1-\rho)$ \\
+\bottomrule
+\end{tabularx}
+\end{center}}
+
+\defn{Marginal Rate of Substitution}{
+    The MRS at a bundle $(x_1, x_2)$ is the rate at which the consumer is willing
+    to trade $x_2$ for $x_1$ along an indifference curve:
+    \[
+        \text{MRS}_{12} = -\frac{dx_2}{dx_1}\bigg|_{u=\bar{u}}
+        = \frac{\partial u/\partial x_1}{\partial u/\partial x_2}
+        = \frac{MU_1}{MU_2}.
+    \]
+    Convex preferences imply a \textbf{diminishing} MRS.
+}
+
+% --------------------------------------------------------------------------
+\section{Budget Constraint and Consumer Optimum}
+% --------------------------------------------------------------------------
+
+\defn{Budget Constraint}{
+    With prices $(p_1, p_2)$ and income $m$, the budget set is
+    \[
+        \mathcal{B}(p, m) = \{(x_1, x_2) \in \mathbb{R}^2_+ : p_1 x_1 + p_2 x_2 \leq m\}.
+    \]
+    The budget line $p_1 x_1 + p_2 x_2 = m$ has slope $-p_1/p_2$ and intercepts
+    $m/p_1$ and $m/p_2$.
+}
+
+\thm{Consumer Optimum (Interior Solution)}{
+    If preferences are strictly convex and differentiable, the optimal bundle
+    $(x_1^*, x_2^*)$ satisfies the budget constraint with equality and
+    \[
+        \text{MRS}_{12} = \frac{p_1}{p_2}
+        \qquad \Longleftrightarrow \qquad
+        \frac{MU_1}{MU_2} = \frac{p_1}{p_2}
+        \qquad \Longleftrightarrow \qquad
+        \frac{MU_1}{p_1} = \frac{MU_2}{p_2}.
+    \]
+    The last form says that at the optimum, the marginal utility per dollar spent
+    is equalised across all goods (\textbf{equal bang per buck}).
+}
+
+\pf{
+    The Lagrangian is $\mathcal{L} = u(x_1, x_2) - \lambda(p_1 x_1 + p_2 x_2 - m)$.
+    First-order conditions: $\partial u/\partial x_i = \lambda p_i$ for $i = 1, 2$.
+    Dividing: $(\partial u/\partial x_1)/(\partial u/\partial x_2) = p_1/p_2$.
+}
+
+% --------------------------------------------------------------------------
+\section{Demand Functions}
+% --------------------------------------------------------------------------
+
+\defn{Marshallian (Ordinary) Demand}{
+    The solution to $\max_{x} u(x)$ s.t.\ $p \cdot x = m$ gives the Marshallian
+    demand functions $x_i^*(p_1, p_2, m)$.  For Cobb-Douglas $u = x_1^\alpha x_2^\beta$:
+    \[
+        x_1^* = \frac{\alpha}{\alpha+\beta}\cdot\frac{m}{p_1}, \qquad
+        x_2^* = \frac{\beta}{\alpha+\beta}\cdot\frac{m}{p_2}.
+    \]
+    The expenditure share on good $i$ is constant: $p_i x_i^*/m = \alpha_i/(\alpha+\beta)$.
+}
+
+\defn{Hicksian (Compensated) Demand}{
+    The solution to $\min_{x} p \cdot x$ s.t.\ $u(x) \geq \bar{u}$ gives the
+    Hicksian demand $h_i(p, \bar{u})$.  By \textbf{Shephard's Lemma}:
+    \[
+        h_i(p, \bar{u}) = \frac{\partial e(p, \bar{u})}{\partial p_i},
+    \]
+    where $e(p, \bar{u})$ is the \textbf{expenditure function} (minimum cost to
+    achieve utility $\bar{u}$ at prices $p$).
+}
+
+\thm{Slutsky Equation}{
+    The total price effect decomposes into a substitution effect and an income effect:
+    \[
+        \underbrace{\frac{\partial x_i^*}{\partial p_j}}_{\text{total}}
+        = \underbrace{\frac{\partial h_i}{\partial p_j}}_{\substack{\text{substitution}\\\text{(always }\leq 0\text{ if }i=j\text{)}}}
+        - \underbrace{x_j^* \frac{\partial x_i^*}{\partial m}}_{\text{income}}.
+    \]
+    For a \textbf{normal good}, both effects reinforce (demand falls as $p_i$ rises).
+    For a \textbf{Giffen good}, the income effect dominates and demand rises with price.
+}
+
+\rmkb{The Slutsky matrix $S_{ij} = \partial h_i/\partial p_j$ is symmetric and
+negative semi-definite.  Own-price substitution effects are always non-positive:
+$S_{ii} \leq 0$.}
+
+% --------------------------------------------------------------------------
+\section{Revealed Preference and Welfare}
+% --------------------------------------------------------------------------
+
+\defn{Indirect Utility and Roy's Identity}{
+    The \textbf{indirect utility function} $v(p, m) = u(x^*(p, m))$ gives maximum
+    utility as a function of prices and income.  \textbf{Roy's Identity} recovers
+    Marshallian demand from $v$:
+    \[
+        x_i^*(p, m) = -\frac{\partial v/\partial p_i}{\partial v/\partial m}.
+    \]
+}
+
+\defn{Equivalent and Compensating Variation}{
+    For a price change from $p^0$ to $p^1$:
+    \[
+        CV = e(p^1, u^0) - e(p^0, u^0) = m - e(p^1, u^0),
+    \]
+    \[
+        EV = e(p^1, u^1) - e(p^0, u^1) = e(p^0, u^1) - m.
+    \]
+    Both measure welfare change in monetary terms; they coincide for quasilinear
+    preferences (where consumer surplus is an exact welfare measure).
+}
+
+% ==============================================================================
+\chapter{Producer Theory}
+% ==============================================================================
+
+\section{Production Technology}
+
+\defn{Production Function}{
+    $f(K, L)$ maps capital $K$ and labour $L$ to maximum output $q$.
+    The \textbf{marginal product} of input $i$ is $MP_i = \partial f/\partial x_i > 0$.
+    \textbf{Diminishing marginal product}: $\partial^2 f/\partial x_i^2 < 0$.
+}
+
+\defn{Returns to Scale}{
+    For scalar $\lambda > 1$:
+    \begin{itemize}
+        \item \textbf{CRS} (Constant): $f(\lambda K, \lambda L) = \lambda f(K,L)$.
+        \item \textbf{IRS} (Increasing): $f(\lambda K, \lambda L) > \lambda f(K,L)$.
+        \item \textbf{DRS} (Decreasing): $f(\lambda K, \lambda L) < \lambda f(K,L)$.
+    \end{itemize}
+    Cobb-Douglas $f = K^\alpha L^\beta$: CRS iff $\alpha + \beta = 1$.
+}
+
+\defn{Marginal Rate of Technical Substitution}{
+    The MRTS is the slope of an isoquant:
+    \[
+        \text{MRTS}_{KL} = -\frac{dK}{dL}\bigg|_{q=\bar{q}}
+        = \frac{MP_L}{MP_K}.
+    \]
+    Diminishing MRTS corresponds to convex isoquants (standard assumption).
+}
+
+% --------------------------------------------------------------------------
+\section{Cost Minimisation}
+% --------------------------------------------------------------------------
+
+\thm{Cost-Minimising Input Choice}{
+    The firm solves $\min_{K,L} wL + rK$ s.t.\ $f(K,L) = q$.
+    Interior solution satisfies:
+    \[
+        \frac{MP_L}{w} = \frac{MP_K}{r}
+        \qquad \Longleftrightarrow \qquad
+        \text{MRTS}_{KL} = \frac{w}{r}.
+    \]
+}
+
+\defn{Cost Function}{
+    The \textbf{total cost function} $c(q, w, r)$ is the minimum expenditure to
+    produce $q$ units.  By \textbf{Shephard's Lemma}:
+    \[
+        \frac{\partial c}{\partial w} = L^*(q,w,r), \qquad
+        \frac{\partial c}{\partial r} = K^*(q,w,r).
+    \]
+    Cost components:
+    \[
+        TC = FC + VC(q), \quad
+        AC(q) = \frac{TC}{q}, \quad
+        MC(q) = \frac{dTC}{dq}.
+    \]
+    The $MC$ curve intersects the $AC$ curve at the minimum of $AC$.
+}
+
+\rmkb{For Cobb-Douglas $f = K^\alpha L^\beta$ with $\alpha + \beta = 1$:
+$c(q,w,r) = q \cdot \text{const} \cdot w^\beta r^\alpha$, so $MC = AC = $ constant
+(CRS $\Rightarrow$ flat LRAC).}
+
+% --------------------------------------------------------------------------
+\section{Profit Maximisation}
+% --------------------------------------------------------------------------
+
+\defn{Profit Function}{
+    $\pi = TR - TC = pq - c(q)$.  Under perfect competition, $p$ is taken as given.
+    FOC: $p = MC(q^*)$.  SOC: $MC'(q^*) > 0$ (rising MC).
+    The firm shuts down if $p < \min AVC$ (short run) or $p < \min AC$ (long run).
+}
+
+\thm{Hotelling's Lemma}{
+    If $\pi(p, w, r) = \max_{q,K,L}[pf(K,L) - wL - rK]$, then:
+    \[
+        \frac{\partial \pi}{\partial p} = q^*, \qquad
+        \frac{\partial \pi}{\partial w} = -L^*, \qquad
+        \frac{\partial \pi}{\partial r} = -K^*.
+    \]
+}
+
+% ==============================================================================
+\chapter{Market Structures}
+% ==============================================================================
+
+\section{Perfect Competition}
+
+\defn{Competitive Equilibrium}{
+    Price $p^*$ and quantity $Q^*$ such that $Q^D(p^*) = Q^S(p^*)$.
+    Each firm takes $p^*$ as given and produces where $p^* = MC(q_i)$.
+    In long-run equilibrium: $p^* = MC = \min AC$ (zero economic profit).
+}
+
+\defn{Consumer and Producer Surplus}{
+    \[
+        CS = \int_0^{Q^*} [P^D(Q) - p^*]\,dQ, \qquad
+        PS = \int_0^{Q^*} [p^* - P^S(Q)]\,dQ.
+    \]
+    \textbf{Total Surplus} $= CS + PS$ is maximised at competitive equilibrium
+    (\textbf{First Welfare Theorem}).
+}
+
+% --------------------------------------------------------------------------
+\section{Monopoly}
+% --------------------------------------------------------------------------
+
+\defn{Monopoly Optimum}{
+    The monopolist maximises $\pi = TR - TC = p(Q) \cdot Q - c(Q)$.
+    FOC: $MR(Q^*) = MC(Q^*)$, where $MR = p + p'(Q)Q = p(1 - 1/|\varepsilon|)$.
+    The \textbf{Lerner Index} measures market power:
+    \[
+        L = \frac{p - MC}{p} = \frac{1}{|\varepsilon_D|}.
+    \]
+    Deadweight loss (DWL) equals the welfare lost relative to the competitive outcome.
+}
+
+\rmkb{\textbf{Price discrimination}: (1st degree) personalized prices extracting
+all CS; (2nd degree) nonlinear pricing/quantity discounts; (3rd degree) separate
+markets segmented by $\varepsilon$.  Under 3rd degree: $MR_1 = MR_2 = MC$.}
+
+% --------------------------------------------------------------------------
+\section{Oligopoly}
+% --------------------------------------------------------------------------
+
+\defn{Cournot Competition}{
+    $n$ firms simultaneously choose quantities $q_i$.  Firm $i$ maximises:
+    \[
+        \pi_i = p(Q) q_i - c_i(q_i), \quad Q = \sum_j q_j.
+    \]
+    FOC (best response): $p(Q) + p'(Q) q_i = MC_i$.
+    Symmetric equilibrium with linear demand $p = a - bQ$ and constant $MC$:
+    \[
+        q^* = \frac{a - MC}{b(n+1)}, \quad p^* = \frac{a + n \cdot MC}{n+1}.
+    \]
+    As $n \to \infty$: $p^* \to MC$ (competitive outcome).
+}
+
+\defn{Bertrand Competition}{
+    Firms simultaneously set prices.  With homogeneous goods and constant identical
+    $MC$: unique Nash equilibrium is $p_1 = p_2 = MC$ (Bertrand paradox).
+    With differentiated products or capacity constraints, equilibrium prices exceed $MC$.
+}
+
+\defn{Stackelberg Competition}{
+    Leader (firm 1) commits to quantity $q_1$ first; follower (firm 2) best-responds.
+    Backward induction: leader internalises the follower's reaction function
+    $q_2^{BR}(q_1)$.  Leader has first-mover advantage: higher profit than Cournot.
+}
+
+% ==============================================================================
+\chapter{Welfare Economics and Market Failures}
+% ==============================================================================
+
+\section{Welfare Analysis}
+
+\thm{First Welfare Theorem}{
+    If all markets are perfectly competitive and there are no externalities or
+    public goods, then every competitive equilibrium is \textbf{Pareto efficient}:
+    no reallocation can make someone better off without making someone else worse off.
+}
+
+\thm{Second Welfare Theorem}{
+    Under convexity assumptions, every Pareto-efficient allocation can be supported
+    as a competitive equilibrium with appropriate lump-sum transfers of endowments.
+}
+
+% --------------------------------------------------------------------------
+\section{Externalities and Public Goods}
+% --------------------------------------------------------------------------
+
+\defn{Externality}{
+    A cost or benefit imposed on a third party not involved in the transaction.
+    \begin{itemize}
+        \item \textbf{Negative externality}: $MSC > MPC$ (e.g.\ pollution).
+              Optimal Pigouvian tax $t^* = MSC - MPC$ at efficient output.
+        \item \textbf{Positive externality}: $MSB > MPB$ (e.g.\ vaccination).
+              Optimal Pigouvian subsidy $s^* = MSB - MPB$.
+    \end{itemize}
+}
+
+\thm{Coase Theorem}{
+    If property rights are well-defined and bargaining is costless, private
+    negotiation leads to the efficient outcome regardless of the initial assignment
+    of rights.  In practice, transaction costs, incomplete information, and
+    hold-up problems limit its applicability.
+}
+
+\defn{Public Good}{
+    A good that is \textbf{non-excludable} (cannot prevent consumption) and
+    \textbf{non-rival} (one person's consumption does not reduce another's).
+    Samuelson rule for efficient provision: $\sum_i MRS_i = MRT$ (sum of marginal
+    willingness to pay equals marginal cost of provision).
+    Market under-provides due to the \textbf{free-rider problem}.
+}
+
+% ==============================================================================
+\chapter{Information Economics}
+% ==============================================================================
+
+\section{Adverse Selection}
+
+\defn{Adverse Selection}{
+    Arises when one party has \textbf{hidden information} (pre-contractual), causing
+    a market to attract a disproportionately unfavourable pool.
+    Classic example (Akerlof): in the used-car market with quality $\theta \sim U[0,1]$,
+    sellers know $\theta$, buyers do not.  At any pooling price $p$, only sellers
+    with $\theta \leq p/v_s$ sell; buyers anticipate average quality $p/(2v_s)$,
+    driving the market toward collapse.
+}
+
+\defn{Signalling Equilibrium}{
+    The high-type agent undertakes a costly signal $s$ to credibly distinguish
+    itself.  Spence education model: worker of type $\theta \in \{H, L\}$ chooses
+    education $e$.  Separating equilibrium requires the single-crossing (Spence-Mirrlees)
+    condition: $\partial^2 u / (\partial e\, \partial \theta) > 0$, ensuring the
+    incentive-compatibility constraints are not both binding simultaneously.
+    \[
+        IC_H: u(w_H, e_H; H) \geq u(w_L, e_L; H), \qquad
+        IC_L: u(w_L, e_L; L) \geq u(w_H, e_H; L).
+    \]
+}
+
+% --------------------------------------------------------------------------
+\section{Moral Hazard}
+% --------------------------------------------------------------------------
+
+\defn{Moral Hazard}{
+    Arises when one party's \textbf{hidden action} (post-contractual) cannot be
+    observed or verified.  Principal--agent problem: principal maximises
+    $E[q(e)] - w(q)$ subject to the agent's
+    \[
+        IR: \quad E[u(w(q))] - c(e) \geq \bar{u} \quad \text{(participation)},
+    \]
+    \[
+        IC: \quad e^* = \arg\max_{e}\, E[u(w(q))] - c(e) \quad \text{(incentive compatibility)}.
+    \]
+    First-best requires both risk sharing and incentive provision; with risk-averse
+    agents these goals conflict (\textbf{second-best} involves incomplete insurance).
+}
+
+\rmkb{Key results: (1) If agent is risk-neutral, sell the firm (franchise contract)
+achieves first-best. (2) Optimal second-best contract balances insurance against
+incentives; bonus/commission schemes approximate it. (3) Relative performance
+evaluation (RPE) removes common shocks from incentive pay.}
+
+% ==============================================================================
+\chapter{Choice Under Uncertainty}
+% ==============================================================================
+
+\section{Expected Utility Theory}
+
+\defn{Von Neumann--Morgenstern Expected Utility}{
+    A lottery $L = (p_1, x_1; \ldots; p_n, x_n)$ assigns probability $p_i$ to outcome $x_i$.
+    Under the VNM axioms (completeness, transitivity, continuity, independence), there
+    exists a Bernoulli utility function $u: \mathbb{R} \to \mathbb{R}$ such that:
+    \[
+        U(L) = \sum_{i=1}^n p_i\, u(x_i) = E[u(x)].
+    \]
+    $u$ is unique up to positive affine transformations.
+}
+
+\defn{Risk Aversion}{
+    An agent is \textbf{risk-averse} if $u$ is strictly concave: $u'' < 0$.
+    \begin{itemize}
+        \item \textbf{Certainty equivalent} $CE$: $u(CE) = E[u(x)]$, so $CE \leq E[x]$.
+        \item \textbf{Risk premium} $\pi_R = E[x] - CE \geq 0$.
+        \item \textbf{Arrow-Pratt absolute risk aversion}: $A(x) = -u''(x)/u'(x)$.
+        \item \textbf{Relative risk aversion}: $R(x) = -xu''(x)/u'(x)$.
+    \end{itemize}
+    For CARA: $u(x) = -e^{-\alpha x}$, so $A(x) = \alpha$ (constant).
+    For CRRA: $u(x) = x^{1-\rho}/(1-\rho)$, so $R(x) = \rho$ (constant).
+}
+
+\thm{Jensen's Inequality}{
+    For a concave function $u$ and random variable $x$:
+    $u(E[x]) \geq E[u(x)]$.
+    Equality holds iff $x$ is degenerate (no risk).
+}
+
+% ==============================================================================
+\part{Macroeconomics}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\chapter{National Income and Output}
+% ------------------------------------------------------------------------------
+
+\section{GDP and National Accounts}
+
+\defn{Gross Domestic Product}{
+    GDP measures the total market value of all \textbf{final goods and services}
+    produced within a country's borders in a given period.  Three equivalent
+    approaches:
+    \[
+        GDP = C + I + G + NX \quad \text{(expenditure approach)},
+    \]
+    where $C$ = private consumption, $I$ = gross investment,
+    $G$ = government spending, $NX = X - M$ = net exports.
+}
+
+\defn{Real vs.\ Nominal GDP}{
+    \textbf{Nominal GDP} values output at current prices.
+    \textbf{Real GDP} values output at base-year prices, removing the effect of
+    price changes.
+    \[
+        \text{GDP Deflator} = \frac{\text{Nominal GDP}}{\text{Real GDP}} \times 100.
+    \]
+    Growth in real GDP $\approx$ growth in nominal GDP $-$ inflation.
+}
+
+\rmkb{GDP captures production but misses distribution, non-market activity,
+informal economy, and welfare.  GNP adds net factor income from abroad.}
+
+% --------------------------------------------------------------------------
+\section{Inflation and Price Levels}
+% --------------------------------------------------------------------------
+
+\defn{CPI and Inflation}{
+    The Consumer Price Index tracks the cost of a fixed basket of goods:
+    \[
+        \text{CPI}_t = \frac{\sum p_t^i q_0^i}{\sum p_0^i q_0^i} \times 100.
+    \]
+    \textbf{Inflation rate}: $\pi_t = (CPI_t - CPI_{t-1})/CPI_{t-1}$.
+    \textbf{Fisher equation} linking nominal rate $i$, real rate $r$, and inflation $\pi$:
+    \[
+        (1 + i) = (1 + r)(1 + \pi) \approx r + \pi \quad \text{(for small rates)}.
+    \]
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Money and Monetary Policy}
+% ------------------------------------------------------------------------------
+
+\section{Money Supply and Demand}
+
+\defn{Money and its Functions}{
+    Money serves as (1) medium of exchange, (2) unit of account, (3) store of value.
+    \textbf{M1} = currency + demand deposits.
+    \textbf{M2} = M1 + savings deposits + small time deposits.
+    \textbf{Money multiplier}: $m = 1/\text{reserve ratio}$ (simple model);
+    in practice, $m = (1 + c)/(c + \theta)$ where $c$ = currency-to-deposit ratio,
+    $\theta$ = reserve ratio.
+}
+
+\section{Monetary Policy and the Interest Rate}
+
+\rmkb{Central banks (e.g., the Fed) target the short-term nominal interest rate
+(federal funds rate) using open market operations (buying/selling government bonds).
+Expansionary policy: buy bonds $\Rightarrow$ money supply $\uparrow$ $\Rightarrow$
+$i \downarrow$ $\Rightarrow$ investment $\uparrow$ $\Rightarrow$ GDP $\uparrow$.
+Key constraint: zero lower bound (ZLB); unconventional tools include QE (asset
+purchases) and forward guidance.}
+
+% ------------------------------------------------------------------------------
+\chapter{Fiscal Policy}
+% ------------------------------------------------------------------------------
+
+\section{Government Budget and Multiplier Effects}
+
+\defn{Fiscal Multiplier}{
+    An increase in government spending $\Delta G$ raises GDP by more than $\Delta G$:
+    \[
+        \Delta Y = \frac{1}{1-MPC} \cdot \Delta G = \frac{1}{MPS} \cdot \Delta G,
+    \]
+    where $MPC$ is the marginal propensity to consume and $MPS = 1 - MPC$.
+    Tax multiplier: $\Delta Y = -\frac{MPC}{1-MPC} \cdot \Delta T$ (smaller in magnitude;
+    negative sign because tax cut raises disposable income indirectly).
+    \textbf{Balanced budget multiplier} $= 1$ (equal $\Delta G$ and $\Delta T$).
+}
+
+\rmkb{Crowding out: expansionary fiscal policy may raise interest rates, reducing
+private investment.  In a liquidity trap ($i$ at ZLB), crowding out is absent
+and the multiplier is larger.  Long-run: deficit spending accumulates debt
+($D/GDP$ ratio); sustainability requires $r < g$ (interest rate below growth rate).}
+
+% ------------------------------------------------------------------------------
+\chapter{International Economics}
+% ------------------------------------------------------------------------------
+
+\section{Exchange Rates and the Balance of Payments}
+
+\defn{Nominal and Real Exchange Rate}{
+    The \textbf{nominal exchange rate} $e$ is units of domestic currency per unit
+    of foreign currency.  The \textbf{real exchange rate}:
+    \[
+        q = e \cdot \frac{P^*}{P},
+    \]
+    where $P^*$ is the foreign price level and $P$ the domestic price level.
+    A rise in $q$ is a \textbf{real depreciation} (domestic goods become cheaper).
+    \textbf{Purchasing Power Parity (PPP)}: $q = 1$ in the long run, implying
+    $e = P/P^*$.
+}
+
+\defn{Balance of Payments}{
+    \[
+        \underbrace{CA}_{\text{Current Account}} + \underbrace{FA}_{\text{Financial Account}} = 0.
+    \]
+    $CA = NX + \text{net factor income} + \text{net transfers}$.
+    A current account \textbf{deficit} means the country imports more than it exports
+    and is a net borrower from the rest of the world.
+}
+
+\rmkb{Under fixed exchange rates, the central bank must intervene (buy/sell FX
+reserves) to maintain the peg; monetary policy autonomy is lost
+(\textbf{impossible trinity}: cannot simultaneously have fixed rate, free capital
+flows, and independent monetary policy).}
+
+% ==============================================================================
+\part{Financial Accounting}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\chapter{Reading Financial Statements}
+% ------------------------------------------------------------------------------
+
+\section{The Three Core Statements}
+
+\defn{Income Statement}{
+    Reports \textbf{revenues} and \textbf{expenses} over a period, resulting in
+    net income (profit or loss):
+    \[
+        \text{Net Income} = \text{Revenue} - \text{COGS} - \text{Operating Expenses}
+        - \text{Interest} - \text{Taxes}.
+    \]
+    Key line items: Revenue, Cost of Goods Sold (COGS), \textbf{Gross Profit}
+    $=$ Revenue $-$ COGS, \textbf{EBITDA}, \textbf{EBIT} (Operating Income),
+    \textbf{EBT}, \textbf{Net Income}.
+}
+
+\defn{Balance Sheet (Statement of Financial Position)}{
+    A snapshot of what the firm \textbf{owns} (assets), \textbf{owes} (liabilities),
+    and the residual claim of shareholders (equity) at a point in time:
+    \[
+        \text{Assets} = \text{Liabilities} + \text{Shareholders' Equity}.
+    \]
+    \textbf{Current assets} (cash, AR, inventory) vs.\ \textbf{non-current assets}
+    (PP\&E, intangibles, goodwill).
+    \textbf{Current liabilities} (AP, short-term debt) vs.\ \textbf{long-term debt}.
+}
+
+\defn{Statement of Cash Flows}{
+    Reconciles net income to actual cash generated:
+    \[
+        \text{Cash Flow} = \underbrace{CFO}_{\text{Operations}} + \underbrace{CFI}_{\text{Investing}} + \underbrace{CFF}_{\text{Financing}}.
+    \]
+    \textbf{CFO}: net income $+$ D\&A $-$ $\Delta$Working Capital (indirect method).
+    \textbf{CFI}: capex, acquisitions, asset disposals.
+    \textbf{CFF}: debt issuance/repayment, equity issuance, dividends.
+    \textbf{Free Cash Flow}: $FCF = CFO - \text{Capex}$.
+}
+
+% --------------------------------------------------------------------------
+\section{Key Ratios for Analysts}
+% --------------------------------------------------------------------------
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Ratio} & \textbf{Formula} & \textbf{Measures} \\
+\midrule
+\multicolumn{3}{l}{\textit{Profitability}} \\
+Gross Margin     & Gross Profit / Revenue                          & Pricing power \\
+EBITDA Margin    & EBITDA / Revenue                                & Operating efficiency \\
+ROE              & Net Income / Avg. Equity                        & Return to shareholders \\
+ROA              & Net Income / Avg. Assets                        & Asset efficiency \\
+\midrule
+\multicolumn{3}{l}{\textit{Leverage}} \\
+Debt/Equity      & Total Debt / Total Equity                       & Capital structure \\
+Interest Coverage & EBIT / Interest Expense                        & Ability to service debt \\
+\midrule
+\multicolumn{3}{l}{\textit{Liquidity}} \\
+Current Ratio    & Current Assets / Current Liabilities            & Short-term solvency \\
+Quick Ratio      & (CA $-$ Inventory) / CL                        & Stringent liquidity \\
+\midrule
+\multicolumn{3}{l}{\textit{Efficiency}} \\
+Asset Turnover   & Revenue / Avg. Assets                           & Asset productivity \\
+Inventory Days   & (Inventory / COGS) $\times$ 365                 & Inventory management \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{\textbf{DuPont decomposition}: $ROE = \underbrace{\frac{\text{NI}}{\text{Sales}}}_{\text{margin}} \times \underbrace{\frac{\text{Sales}}{\text{Assets}}}_{\text{turnover}} \times \underbrace{\frac{\text{Assets}}{\text{Equity}}}_{\text{leverage}}$.}
+
+% --------------------------------------------------------------------------
+\section{Accrual Accounting vs.\ Cash Accounting}
+% --------------------------------------------------------------------------
+
+\defn{Accrual Basis}{
+    Revenue is recognised when \textbf{earned} (goods delivered/services rendered),
+    not when cash is received.  Expenses are recognised when \textbf{incurred},
+    not when paid.  Result: net income $\neq$ cash flow in any given period.
+    Key accruals:
+    \begin{itemize}
+        \item \textbf{Accounts Receivable}: revenue earned, cash not yet received.
+        \item \textbf{Accounts Payable}: expense incurred, cash not yet paid.
+        \item \textbf{Deferred Revenue}: cash received, revenue not yet earned.
+        \item \textbf{Prepaid Expense}: cash paid, expense not yet incurred.
+    \end{itemize}
+}
+
+% ==============================================================================
+\part{Corporate Finance}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\chapter{Time Value of Money}
+% ------------------------------------------------------------------------------
+
+\section{Discounting and Compounding}
+
+\defn{Present and Future Value}{
+    A cash flow $C$ received in $n$ periods, discounted at rate $r$ per period:
+    \[
+        PV = \frac{C}{(1+r)^n}, \qquad FV = C \cdot (1+r)^n.
+    \]
+    \textbf{Continuous compounding}: $PV = C\,e^{-rn}$, $FV = C\,e^{rn}$.
+}
+
+\defn{Annuities and Perpetuities}{
+    \textbf{Ordinary annuity} (payments at end of period):
+    \[
+        PV_{\text{annuity}} = PMT \cdot \frac{1 - (1+r)^{-n}}{r}.
+    \]
+    \textbf{Growing annuity} (payment grows at rate $g$, $g \neq r$):
+    \[
+        PV = PMT \cdot \frac{1 - [(1+g)/(1+r)]^n}{r - g}.
+    \]
+    \textbf{Perpetuity}: $PV = PMT/r$.
+    \textbf{Growing perpetuity} (Gordon Growth Model): $PV = PMT/(r-g)$, $g < r$.
+}
+
+\defn{Effective Annual Rate}{
+    For $m$ compounding periods per year at nominal rate $r_{\text{nom}}$:
+    \[
+        EAR = \left(1 + \frac{r_{\text{nom}}}{m}\right)^m - 1.
+    \]
+    Continuous: $EAR = e^{r_{\text{nom}}} - 1$.
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Capital Budgeting}
+% ------------------------------------------------------------------------------
+
+\section{Investment Decision Rules}
+
+\defn{Net Present Value}{
+    \[
+        NPV = \sum_{t=0}^{T} \frac{CF_t}{(1+r)^t} = -C_0 + \sum_{t=1}^{T} \frac{CF_t}{(1+r)^t}.
+    \]
+    \textbf{NPV Rule}: accept project iff $NPV > 0$.  NPV correctly accounts for
+    the time value of money, risk, and opportunity cost of capital.
+}
+
+\defn{Internal Rate of Return}{
+    The IRR solves $NPV(IRR) = 0$:
+    \[
+        0 = \sum_{t=0}^{T} \frac{CF_t}{(1+IRR)^t}.
+    \]
+    \textbf{IRR Rule}: accept iff $IRR > $ hurdle rate (cost of capital).
+    Pitfalls: (1) multiple IRRs if sign changes more than once; (2) scale problem
+    (higher IRR $\not\Rightarrow$ higher NPV); (3) assumes reinvestment at IRR.
+    Always prefer NPV for mutually exclusive projects.
+}
+
+\rmkb{Other metrics: \textbf{Payback Period} (time to recoup $C_0$) ignores TVM
+and post-payback flows.  \textbf{Profitability Index} $= NPV/C_0$ useful for
+capital rationing (ranking projects under budget constraint).}
+
+% ------------------------------------------------------------------------------
+\chapter{Risk and Cost of Capital}
+% ------------------------------------------------------------------------------
+
+\section{Weighted Average Cost of Capital}
+
+\defn{WACC}{
+    The after-tax required return on the firm's assets, weighted by capital structure:
+    \[
+        WACC = \frac{E}{V} r_E + \frac{D}{V} r_D (1 - \tau_C),
+    \]
+    where $V = E + D$ is total firm value, $r_E$ is cost of equity, $r_D$ is
+    pre-tax cost of debt, and $\tau_C$ is the corporate tax rate.
+    Use WACC to discount FCFs when capital structure is stable.
+}
+
+\defn{Cost of Equity via CAPM}{
+    \[
+        r_E = r_f + \beta_E \cdot [E(R_M) - r_f].
+    \]
+    $\beta_E$ (equity beta) incorporates both business risk and financial leverage.
+    \textbf{Unlevering}: $\beta_A = \frac{E}{E+D(1-\tau_C)} \beta_E + \frac{D(1-\tau_C)}{E+D(1-\tau_C)} \beta_D \approx \frac{E}{E+D}\beta_E$ (if $\beta_D \approx 0$).
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Capital Structure}
+% ------------------------------------------------------------------------------
+
+\section{Modigliani--Miller Theorems}
+
+\thm{MM Proposition I (No Taxes)}{
+    In perfect capital markets (no taxes, no bankruptcy costs, no information
+    asymmetry, no transaction costs), the value of a firm is independent of its
+    capital structure:
+    \[
+        V_L = V_U.
+    \]
+}
+
+\thm{MM Proposition II (No Taxes)}{
+    The cost of equity is an increasing linear function of leverage:
+    \[
+        r_E = r_A + \frac{D}{E}(r_A - r_D),
+    \]
+    where $r_A$ is the unlevered cost of equity.  WACC is constant regardless
+    of leverage.
+}
+
+\thm{MM with Corporate Taxes}{
+    Interest payments are tax-deductible, creating a \textbf{tax shield}:
+    \[
+        V_L = V_U + \tau_C D \quad \text{(assuming perpetual debt)}.
+    \]
+    Implication: firms should use maximum leverage.  Real-world limits:
+    financial distress costs and agency costs.
+}
+
+\defn{Trade-Off Theory}{
+    Optimal capital structure balances the tax shield benefit of debt against
+    financial distress costs:
+    \[
+        V_L = V_U + PV(\text{Tax Shield}) - PV(\text{Distress Costs}).
+    \]
+    Predicts an interior optimal leverage ratio for each firm.
+}
+
+\defn{Pecking Order Theory}{
+    Firms prefer internal financing (retained earnings), then debt, then equity.
+    Rationale: adverse selection costs are lowest for internal funds, moderate
+    for debt, and highest for equity (Myers-Majluf).
+}
+
+% ==============================================================================
+\part{Investments and Portfolio Theory}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\chapter{Financial Markets and Return Measurement}
+% ------------------------------------------------------------------------------
+
+\section{Asset Classes and Market Structure}
+
+\defn{Primary vs.\ Secondary Markets}{
+    \textbf{Primary market}: new securities are issued (IPO, seasoned offering).
+    \textbf{Secondary market}: previously issued securities trade between investors
+    (NYSE, NASDAQ).  Market efficiency implies secondary prices reflect all
+    available information.
+}
+
+\section{Return Measurement}
+
+\defn{Holding Period Return}{
+    For a single period with beginning price $P_0$, ending price $P_1$,
+    and dividend $D_1$:
+    \[
+        HPR = \frac{P_1 - P_0 + D_1}{P_0} = \frac{P_1 + D_1}{P_0} - 1.
+    \]
+}
+
+\defn{Multi-Period Returns}{
+    \textbf{Arithmetic mean} (best estimate of expected single-period return):
+    \[
+        \bar{R}_A = \frac{1}{T}\sum_{t=1}^T R_t.
+    \]
+    \textbf{Geometric mean} (best estimate of compound growth rate):
+    \[
+        \bar{R}_G = \left(\prod_{t=1}^T (1+R_t)\right)^{1/T} - 1.
+    \]
+    Always $\bar{R}_G \leq \bar{R}_A$; equality iff all returns are equal.
+    Approximation: $\bar{R}_G \approx \bar{R}_A - \sigma^2/2$.
+}
+
+\defn{Risk Measures}{
+    Sample variance and standard deviation of returns:
+    \[
+        s^2 = \frac{1}{T-1}\sum_{t=1}^T (R_t - \bar{R})^2, \qquad
+        s = \sqrt{s^2}.
+    \]
+    \textbf{Sharpe Ratio}: $SR = (E[R] - r_f)/\sigma$ (reward per unit of total risk).
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Portfolio Theory}
+% ------------------------------------------------------------------------------
+
+\section{Mean-Variance Analysis}
+
+\defn{Portfolio Return and Variance}{
+    For $n$ assets with weights $\mathbf{w} = (w_1,\ldots,w_n)^\top$, $\mathbf{1}^\top\mathbf{w} = 1$:
+    \[
+        E[R_p] = \mathbf{w}^\top \boldsymbol{\mu} = \sum_{i=1}^n w_i \mu_i,
+    \]
+    \[
+        \sigma_p^2 = \mathbf{w}^\top \boldsymbol{\Sigma}\, \mathbf{w}
+        = \sum_{i=1}^n\sum_{j=1}^n w_i w_j \sigma_{ij},
+    \]
+    where $\boldsymbol{\Sigma}$ is the $n\times n$ covariance matrix and
+    $\sigma_{ij} = \rho_{ij}\sigma_i\sigma_j$.
+}
+
+\defn{Diversification}{
+    For an equally weighted portfolio of $n$ assets with average variance
+    $\bar{\sigma}^2$ and average covariance $\bar{\sigma}_{ij}$:
+    \[
+        \sigma_p^2 = \frac{1}{n}\bar{\sigma}^2 + \frac{n-1}{n}\bar{\sigma}_{ij}
+        \;\xrightarrow{n\to\infty}\; \bar{\sigma}_{ij}.
+    \]
+    Idiosyncratic (diversifiable) risk vanishes; systematic risk remains.
+}
+
+\section{Efficient Frontier}
+
+\defn{Minimum Variance Portfolio}{
+    The \textbf{Global Minimum Variance} (GMV) portfolio solves:
+    \[
+        \min_{\mathbf{w}}\; \mathbf{w}^\top \boldsymbol{\Sigma}\, \mathbf{w}
+        \quad \text{s.t.} \quad \mathbf{1}^\top \mathbf{w} = 1.
+    \]
+    Solution: $\mathbf{w}_{GMV} = \frac{\boldsymbol{\Sigma}^{-1}\mathbf{1}}{\mathbf{1}^\top\boldsymbol{\Sigma}^{-1}\mathbf{1}}$.
+    Adding the return target $\mathbf{w}^\top\boldsymbol{\mu} = \mu_p$ traces the
+    \textbf{efficient frontier} in $(\sigma, E[R])$ space.
+}
+
+\defn{Capital Allocation Line and Tangency Portfolio}{
+    With a risk-free asset at rate $r_f$, the investor's opportunity set becomes
+    the \textbf{Capital Allocation Line (CAL)}:
+    \[
+        E[R_p] = r_f + \frac{E[R_T] - r_f}{\sigma_T}\,\sigma_p,
+    \]
+    where $T$ is the \textbf{tangency portfolio} maximising the Sharpe ratio:
+    \[
+        \mathbf{w}_T = \frac{\boldsymbol{\Sigma}^{-1}(\boldsymbol{\mu} - r_f\mathbf{1})}
+        {\mathbf{1}^\top\boldsymbol{\Sigma}^{-1}(\boldsymbol{\mu} - r_f\mathbf{1})}.
+    \]
+}
+
+\thm{Two-Fund Separation Theorem}{
+    Every mean-variance efficient portfolio is a linear combination of the
+    risk-free asset and the tangency portfolio.  All investors, regardless of
+    risk aversion, choose a portfolio on the CAL through $T$.
+}
+
+\defn{Investor Utility and Optimal Allocation}{
+    For mean-variance utility $U = E[R_p] - \frac{A}{2}\sigma_p^2$, the optimal
+    fraction $w^*$ invested in the risky asset (or risky portfolio) satisfies:
+    \[
+        w^* = \frac{E[R] - r_f}{A\,\sigma^2}.
+    \]
+    Higher risk aversion ($A$) or higher variance $\Rightarrow$ lower allocation to risky assets.
+}
+
+% ------------------------------------------------------------------------------
+\chapter{CAPM and Factor Models}
+% ------------------------------------------------------------------------------
+
+\section{Capital Asset Pricing Model}
+
+\defn{CAPM}{
+    In equilibrium, all investors hold the market portfolio $M$.  For any asset $i$:
+    \[
+        E[R_i] = r_f + \beta_i\,(E[R_M] - r_f),
+    \]
+    where the \textbf{beta} measures systematic risk:
+    \[
+        \beta_i = \frac{\text{Cov}(R_i, R_M)}{\text{Var}(R_M)}
+        = \frac{\sigma_{iM}}{\sigma_M^2}.
+    \]
+    The \textbf{Security Market Line (SML)} plots $E[R_i]$ against $\beta_i$.
+    The \textbf{Capital Market Line (CML)} plots $E[R_p]$ against $\sigma_p$ for
+    efficient (fully diversified) portfolios:
+    \[
+        E[R_p] = r_f + \frac{E[R_M] - r_f}{\sigma_M}\,\sigma_p.
+    \]
+}
+
+\defn{Risk Decomposition and Alpha}{
+    Total variance decomposes into systematic and idiosyncratic parts:
+    \[
+        \sigma_i^2 = \beta_i^2\sigma_M^2 + \sigma_{\varepsilon_i}^2.
+    \]
+    \textbf{Alpha} (Jensen's alpha) measures risk-adjusted outperformance:
+    \[
+        \alpha_i = E[R_i] - \left[r_f + \beta_i(E[R_M] - r_f)\right].
+    \]
+    In an efficient market, $\alpha = 0$ for all assets.
+}
+
+\section{Factor Models}
+
+\defn{Fama-French Three-Factor Model}{
+    Extends CAPM with size and value factors:
+    \[
+        E[R_i] - r_f = \alpha_i + \beta_{iM}(R_M - r_f) + \beta_{iSMB}\cdot SMB + \beta_{iHML}\cdot HML,
+    \]
+    where $SMB$ (Small Minus Big) captures the size premium, and $HML$ (High Minus Low
+    book-to-market) captures the value premium.  Carhart adds $MOM$ (momentum).
+}
+
+\rmkb{The CAPM assumptions that fail empirically: (1) all investors hold the same
+mean-variance efficient portfolio; (2) no taxes or transaction costs; (3) unlimited
+borrowing at $r_f$.  Factor models are more descriptive; they do not necessarily
+imply risk-based explanations (may reflect mispricing or data mining).}
+
+% ------------------------------------------------------------------------------
+\chapter{Equity Valuation}
+% ------------------------------------------------------------------------------
+
+\section{Dividend Discount Model}
+
+\defn{DDM (Gordon Growth Model)}{
+    The price of a stock equals the PV of all future dividends:
+    \[
+        P_0 = \sum_{t=1}^{\infty} \frac{D_t}{(1+r_E)^t}.
+    \]
+    For constant growth $g$ (Gordon Growth Model):
+    \[
+        P_0 = \frac{D_1}{r_E - g} = \frac{D_0(1+g)}{r_E - g}, \qquad g < r_E.
+    \]
+    Implies: $r_E = D_1/P_0 + g$ (dividend yield + capital gains yield).
+}
+
+\section{Free Cash Flow to Firm (FCFF) Model}
+
+\defn{DCF Valuation}{
+    Enterprise value equals the PV of future FCFs discounted at WACC:
+    \[
+        EV = \sum_{t=1}^{T} \frac{FCFF_t}{(1+WACC)^t} + \frac{TV_T}{(1+WACC)^T},
+    \]
+    where terminal value $TV_T = FCFF_{T+1}/(WACC - g)$ (Gordon Growth).
+    \[
+        \text{Equity Value} = EV - \text{Net Debt}.
+    \]
+    $FCFF = EBIT(1-\tau) + D\&A - \Delta NWC - \text{Capex}$.
+}
+
+\section{Relative Valuation}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXX}
+\toprule
+\textbf{Multiple} & \textbf{Formula} & \textbf{Use} \\
+\midrule
+P/E       & Price per share / EPS         & Mature, profitable firms \\
+EV/EBITDA & Enterprise Value / EBITDA     & Cross-capital-structure comparisons \\
+EV/Sales  & Enterprise Value / Revenue    & High-growth or loss-making firms \\
+P/B       & Price / Book Value per share  & Financials; asset-heavy sectors \\
+PEG       & P/E / Earnings Growth Rate    & Growth-adjusted P/E \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\rmkb{Multiples are only meaningful relative to peers.  Always adjust for differences
+in growth, risk, and margins across comparables.}
+
+% ------------------------------------------------------------------------------
+\chapter{Fixed Income}
+% ------------------------------------------------------------------------------
+
+\section{Bond Pricing}
+
+\defn{Bond Price}{
+    A bond with face value $F$, coupon rate $c$, maturity $T$, and yield to maturity
+    $y$ has price:
+    \[
+        P = \sum_{t=1}^{T} \frac{cF}{(1+y)^t} + \frac{F}{(1+y)^T}
+        = cF\cdot\frac{1-(1+y)^{-T}}{y} + F(1+y)^{-T}.
+    \]
+    $P > F$ iff $y < c$ (premium bond); $P < F$ iff $y > c$ (discount bond).
+    Price and yield move \textbf{inversely}.
+}
+
+\section{Duration and Convexity}
+
+\defn{Macaulay Duration}{
+    The weighted-average time to receipt of cash flows (weights = PV of each
+    cash flow as fraction of total price):
+    \[
+        D_{Mac} = \frac{1}{P}\sum_{t=1}^{T} t \cdot \frac{CF_t}{(1+y)^t}.
+    \]
+    \textbf{Modified Duration}: $D_{Mod} = D_{Mac}/(1+y)$.
+    Price sensitivity: $\Delta P \approx -D_{Mod} \cdot P \cdot \Delta y$.
+}
+
+\defn{Convexity}{
+    Second-order correction to the price-yield relationship:
+    \[
+        \frac{\Delta P}{P} \approx -D_{Mod}\,\Delta y + \frac{1}{2}\,C\,(\Delta y)^2,
+    \]
+    where convexity $C = \frac{1}{P}\frac{d^2P}{dy^2}$.
+    Higher convexity is always beneficial: the bond rises more (falls less) than
+    the duration approximation predicts for any yield change.
+}
+
+\section{Yield Curve}
+
+\defn{Term Structure of Interest Rates}{
+    The \textbf{yield curve} plots spot rates $s_t$ (YTM of zero-coupon bonds)
+    against maturity $t$.  Shapes: normal (upward sloping), flat, inverted.
+    \textbf{Forward rate} $f_{t,t+1}$ is the implied one-period rate from $t$ to $t+1$:
+    \[
+        (1+s_{t+1})^{t+1} = (1+s_t)^t\,(1+f_{t,t+1}).
+    \]
+    Theories: (1) Expectations: $f_{t,t+1} = E[s_{t+1}]$;
+    (2) Liquidity preference: $f_{t,t+1} > E[s_{t+1}]$ (term premium);
+    (3) Market segmentation: supply/demand at each maturity.
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Derivatives and Options}
+% ------------------------------------------------------------------------------
+
+\section{Option Payoffs and Strategies}
+
+\defn{Call and Put Options}{
+    A \textbf{European call} gives the right to buy asset $S$ at strike $K$ at
+    maturity $T$. Payoff at expiry: $\max(S_T - K, 0)$.
+    A \textbf{European put}: payoff $\max(K - S_T, 0)$.
+    Premium (price) paid upfront; net profit = payoff $-$ premium.
+}
+
+\defn{Put--Call Parity}{
+    For European options on a non-dividend-paying stock:
+    \[
+        C - P = S_0 - K e^{-rT},
+    \]
+    where $C$ and $P$ are call and put prices with the same $K$ and $T$.
+    Violation implies arbitrage.
+}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lXl}
+\toprule
+\textbf{Strategy} & \textbf{Construction} & \textbf{View} \\
+\midrule
+Covered Call     & Long stock $+$ Short call           & Mildly bullish, income \\
+Protective Put   & Long stock $+$ Long put             & Bullish, insured \\
+Bull Spread      & Long call($K_1$) $+$ Short call($K_2$), $K_1 < K_2$ & Moderately bullish \\
+Bear Spread      & Long put($K_2$) $+$ Short put($K_1$) & Moderately bearish \\
+Straddle         & Long call $+$ Long put (same $K,T$) & High volatility \\
+Strangle         & Long call($K_H$) $+$ Long put($K_L$), $K_H > K_L$ & High vol, cheaper \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Black-Scholes-Merton Model}
+
+\defn{BSM Price}{
+    Assuming the stock price follows geometric Brownian motion
+    $dS = \mu S\,dt + \sigma S\,dW_t$, the no-arbitrage price of a European call is:
+    \[
+        C = S_0 N(d_1) - K e^{-rT} N(d_2),
+    \]
+    \[
+        d_1 = \frac{\ln(S_0/K) + (r + \sigma^2/2)T}{\sigma\sqrt{T}}, \qquad
+        d_2 = d_1 - \sigma\sqrt{T},
+    \]
+    where $N(\cdot)$ is the standard normal CDF.
+    Put price: $P = Ke^{-rT}N(-d_2) - S_0 N(-d_1)$.
+}
+
+\defn{The Greeks}{
+    \begin{center}
+    \begin{tabularx}{\linewidth}{llX}
+    \toprule
+    \textbf{Greek} & \textbf{Definition} & \textbf{Interpretation} \\
+    \midrule
+    Delta $\Delta$ & $\partial C/\partial S$        & Change in option price per \$1 change in $S$; $\in(0,1)$ for calls \\
+    Gamma $\Gamma$ & $\partial^2 C/\partial S^2$    & Rate of change of delta; highest near ATM \\
+    Theta $\Theta$ & $\partial C/\partial t$        & Time decay; typically negative for long options \\
+    Vega $\nu$     & $\partial C/\partial \sigma$   & Sensitivity to volatility; positive for long options \\
+    Rho $\rho$     & $\partial C/\partial r$        & Sensitivity to interest rate \\
+    \bottomrule
+    \end{tabularx}
+    \end{center}
+}
+
+% ==============================================================================
+\part{Quantitative Finance}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\chapter{Portfolio Optimisation}
+% ------------------------------------------------------------------------------
+
+\section{Mean-Variance Optimisation}
+
+\defn{Markowitz Optimisation Problem}{
+    For a target return $\mu_p^*$, the minimum variance portfolio solves:
+    \[
+        \min_{\mathbf{w}}\; \mathbf{w}^\top \boldsymbol{\Sigma}\, \mathbf{w}
+        \quad \text{s.t.} \quad
+        \mathbf{w}^\top\boldsymbol{\mu} = \mu_p^*, \quad
+        \mathbf{1}^\top\mathbf{w} = 1.
+    \]
+    Using Lagrangians $\lambda$ and $\gamma$, the KKT conditions give the closed form:
+    \[
+        \mathbf{w}^* = \lambda^* \boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}
+        + \gamma^* \boldsymbol{\Sigma}^{-1}\mathbf{1},
+    \]
+    where the multipliers solve the $2\times 2$ system:
+    \[
+        \begin{pmatrix} A & B \\ B & C \end{pmatrix}
+        \begin{pmatrix} \lambda^* \\ \gamma^* \end{pmatrix}
+        = \begin{pmatrix} \mu_p^* \\ 1 \end{pmatrix},
+    \]
+    with $A = \boldsymbol{\mu}^\top\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}$,
+    $B = \boldsymbol{\mu}^\top\boldsymbol{\Sigma}^{-1}\mathbf{1}$,
+    $C = \mathbf{1}^\top\boldsymbol{\Sigma}^{-1}\mathbf{1}$, and
+    $\Delta = AC - B^2 > 0$.
+    The minimum variance of the frontier portfolio at $\mu_p^*$ is:
+    \[
+        \sigma^{*2}(\mu_p^*) = \frac{C\mu_p^{*2} - 2B\mu_p^* + A}{\Delta}.
+    \]
+}
+
+\section{Sharpe Ratio Maximisation}
+
+\defn{Tangency Portfolio (Analytical Form)}{
+    With a risk-free rate $r_f$, the excess return vector is
+    $\tilde{\boldsymbol{\mu}} = \boldsymbol{\mu} - r_f\mathbf{1}$.
+    The tangency (maximum Sharpe) portfolio is:
+    \[
+        \mathbf{w}_T = \frac{\boldsymbol{\Sigma}^{-1}\tilde{\boldsymbol{\mu}}}
+        {\mathbf{1}^\top\boldsymbol{\Sigma}^{-1}\tilde{\boldsymbol{\mu}}},
+        \qquad
+        SR_T = \sqrt{\tilde{\boldsymbol{\mu}}^\top\boldsymbol{\Sigma}^{-1}\tilde{\boldsymbol{\mu}}}.
+    \]
+}
+
+\section{Practical Constraints and Shrinkage}
+
+\rmkb{The classical Markowitz solution is notoriously unstable: small errors in
+$\boldsymbol{\mu}$ and $\boldsymbol{\Sigma}$ lead to extreme allocations.  Practical remedies:
+\begin{itemize}
+    \item \textbf{Long-only constraint}: $w_i \geq 0$ (convex QP, solved via active-set or interior-point methods).
+    \item \textbf{Shrinkage estimators}: Ledoit-Wolf shrinks $\hat{\boldsymbol{\Sigma}}$ toward a structured target (e.g., diagonal) to reduce estimation error.
+    \item \textbf{Black-Litterman}: blends market-implied equilibrium returns with investor views via Bayesian updating, producing better-conditioned portfolios.
+    \item \textbf{Risk parity}: allocate equal risk contribution $w_i(\boldsymbol{\Sigma}\mathbf{w})_i / \sigma_p^2 = 1/n$ across assets.
+\end{itemize}}
+
+% ------------------------------------------------------------------------------
+\chapter{Mathematical Finance}
+% ------------------------------------------------------------------------------
+
+\section{Single-Period Model and No-Arbitrage}
+
+\defn{Single-Period Market Model}{
+    A market consists of:
+    \begin{itemize}
+        \item A \textbf{risk-free bond}: value 1 at time 0, value $1+r$ at time 1.
+        \item $d$ \textbf{risky assets}: price vector $S_0 \in \mathbb{R}^d$ at time 0;
+              random payoff $S_1(\omega)$ at time 1 in state $\omega \in \Omega$
+              (finite state space, $|\Omega| = k$).
+        \item A \textbf{portfolio} $H = (H^0, H^1, \ldots, H^d)$: holdings of bond
+              and risky assets.
+    \end{itemize}
+    Portfolio value: $V_0 = H^0 + H \cdot S_0$, $V_1(\omega) = H^0(1+r) + H \cdot S_1(\omega)$.
+}
+
+\defn{Arbitrage}{
+    A portfolio $H$ is an \textbf{arbitrage} if:
+    \[
+        V_0 \leq 0, \quad V_1(\omega) \geq 0\ \forall\omega, \quad
+        \exists\,\omega^*: V_1(\omega^*) > 0.
+    \]
+    (Get something from nothing, or nothing for free with positive probability of gain.)
+}
+
+\thm{Fundamental Theorem of Asset Pricing (FTAP) --- Single Period}{
+    The market is \textbf{arbitrage-free} if and only if there exists a
+    \textbf{risk-neutral (equivalent martingale) measure} $\mathbb{Q}$,
+    i.e., a probability measure with $\mathbb{Q}(\omega) > 0\ \forall\omega$ such that
+    \[
+        S_0^i = \frac{1}{1+r}\,\mathbb{E}^{\mathbb{Q}}[S_1^i]
+        \qquad \forall\, i = 1, \ldots, d.
+    \]
+    The market is \textbf{complete} (every payoff is replicable) iff $\mathbb{Q}$
+    is unique.
+}
+
+\section{Binomial Model}
+
+\defn{One-Period Binomial Model}{
+    Stock price $S_0$ moves to $S_0 u$ (up) with physical probability $p$,
+    or $S_0 d$ (down) with $1-p$, where $d < 1+r < u$ (no-arbitrage condition).
+    The unique risk-neutral probability:
+    \[
+        q = \frac{(1+r) - d}{u - d}.
+    \]
+    Price of a derivative with payoffs $(V_u, V_d)$:
+    \[
+        V_0 = \frac{qV_u + (1-q)V_d}{1+r}.
+    \]
+    \textbf{Replicating portfolio}: $\Delta = (V_u - V_d)/(S_0 u - S_0 d)$ shares,
+    bond position $B = (V_0 - \Delta S_0)/(1+r)^0$.
+}
+
+\defn{Multi-Period Binomial Tree}{
+    After $n$ steps, each path is a sequence of ups and downs.
+    The $T$-period European option price:
+    \[
+        V_0 = \frac{1}{(1+r)^T}\sum_{k=0}^{T}\binom{T}{k}q^k(1-q)^{T-k} h(S_0 u^k d^{T-k}),
+    \]
+    where $h(S_T)$ is the payoff function.
+    American options: use backward induction, taking $\max(\text{intrinsic value}, \text{continuation value})$ at each node.
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Stochastic Processes and Black-Scholes}
+% ------------------------------------------------------------------------------
+
+\section{Brownian Motion}
+
+\defn{Standard Brownian Motion}{
+    A stochastic process $\{W_t\}_{t \geq 0}$ is a \textbf{standard Brownian motion}
+    (Wiener process) if:
+    \begin{enumerate}
+        \item $W_0 = 0$ a.s.
+        \item \textbf{Independent increments}: for $0 \leq s < t$, $W_t - W_s$ is
+              independent of $\mathcal{F}_s$ (the natural filtration).
+        \item \textbf{Gaussian increments}: $W_t - W_s \sim \mathcal{N}(0, t-s)$.
+        \item \textbf{Continuous paths}: $t \mapsto W_t$ is continuous a.s.
+    \end{enumerate}
+}
+
+\rmkb{Key properties of Brownian motion:
+\begin{itemize}
+    \item $E[W_t] = 0$, $\text{Var}(W_t) = t$, $\text{Cov}(W_s, W_t) = \min(s,t)$.
+    \item Paths are continuous but nowhere differentiable (a.s.).
+    \item \textbf{Quadratic variation}: $[W]_t = t$ (i.e., $\sum (W_{t_i} - W_{t_{i-1}})^2 \to t$).
+    \item $W_t$ is a martingale: $E[W_t | \mathcal{F}_s] = W_s$.
+\end{itemize}}
+
+\section{It\^{o} Calculus}
+
+\defn{It\^{o} Integral}{
+    For an adapted process $\{H_t\}$, the \textbf{It\^{o} integral} is defined as:
+    \[
+        \int_0^T H_t\,dW_t = \lim_{n\to\infty} \sum_{i=0}^{n-1} H_{t_i}(W_{t_{i+1}} - W_{t_i}),
+    \]
+    using the \emph{left-endpoint} (non-anticipating) evaluation.  This differs
+    from the Stratonovich integral and preserves the martingale property.
+}
+
+\thm{It\^{o}'s Lemma}{
+    Let $X_t$ be an It\^{o} process: $dX_t = \mu_t\,dt + \sigma_t\,dW_t$.
+    For $f \in C^{2,1}(\mathbb{R}\times[0,T])$:
+    \[
+        df(X_t, t) = \left(\frac{\partial f}{\partial t} + \mu_t\frac{\partial f}{\partial x}
+        + \frac{\sigma_t^2}{2}\frac{\partial^2 f}{\partial x^2}\right)dt
+        + \sigma_t\frac{\partial f}{\partial x}\,dW_t.
+    \]
+    The extra term $\frac{\sigma^2}{2}\frac{\partial^2 f}{\partial x^2}dt$ arises from
+    the quadratic variation of $W_t$: $(dW_t)^2 = dt$ (It\^{o}'s table:
+    $dt \cdot dt = 0$, $dt \cdot dW = 0$, $dW \cdot dW = dt$).
+}
+
+\section{Geometric Brownian Motion and the BSM Equation}
+
+\defn{Geometric Brownian Motion}{
+    The standard model for stock prices:
+    \[
+        dS_t = \mu S_t\,dt + \sigma S_t\,dW_t.
+    \]
+    By It\^{o}'s lemma applied to $f(S_t) = \ln S_t$:
+    \[
+        d\ln S_t = \left(\mu - \frac{\sigma^2}{2}\right)dt + \sigma\,dW_t,
+    \]
+    so $\ln S_t \sim \mathcal{N}\!\left(\ln S_0 + (\mu-\sigma^2/2)t,\; \sigma^2 t\right)$
+    and:
+    \[
+        S_t = S_0 \exp\!\left[\left(\mu - \frac{\sigma^2}{2}\right)t + \sigma W_t\right].
+    \]
+}
+
+\thm{Black-Scholes PDE}{
+    Consider a self-financing portfolio in stock $S$ and bond $B = e^{rt}$
+    that replicates derivative payoff $V(S, t)$.  The no-arbitrage condition yields
+    the \textbf{Black-Scholes PDE}:
+    \[
+        \frac{\partial V}{\partial t} + rS\frac{\partial V}{\partial S}
+        + \frac{1}{2}\sigma^2 S^2\frac{\partial^2 V}{\partial S^2} - rV = 0,
+    \]
+    with terminal condition $V(S,T) = h(S)$ (payoff function).
+}
+
+\pf{
+    (Delta-hedging derivation.)  Let $\Pi = V - \Delta S$ be a hedged portfolio.
+    By It\^{o}'s lemma:
+    \[
+        d\Pi = \left(\frac{\partial V}{\partial t} + \frac{1}{2}\sigma^2 S^2
+        \frac{\partial^2 V}{\partial S^2}\right)dt
+        + \left(\frac{\partial V}{\partial S} - \Delta\right)\!dS.
+    \]
+    Setting $\Delta = \partial V/\partial S$ eliminates the stochastic term.
+    The resulting riskless portfolio must earn the risk-free rate: $d\Pi = r\Pi\,dt$,
+    giving the BS PDE.
+}
+
+\defn{Risk-Neutral Pricing and the Girsanov Theorem}{
+    Under the physical measure $\mathbb{P}$, $dS = \mu S\,dt + \sigma S\,dW_t$.
+    Define the market price of risk $\theta = (\mu - r)/\sigma$.
+    By \textbf{Girsanov's theorem}, changing measure to $\mathbb{Q}$ via
+    Radon-Nikod\'ym derivative
+    \[
+        \frac{d\mathbb{Q}}{d\mathbb{P}} = \exp\!\left(-\theta W_T - \frac{\theta^2}{2}T\right),
+    \]
+    the process $\tilde{W}_t = W_t + \theta t$ is a $\mathbb{Q}$-Brownian motion and:
+    \[
+        dS = r S\,dt + \sigma S\,d\tilde{W}_t.
+    \]
+    Under $\mathbb{Q}$, the discounted price $e^{-rt}S_t$ is a martingale, and any
+    derivative price is:
+    \[
+        V_0 = e^{-rT}\,\mathbb{E}^{\mathbb{Q}}[h(S_T)].
+    \]
+    For a European call, this integral yields the BSM formula.
+}
+
+\thm{BSM Formula (Derivation Sketch)}{
+    Under $\mathbb{Q}$: $S_T = S_0\exp[(r - \sigma^2/2)T + \sigma\tilde{W}_T]$,
+    $\tilde{W}_T \sim \mathcal{N}(0,T)$.
+    \begin{align*}
+        C &= e^{-rT}\mathbb{E}^{\mathbb{Q}}[\max(S_T - K, 0)] \\
+          &= e^{-rT}\mathbb{E}^{\mathbb{Q}}[(S_T - K)\mathbf{1}_{S_T > K}] \\
+          &= S_0\,\mathbb{Q}(S_T > K \mid S_0)
+             - Ke^{-rT}\,\mathbb{Q}(S_T > K \mid S_0) \\
+          &= S_0 N(d_1) - Ke^{-rT}N(d_2),
+    \end{align*}
+    where the two probabilities $N(d_1)$ and $N(d_2)$ are computed by standardising
+    the lognormal $S_T$ under $\mathbb{Q}$ and the $S$-forward measure respectively.
+}
+
+% ==============================================================================
+\part{Game Theory}
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+\chapter{Normal Form Games}
+% ------------------------------------------------------------------------------
+
+\section{Strategic Form and Dominance}
+
+\defn{Normal Form Game}{
+    A game $G = (N, \{S_i\}_{i\in N}, \{u_i\}_{i\in N})$ consists of:
+    \begin{itemize}
+        \item A finite set of \textbf{players} $N = \{1, \ldots, n\}$.
+        \item For each player $i$: a \textbf{strategy set} $S_i$
+              (finite for matrix games).
+        \item \textbf{Payoff functions} $u_i: S_1 \times \cdots \times S_n \to \mathbb{R}$.
+    \end{itemize}
+    The strategy profile $s = (s_1, \ldots, s_n) \in S = \prod_i S_i$.
+    Notation: $s_{-i}$ denotes all players' strategies except $i$.
+}
+
+\defn{Dominant Strategy}{
+    Strategy $s_i^*$ \textbf{strictly dominates} $s_i'$ if
+    $u_i(s_i^*, s_{-i}) > u_i(s_i', s_{-i})$ for all $s_{-i} \in S_{-i}$.
+    \textbf{Iterated Elimination of Strictly Dominated Strategies (IESDS)}:
+    repeatedly remove dominated strategies; the order does not matter;
+    any rationalizable strategy survives IESDS.
+}
+
+\defn{Nash Equilibrium}{
+    A strategy profile $s^* \in S$ is a \textbf{Nash Equilibrium (NE)} if for all
+    players $i$ and all $s_i \in S_i$:
+    \[
+        u_i(s_i^*, s_{-i}^*) \geq u_i(s_i, s_{-i}^*).
+    \]
+    No player can profitably deviate given the others' strategies.
+}
+
+\defn{Mixed Strategy Nash Equilibrium}{
+    A \textbf{mixed strategy} $\sigma_i \in \Delta(S_i)$ is a probability
+    distribution over $S_i$.  Player $i$'s expected payoff:
+    $u_i(\sigma) = \sum_{s\in S} \sigma_1(s_1)\cdots\sigma_n(s_n)\,u_i(s)$.
+    In a \textbf{mixed strategy NE}, each player is indifferent among all
+    strategies in the support of $\sigma_i^*$:
+    \[
+        u_i(s_i, \sigma_{-i}^*) = \text{const} \quad \forall s_i \in \text{supp}(\sigma_i^*).
+    \]
+}
+
+\thm{Nash Existence Theorem}{
+    Every finite game (finite $N$, finite $S_i$) has at least one Nash equilibrium
+    in mixed strategies.
+}
+
+\pf{(Sketch.) Define the best-response correspondence $BR_i(\sigma_{-i}) = \arg\max_{\sigma_i} u_i(\sigma_i, \sigma_{-i})$.  The joint $BR(\sigma) = \prod_i BR_i(\sigma_{-i})$ maps the compact convex set $\prod_i \Delta(S_i)$ to itself.  Kakutani's fixed-point theorem applies (BR is upper hemicontinuous with non-empty convex values), guaranteeing a fixed point $\sigma^* = BR(\sigma^*)$, which is a NE.}
+
+\section{Classic Examples}
+
+\ex{
+\textbf{Prisoner's Dilemma}: both players choose $\{C, D\}$; payoff matrix:
+\[
+\begin{array}{c|cc}
+ & C & D \\\hline
+C & (2,2) & (0,3) \\
+D & (3,0) & (1,1)
+\end{array}
+\]
+$D$ strictly dominates $C$ for both players.  Unique NE: $(D,D)$ with payoffs
+$(1,1)$ --- Pareto dominated by $(C,C)$.  Illustrates the tension between
+individual rationality and social efficiency.
+}
+
+\ex{
+\textbf{Battle of the Sexes}: two pure NE (Opera, Opera) and (Football, Football),
+plus one mixed NE where the mixing probabilities balance payoffs.
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Extensive Form Games}
+% ------------------------------------------------------------------------------
+
+\section{Sequential Games and Backward Induction}
+
+\defn{Extensive Form Game}{
+    Represented as a game tree with:
+    \begin{itemize}
+        \item \textbf{Nodes}: decision nodes (assigned to a player) and terminal nodes.
+        \item \textbf{Information sets}: sets of nodes a player cannot distinguish.
+        \item \textbf{Actions}: edges from a decision node.
+        \item \textbf{Payoffs}: at each terminal node.
+    \end{itemize}
+    A \textbf{strategy} for player $i$ specifies an action at every information set.
+}
+
+\defn{Subgame Perfect Equilibrium (SPE)}{
+    A strategy profile is an SPE if it induces a Nash equilibrium in every
+    \textbf{subgame} (subtree starting from a single node with complete information).
+    SPE eliminates non-credible threats.
+    \textbf{Backward induction}: solve the game tree from terminal nodes upward,
+    choosing the optimal action at each node --- yields the unique SPE in finite
+    games of perfect information.
+}
+
+\ex{
+\textbf{Stackelberg Duopoly}: leader (L) moves first, follower (F) observes and
+responds.  Backward induction: F's best response $q_F^{BR}(q_L)$ is computed first;
+L maximises profit anticipating F's response.  Result: L produces more than Cournot;
+F produces less.  First-mover advantage arises from commitment.
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Repeated Games}
+% ------------------------------------------------------------------------------
+
+\section{Finitely and Infinitely Repeated Games}
+
+\defn{Repeated Game}{
+    The stage game $G$ is played at $t = 1, 2, \ldots$ Players observe all
+    past actions and discount future payoffs by $\delta \in (0,1)$ per period.
+    Total payoff: $\sum_{t=0}^{\infty}\delta^t u_i(a^t)$.
+}
+
+\thm{Backward Induction in Finite Repetition}{
+    If the stage game has a unique NE, then in the finitely repeated game the unique
+    SPE is to play the stage NE at every period.  Cooperation cannot be sustained
+    by the threat of future punishment (unravelling from the last period).
+}
+
+\thm{Folk Theorem (Informal)}{
+    In an infinitely repeated game, if players are sufficiently patient (high $\delta$),
+    any feasible individually rational payoff vector can be supported as a NE
+    payoff (and under stronger conditions, as an SPE payoff via \textbf{grim trigger}
+    or \textbf{tit-for-tat} strategies).
+}
+
+\pf{(Grim Trigger example, Prisoner's Dilemma.)
+Cooperate while the opponent has always cooperated; defect forever otherwise.
+Cooperation is sustainable if the one-shot gain from defecting is outweighed
+by the loss of future cooperation:
+\[
+    3 + \frac{\delta}{1-\delta}\cdot 1 \leq 2 + \frac{\delta}{1-\delta}\cdot 2
+    \quad\Longleftrightarrow\quad \delta \geq \frac{1}{2}.
+\]
+For $\delta \geq 1/2$, cooperation is a subgame-perfect equilibrium.}
+
+% ------------------------------------------------------------------------------
+\chapter{Bayesian Games and Auctions}
+% ------------------------------------------------------------------------------
+
+\section{Games with Incomplete Information}
+
+\defn{Bayesian Game}{
+    A game where each player has a \textbf{type} $\theta_i \in \Theta_i$ drawn from
+    a joint distribution $F(\theta)$, privately observed.  Player $i$ maximises
+    expected payoff over others' types:
+    \[
+        \max_{a_i(\theta_i)}\; \mathbb{E}_{\theta_{-i}}[u_i(a_i, a_{-i}(\theta_{-i}), \theta)].
+    \]
+    A \textbf{Bayesian Nash Equilibrium (BNE)} is a strategy profile
+    $a_i^*(\cdot): \Theta_i \to A_i$ such that each player's strategy is a best
+    response to the others' strategies, given beliefs about others' types.
+}
+
+\section{Auction Theory}
+
+\defn{Auction Formats}{
+    \begin{center}
+    \begin{tabularx}{\linewidth}{lX}
+    \toprule
+    \textbf{Format} & \textbf{Mechanism} \\
+    \midrule
+    English (ascending) & Open, price rises until one bidder remains; winner pays final price \\
+    Dutch (descending)  & Price falls until first bidder accepts; strategically equivalent to FPSB \\
+    First-Price Sealed Bid (FPSB) & Bidders submit sealed bids; highest bid wins, pays own bid \\
+    Second-Price Sealed Bid (Vickrey) & Highest bid wins, pays second-highest bid \\
+    \bottomrule
+    \end{tabularx}
+    \end{center}
+}
+
+\thm{Revenue Equivalence Theorem}{
+    Suppose bidders have independent private values drawn from a common distribution
+    $F$ on $[0, \bar{v}]$, are risk-neutral, and the auction allocates the object
+    to the highest-value bidder with a zero expected payment for the lowest type.
+    Then \textbf{all four standard auction formats yield the same expected revenue
+    to the seller}.
+}
+
+\defn{FPSB Equilibrium Bid}{
+    With $n$ bidders and values $v_i \sim U[0,\bar{v}]$ i.i.d., the symmetric
+    Bayesian Nash equilibrium bid is:
+    \[
+        b^*(v) = \frac{n-1}{n}\,v.
+    \]
+    Each bidder shades their bid below their value; the shading diminishes as $n$ grows.
+}
+
+\defn{Vickrey Auction (SPSB)}{
+    In the second-price auction, bidding own value $b_i(v_i) = v_i$ is a
+    \textbf{weakly dominant strategy} for every bidder, regardless of the number of
+    bidders or others' strategies.  Truth-telling is optimal because:
+    \[
+        \text{winning at second price} = \max_{j \neq i} b_j \leq v_i
+        \Rightarrow \text{surplus} = v_i - \max_{j \neq i} b_j > 0.
+    \]
+    Overbidding risks winning at a price exceeding value; underbidding risks
+    losing a profitable auction.
+}
+
+\rmkb{The Myerson optimal auction maximises expected revenue by introducing a
+\textbf{reserve price} $r^*$: the seller withholds the good if the highest bid
+falls below $r^*$.  With $n$ bidders and $v_i \sim U[0,1]$:
+$r^* = 1/2$ regardless of $n$.}
+
+\end{document}
