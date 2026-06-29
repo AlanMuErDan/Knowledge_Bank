@@ -14,10 +14,13 @@
 \usepackage{tcolorbox}
 \tcbuselibrary{theorems, skins, breakable}
 
+
 \usepackage{geometry}
 \usepackage{setspace}
 \usepackage{hyperref}
 \usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{array}
 
 \usepackage{multicol}
 \setlength{\columnsep}{1.2em}
@@ -115,65 +118,2828 @@
 \mainmatter
 
 % ==============================================================================
-% Part I: Foundations
-%
-% The learning problem: what ML is actually doing.
-% Covers problem formulation, generalization theory,
-% evaluation methodology, and the optimization machinery
-% that underlies every algorithm in the rest of the book.
+% PART I: FOUNDATIONS
 % ==============================================================================
+
 \part{Foundations}
 
-% ==============================================================================
-% Part II: Supervised Learning
-%
-% Classical algorithms for labeled data.
-% Linear models, kernel methods, tree-based models, and
-% nearest neighbors -- the workhorses of applied ML.
-% ==============================================================================
-\part{Supervised Learning}
+% ------------------------------------------------------------------------------
+\chapter{The Learning Problem}
+\label{ch:learnproblem}
+% ------------------------------------------------------------------------------
+
+\section{What Is Machine Learning?}
+
+\defn{Machine Learning}{
+A computer program is said to \textbf{learn} from experience $E$ with respect to some class of tasks $T$ and performance measure $P$, if its performance at tasks in $T$, as measured by $P$, improves with experience $E$. \rmk{(Mitchell, 1997)}
+}
+
+Every ML system sits at the intersection of three components:
+\begin{itemize}
+    \item \textbf{Model} --- the family of functions $f_\theta : \mathcal{X} \to \mathcal{Y}$ parameterized by $\theta$.
+    \item \textbf{Data} --- observations $\mathcal{D} = \{(\vect{x}_i, y_i)\}_{i=1}^N$ used to constrain $\theta$.
+    \item \textbf{Optimization} --- the algorithm that searches for the best $\theta$ given $\mathcal{D}$.
+\end{itemize}
+
+The three learning paradigms differ in the structure of data:
+\begin{description}
+    \item[Supervised learning] Labeled pairs $(\vect{x}, y)$. Goal: predict $y$ from $\vect{x}$.
+    \item[Unsupervised learning] Unlabeled observations $\{\vect{x}_i\}$. Goal: discover structure.
+    \item[Reinforcement learning] Agent--environment interaction with reward signals. Goal: find a policy maximizing cumulative reward.
+\end{description}
+
+\section{The Statistical Learning Setup}
+
+\defn{Hypothesis Class}{
+A \textbf{hypothesis class} $\mathcal{H}$ is a set of candidate functions $h: \mathcal{X} \to \mathcal{Y}$. Learning means searching for the best $h \in \mathcal{H}$.
+}
+
+\defn{Loss Function}{
+A \textbf{loss function} $\ell: \mathcal{Y} \times \mathcal{Y} \to \R_{\geq 0}$ quantifies the cost of predicting $\hat{y}$ when the truth is $y$. Common choices:
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Name & Formula & Use case \\
+\midrule
+Squared loss & $\ell(\hat{y}, y) = (\hat{y} - y)^2$ & Regression \\
+0-1 loss & $\ell(\hat{y}, y) = \mathbf{1}[\hat{y} \neq y]$ & Classification \\
+Cross-entropy & $\ell(\hat{p}, y) = -y\log\hat{p} - (1-y)\log(1-\hat{p})$ & Binary classification \\
+\bottomrule
+\end{tabular}
+\end{center}
+}
+
+\defn{Risk and Empirical Risk Minimization}{
+The \textbf{true risk} (generalization error) of $h$ is the expected loss under the data distribution:
+\[
+R(h) = \mathbb{E}_{(\vect{x},y) \sim \mathcal{D}}[\ell(h(\vect{x}),\, y)].
+\]
+Since $\mathcal{D}$ is unknown, we minimize the \textbf{empirical risk} on the training set:
+\[
+\hat{R}(h) = \frac{1}{N}\sum_{i=1}^{N}\ell(h(\vect{x}_i),\, y_i).
+\]
+\textbf{Empirical Risk Minimization (ERM):} $\hat{h} = \arg\min_{h \in \mathcal{H}}\hat{R}(h)$.
+}
+
+The difference $R(\hat{h}) - \hat{R}(\hat{h})$ is the \textbf{generalization gap}. A model \textbf{overfits} if this gap is large; it \textbf{underfits} if both $R$ and $\hat{R}$ are large. The capacity of $\mathcal{H}$ controls this tradeoff.
+
+\rmkb{
+Data is divided into three non-overlapping sets:
+\begin{description}
+    \item[Training set] Used to minimize $\hat{R}(h)$.
+    \item[Validation set] Used for model selection and hyperparameter tuning.
+    \item[Test set] Used once, at the very end, as an unbiased estimate of $R(\hat{h})$.
+\end{description}
+Never touch the test set until final evaluation.
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Probability and Statistics}
+% ------------------------------------------------------------------------------
+
+\section{Random Variables}
+
+\defn{Random Variable}{
+A \textbf{random variable} $X$ is a function mapping outcomes from a probability space to $\R$. We write $P(X = x)$ or $P(X \leq x)$ for event probabilities.
+
+For a \textbf{discrete} RV: the \textbf{PMF} $p_X(x) = P(X = x)$ satisfies $\sum_x p_X(x) = 1$; the \textbf{CDF} $F_X(x) = \sum_{x' \leq x} p_X(x')$.
+
+For a \textbf{continuous} RV: the \textbf{PDF} $f_X(x) = \frac{dF_X(x)}{dx}$ satisfies $\int f_X(x)\,dx = 1$; note $f_X(x) \neq P(X = x)$. The \textbf{CDF} $F_X(x) = \int_{-\infty}^x f_X(t)\,dt$.
+}
+
+\section{Expectation and Variance}
+
+\defn{Expectation}{
+\[
+E[X] = \begin{cases} \displaystyle\sum_x x\,p_X(x) & \text{(discrete)} \\[6pt] \displaystyle\int_{-\infty}^{\infty} x\,f_X(x)\,dx & \text{(continuous)} \end{cases}
+\]
+More generally, $E[g(X)] = \int g(x)\,f_X(x)\,dx$.
+}
+
+\prop{
+\textbf{Linearity of expectation}: for any constants $a, b$ and random variables $X, Y$:
+\[
+E[aX + b] = aE[X] + b, \qquad E[X + Y] = E[X] + E[Y].
+\]
+Linearity holds regardless of whether $X$ and $Y$ are independent.
+}
+
+\defn{Variance}{
+\[
+\mathrm{Var}[X] = E\!\left[(X - E[X])^2\right] = E[X^2] - (E[X])^2.
+\]
+The \textbf{standard deviation} is $\sigma_X = \sqrt{\mathrm{Var}[X]}$.
+}
+
+\prop{
+Key variance identities: $\mathrm{Var}[a] = 0$, $\mathrm{Var}[aX] = a^2\,\mathrm{Var}[X]$, and
+\[
+\mathrm{Var}[X + Y] = \mathrm{Var}[X] + \mathrm{Var}[Y] + 2\,\mathrm{Cov}[X,Y].
+\]
+If $X, Y$ are independent, $\mathrm{Var}[X + Y] = \mathrm{Var}[X] + \mathrm{Var}[Y]$.
+}
+
+\section{Common Distributions}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{lp{5.8cm}cc}
+\toprule
+Distribution & PMF / PDF & Mean & Variance \\
+\midrule
+$\mathrm{Bernoulli}(p)$ & $p^x(1-p)^{1-x}$, $x\in\{0,1\}$ & $p$ & $p(1-p)$ \\
+$\mathrm{Binomial}(n,p)$ & $\binom{n}{x}p^x(1-p)^{n-x}$, $x\in\{0,\ldots,n\}$ & $np$ & $np(1-p)$ \\
+$\mathrm{Geometric}(p)$ & $p(1-p)^{k-1}$, $k=1,2,\ldots$ & $\tfrac{1}{p}$ & $\tfrac{1-p}{p^2}$ \\
+$\mathrm{Poisson}(\lambda)$ & $\tfrac{e^{-\lambda}\lambda^k}{k!}$, $k=0,1,\ldots$ & $\lambda$ & $\lambda$ \\
+$\mathrm{Uniform}(a,b)$ & $\tfrac{1}{b-a}$ for $x\in(a,b)$ & $\tfrac{a+b}{2}$ & $\tfrac{(b-a)^2}{12}$ \\
+$\mathcal{N}(\mu,\sigma^2)$ & $\tfrac{1}{\sigma\sqrt{2\pi}}\exp\!\left(-\tfrac{(x-\mu)^2}{2\sigma^2}\right)$ & $\mu$ & $\sigma^2$ \\
+$\mathrm{Exponential}(\lambda)$ & $\lambda e^{-\lambda x}$, $x \geq 0$ & $\tfrac{1}{\lambda}$ & $\tfrac{1}{\lambda^2}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Maximum Likelihood Estimation}
+
+Given data $\{x_i\}_{i=1}^N$ assumed i.i.d.\ from $p(x;\,\theta)$, MLE finds the parameter making observations most probable.
+
+\defn{Likelihood, Log-Likelihood, and MLE}{
+\[
+L(\theta) = \prod_{i=1}^{N} p(x_i;\,\theta), \qquad
+\ell(\theta) = \log L(\theta) = \sum_{i=1}^{N} \log p(x_i;\,\theta).
+\]
+\[
+\hat{\theta}_\mathrm{ML} = \arg\max_\theta\; \ell(\theta).
+\]
+The log transform converts the product into a sum and has the same maximizer since $\log$ is monotone.
+}
+
+\thm{MLE for the Gaussian Distribution}{
+Given $N$ i.i.d.\ samples from $\mathcal{N}(\mu,\sigma^2)$, the MLEs are:
+\[
+\mu_\mathrm{ML} = \frac{1}{N}\sum_{i=1}^{N} x_i, \qquad
+\sigma^2_\mathrm{ML} = \frac{1}{N}\sum_{i=1}^{N}(x_i - \mu_\mathrm{ML})^2.
+\]
+}
+
+\pf{
+The log-likelihood expands as:
+\begin{align*}
+\ell(\mu,\sigma^2)
+&= \sum_{i=1}^N \log \frac{1}{\sigma\sqrt{2\pi}}\exp\!\left(-\frac{(x_i-\mu)^2}{2\sigma^2}\right) \\
+&= -N\log\sigma - \frac{N}{2}\log(2\pi) - \frac{1}{2\sigma^2}\sum_{i=1}^N (x_i - \mu)^2.
+\end{align*}
+
+\textbf{Estimating $\mu$:} Set $\pd{\ell}{\mu} = 0$:
+\[
+\pd{\ell}{\mu} = \frac{1}{\sigma^2}\sum_{i=1}^N (x_i - \mu) = 0 \implies \mu_\mathrm{ML} = \frac{1}{N}\sum_{i=1}^N x_i.
+\]
+
+\textbf{Estimating $\sigma^2$:} Let $\tau = \sigma^2$ and set $\pd{\ell}{\tau} = 0$:
+\[
+\pd{\ell}{\tau} = -\frac{N}{2\tau} + \frac{1}{2\tau^2}\sum_{i=1}^N (x_i - \mu)^2 = 0 \implies \sigma^2_\mathrm{ML} = \frac{1}{N}\sum_{i=1}^N (x_i - \mu_\mathrm{ML})^2.
+\]
+}
+
+\thm{MLE Variance Estimator is Biased}{
+$E\!\left[\sigma^2_\mathrm{ML}\right] = \dfrac{N-1}{N}\,\sigma^2 \neq \sigma^2$. The unbiased estimator is the \textbf{sample variance} $\hat{\sigma}^2 = \dfrac{1}{N-1}\sum_{i=1}^N (x_i - \bar{x})^2$.
+}
+
+\pf{
+Write $\bar{x} = \mu_\mathrm{ML}$. Use the identity $(x_i - \bar{x}) = (x_i - \mu) - (\bar{x} - \mu)$:
+\begin{align*}
+\sum_{i=1}^N (x_i - \bar{x})^2
+&= \sum_{i=1}^N \bigl[(x_i-\mu) - (\bar{x}-\mu)\bigr]^2 \\
+&= \sum_{i=1}^N (x_i-\mu)^2
+   - 2(\bar{x}-\mu)\underbrace{\sum_{i=1}^N (x_i-\mu)}_{=\,N(\bar{x}-\mu)}
+   + N(\bar{x}-\mu)^2 \\
+&= \sum_{i=1}^N (x_i-\mu)^2 - N(\bar{x}-\mu)^2.
+\end{align*}
+Taking expectations (with $E[(x_i - \mu)^2] = \sigma^2$ and $\mathrm{Var}[\bar{x}] = \sigma^2/N$):
+\[
+E\!\left[\sigma^2_\mathrm{ML}\right]
+= \frac{1}{N}\!\left(N\sigma^2 - N\cdot\frac{\sigma^2}{N}\right)
+= \sigma^2 - \frac{\sigma^2}{N}
+= \frac{N-1}{N}\,\sigma^2.
+\]
+}
+
+\thm{Strong Law of Large Numbers}{
+Let $X_1, X_2, \ldots$ be i.i.d.\ with $E[X_i] = \mu < \infty$. Then, with probability 1:
+\[
+\frac{1}{n}\sum_{i=1}^n X_i \;\xrightarrow{\;\mathrm{a.s.}\;}\; \mu \quad \text{as } n\to\infty.
+\]
+This justifies using the empirical mean as a proxy for the true mean, and more broadly underpins why ERM works.
+}
+
+\section{Multiple Random Variables}
+
+\defn{Joint, Marginal, and Conditional Distributions}{
+For two random variables $X$ and $Y$:
+\begin{align*}
+&\textbf{Joint PMF (discrete):} & p_{XY}(x,y) &= P(X=x,\,Y=y) \\
+&\textbf{Marginal PMF:} & p_X(x) &= \textstyle\sum_y p_{XY}(x,y) \\
+&\textbf{Joint PDF (continuous):} & f_{XY}(x,y) &= \dfrac{\partial^2 F_{XY}(x,y)}{\partial x\,\partial y} \\
+&\textbf{Marginal PDF:} & f_X(x) &= \displaystyle\int f_{XY}(x,y)\,dy \\
+&\textbf{Conditional PDF:} & f_{Y|X=x}(y) &= \dfrac{f_{XY}(x,y)}{f_X(x)}
+\end{align*}
+}
+
+\thm{Bayes' Theorem}{
+\[
+P(B \mid A) = \frac{P(A \mid B)\,P(B)}{P(A)}.
+\]
+For continuous random variables:
+\[
+f_{Y|X=x}(y) = \frac{f_{X|Y=y}(x)\,f_Y(y)}{f_X(x)}.
+\]
+}
+
+\defn{Independence}{
+$X$ and $Y$ are \textbf{independent} if $f_{XY}(x,y) = f_X(x)\,f_Y(y)$ (equivalently, $p_{XY}(x,y) = p_X(x)\,p_Y(y)$ for discrete). Independence implies $E[XY] = E[X]E[Y]$.
+}
+
+\defn{Covariance and Pearson Correlation}{
+\[
+\mathrm{Cov}[X,Y] = E\!\bigl[(X - E[X])(Y - E[Y])\bigr] = E[XY] - E[X]E[Y].
+\]
+\[
+\rho_{X,Y} = \frac{\mathrm{Cov}[X,Y]}{\sigma_X\,\sigma_Y} \in [-1,\,1].
+\]
+Independence implies $\mathrm{Cov}[X,Y] = 0$, but the converse is false in general.
+$\rho$ measures linear dependence: $|\rho| = 1$ iff $Y = aX + b$ for some $a \neq 0$.
+}
+
+For a random vector $\vect{X} = (X_1,\ldots,X_n)^\top$, the \textbf{covariance matrix} is:
+\[
+\Sigma = E\!\left[(\vect{X} - E[\vect{X}])(\vect{X} - E[\vect{X}])^\top\right], \quad \Sigma_{ij} = \mathrm{Cov}[X_i, X_j].
+\]
+$\Sigma$ is always symmetric and positive semidefinite.
+
+The \textbf{sample} counterparts from observations $\{(x_i, y_i)\}_{i=1}^N$:
+\[
+\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i, \quad
+\hat{\sigma}^2 = \frac{1}{N-1}\sum_{i=1}^N (x_i - \bar{x})^2, \quad
+\hat{\sigma}^2_{XY} = \frac{1}{N-1}\sum_{i=1}^N (x_i - \bar{x})(y_i - \bar{y}).
+\]
+
+\section{Multivariate Gaussian Distribution}
+
+\defn{Multivariate Gaussian}{
+A random vector $\vect{X} \in \R^n$ follows $\mathcal{N}(\vect{\mu}, \Sigma)$ with mean $\vect{\mu} \in \R^n$ and PSD covariance $\Sigma \in \R^{n\times n}$ if:
+\[
+f(\vect{x};\,\vect{\mu},\Sigma) = \frac{1}{(2\pi)^{n/2}|\Sigma|^{1/2}} \exp\!\left(-\frac{1}{2}(\vect{x} - \vect{\mu})^\top \Sigma^{-1}(\vect{x} - \vect{\mu})\right).
+\]
+The quantity $(\vect{x} - \vect{\mu})^\top \Sigma^{-1}(\vect{x} - \vect{\mu})$ is the squared \textbf{Mahalanobis distance}, which reduces to $\frac{\|\vect{x}-\vect{\mu}\|^2}{\sigma^2}$ when $\Sigma = \sigma^2 I$.
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Linear Algebra}
+% ------------------------------------------------------------------------------
+
+The structure of this chapter follows a hierarchy from general to structured:
+\[
+\text{General matrices} \;\supset\; \text{Diagonalizable} \;\supset\; \text{Symmetric} \;\supset\; \text{PSD.}
+\]
+More structure yields nicer properties that ML heavily exploits.
+
+\section{Vectors and Matrices}
+
+We work with real-valued matrices throughout. Vectors are column vectors by default: $\vect{x} \in \R^n$ means $\vect{x} \in \R^{n \times 1}$.
+
+\defn{Basic Operations}{
+For $\vect{x}, \vect{y} \in \R^n$ and $A \in \R^{m\times n}$:
+\begin{itemize}
+    \item \textbf{Inner product:} $\vect{x}^\top \vect{y} = \sum_{i=1}^n x_i y_i \in \R$
+    \item \textbf{Outer product:} $\vect{x}\vect{y}^\top \in \R^{n\times n}$, with $(\vect{x}\vect{y}^\top)_{ij} = x_i y_j$
+    \item \textbf{Matrix--vector product:} $(A\vect{x})_i = \sum_{j=1}^n A_{ij} x_j$
+    \item \textbf{Transpose:} $(A^\top)_{ij} = A_{ji}$;\quad $(AB)^\top = B^\top A^\top$
+\end{itemize}
+}
+
+\defn{Vector Norms}{
+The $\ell_p$ norm of $\vect{x} \in \R^n$: $\norm{\vect{x}}_p = \left(\sum_{i=1}^n |x_i|^p\right)^{1/p}$.
+\begin{itemize}
+    \item $\norm{\vect{x}}_1 = \sum_i |x_i|$ \quad (sparsity-inducing; used in Lasso)
+    \item $\norm{\vect{x}}_2 = \sqrt{\sum_i x_i^2}$ \quad (Euclidean; default $\norm{\vect{x}}$)
+    \item $\norm{\vect{x}}_\infty = \max_i |x_i|$
+\end{itemize}
+}
+
+\section{Matrix Properties}
+
+\thm{Equivalences for Invertible Matrices}{
+For $A \in \R^{n\times n}$, the following are equivalent:
+\begin{enumerate}
+    \item $A$ is invertible ($A^{-1}$ exists with $AA^{-1} = I$).
+    \item $\det(A) \neq 0$.
+    \item $\mathrm{rank}(A) = n$ (full rank).
+    \item $A\vect{x} = \vect{0}$ implies $\vect{x} = \vect{0}$ (trivial null space).
+    \item The columns (and rows) of $A$ are linearly independent.
+\end{enumerate}
+}
+
+\rmkb{The \textbf{trace} $\mathrm{tr}(A) = \sum_i A_{ii}$ equals the sum of eigenvalues; the \textbf{determinant} $\det(A)$ equals their product. Both are invariant under similarity transforms: $\mathrm{tr}(P^{-1}AP) = \mathrm{tr}(A)$.}
+
+\section{Eigendecomposition}
+
+\defn{Eigenvalue and Eigenvector}{
+A scalar $\lambda \in \R$ and non-zero vector $\vect{v} \in \R^n$ satisfy
+\[
+A\vect{v} = \lambda\vect{v}
+\]
+if $\lambda$ is an \textbf{eigenvalue} and $\vect{v}$ the corresponding \textbf{eigenvector} of $A \in \R^{n\times n}$. The eigenvalues are the roots of the \textbf{characteristic polynomial} $\det(A - \lambda I) = 0$.
+}
+
+\thm{Spectral Theorem for Symmetric Matrices}{
+If $A \in \R^{n\times n}$ is symmetric ($A = A^\top$), then:
+\begin{enumerate}
+    \item All eigenvalues are real.
+    \item Eigenvectors for distinct eigenvalues are orthogonal.
+    \item $A$ is \textbf{orthogonally diagonalizable}: $A = Q\Lambda Q^\top$ where $Q$ is orthogonal ($Q^\top Q = I$), its columns are eigenvectors, and $\Lambda = \mathrm{diag}(\lambda_1, \ldots, \lambda_n)$.
+\end{enumerate}
+}
+
+\section{Positive Semidefinite Matrices}
+
+\defn{Positive Semidefinite (PSD)}{
+A symmetric matrix $A \in \R^{n\times n}$ is \textbf{positive semidefinite} ($A \succeq 0$) if:
+\[
+\vect{x}^\top A \vect{x} \geq 0 \quad \text{for all } \vect{x} \in \R^n.
+\]
+It is \textbf{positive definite} ($A \succ 0$) if equality holds only for $\vect{x} = \vect{0}$.
+}
+
+\thm{PSD Equivalences}{
+For a symmetric $A \in \R^{n\times n}$, the following are equivalent:
+\begin{enumerate}
+    \item $A \succeq 0$ (by definition).
+    \item All eigenvalues $\lambda_i \geq 0$.
+    \item $A = B^\top B$ for some matrix $B$.
+\end{enumerate}
+}
+
+\rmkb{PSD matrices arise as covariance matrices ($\Sigma \succeq 0$ always), and as Hessians of convex functions. The 2nd-order convexity test ($\nabla^2 f \succeq 0$) is precisely a PSD check.}
+
+\section{Singular Value Decomposition}
+
+\thm{Singular Value Decomposition}{
+Every matrix $A \in \R^{m\times n}$ of rank $r$ admits:
+\[
+A = U\Sigma V^\top,
+\]
+where $U \in \R^{m\times m}$, $V \in \R^{n\times n}$ are orthogonal, and $\Sigma \in \R^{m\times n}$ is diagonal with entries $\sigma_1 \geq \cdots \geq \sigma_r > 0 = \sigma_{r+1} = \cdots$ called \textbf{singular values}.
+}
+
+The columns of $U$ are eigenvectors of $AA^\top$; columns of $V$ are eigenvectors of $A^\top A$; $\sigma_i = \sqrt{\lambda_i(A^\top A)}$. SVD is the computational foundation of PCA.
+
+% ------------------------------------------------------------------------------
+\chapter{Multivariate Calculus}
+% ------------------------------------------------------------------------------
+
+\section{Gradient}
+
+\defn{Gradient}{
+For $f: \R^n \to \R$, the \textbf{gradient} is the vector of partial derivatives:
+\[
+\grad f(\vect{x}) = \nabla f(\vect{x}) = \begin{pmatrix}\pd{f}{x_1} \\ \vdots \\ \pd{f}{x_n}\end{pmatrix} \in \R^n.
+\]
+$\grad f(\vect{x})$ points in the direction of \emph{steepest ascent}; $-\grad f(\vect{x})$ toward steepest descent.
+}
+
+\section{Jacobian and Hessian}
+
+\defn{Jacobian}{
+For $\vect{f}: \R^n \to \R^m$, the \textbf{Jacobian} $J \in \R^{m\times n}$ is:
+\[
+J_{ij} = \pd{f_i}{x_j}, \qquad J = \begin{pmatrix}\grad f_1^\top \\ \vdots \\ \grad f_m^\top\end{pmatrix}.
+\]
+}
+
+\defn{Hessian}{
+For $f: \R^n \to \R$, the \textbf{Hessian} $H = \nabla^2 f(\vect{x}) \in \R^{n\times n}$ is the matrix of second partial derivatives:
+\[
+H_{ij} = \frac{\partial^2 f}{\partial x_i\,\partial x_j}, \qquad
+\nabla^2 f(\vect{x}) = \begin{pmatrix}
+\pd{^2 f}{x_1^2} & \cdots & \dfrac{\partial^2 f}{\partial x_1\partial x_n} \\[6pt]
+\vdots & \ddots & \vdots \\[4pt]
+\dfrac{\partial^2 f}{\partial x_n\partial x_1} & \cdots & \pd{^2 f}{x_n^2}
+\end{pmatrix}.
+\]
+By Schwarz's theorem, $H$ is symmetric whenever mixed partials are continuous.
+}
+
+\section{Chain Rule and Matrix Calculus}
+
+\prop{
+\textbf{Univariate:} $\dfrac{d}{dt}f(g(t)) = f'(g(t))\cdot g'(t)$.
+
+\textbf{Multivariate:} If $\vect{x} = \vect{g}(\vect{t})$ and $f: \R^n \to \R$:
+\[
+\pd{f}{t_k} = \sum_{i=1}^n \pd{f}{x_i}\,\pd{x_i}{t_k}, \qquad
+\nabla_{\vect{t}} f = J_{\vect{g}}^\top\, \nabla_{\vect{x}} f.
+\]
+}
+
+\fact{
+Useful matrix calculus identities (where $A$ is a constant matrix):
+\begin{align*}
+\nabla_{\vect{x}}\,(A\vect{x}) &= A^\top \\
+\nabla_{\vect{x}}\,(\vect{x}^\top A\vect{x}) &= (A + A^\top)\vect{x} = 2A\vect{x} \quad \text{(if $A$ symmetric)}
+\end{align*}
+The second identity is used directly in the normal equations for linear regression.
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Convex Optimization}
+\label{ch:convex}
+% ------------------------------------------------------------------------------
+
+\section{Convex Sets and Functions}
+
+\defn{Convex Set}{
+$\mathcal{C} \subseteq \R^d$ is \textbf{convex} if for any $\vect{x}, \vect{y} \in \mathcal{C}$ and $\theta \in [0,1]$:
+\[
+\theta\vect{x} + (1-\theta)\vect{y} \in \mathcal{C}.
+\]
+Examples: $\R^d$; affine subspaces $\{\vect{x} \mid A\vect{x} = \vect{b}\}$; polyhedra $\{\vect{x} \mid A\vect{x} \leq \vect{b}\}$. Intersections of convex sets are convex.
+}
+
+\defn{Convex Function}{
+$f: \mathcal{D} \to \R$ (with convex $\mathcal{D}$) is \textbf{convex} if for all $\vect{x}_1, \vect{x}_2 \in \mathcal{D}$ and $\lambda \in [0,1]$:
+\[
+f\!\left(\lambda\vect{x}_1 + (1-\lambda)\vect{x}_2\right) \leq \lambda f(\vect{x}_1) + (1-\lambda)f(\vect{x}_2).
+\]
+$f$ is \textbf{strictly convex} if strict inequality holds for $\vect{x}_1 \neq \vect{x}_2$, $\lambda \in (0,1)$. $f$ is \textbf{concave} if $-f$ is convex.
+}
+
+\thm{Global Optimality of Critical Points}{
+If $f$ is convex and $\vect{x}^*$ satisfies $\nabla f(\vect{x}^*) = \vect{0}$ (or the gradient does not exist there), then $\vect{x}^*$ is a \textbf{global minimum} of $f$.
+}
+
+This is the central reason ML prefers convex losses: any optimizer that finds a critical point has found the global solution.
+
+\section{Verifying Convexity}
+
+\thm{Three Convexity Tests --- Scalar}{
+For $f: \R \to \R$, each of the following is equivalent to convexity:
+\begin{enumerate}
+    \item \textbf{0th-order:} $f(\lambda x_1 + (1-\lambda)x_2) \leq \lambda f(x_1) + (1-\lambda)f(x_2)$ \quad (definition).
+    \item \textbf{1st-order (tangent line below):} $f(x_2) \geq f(x_1) + f'(x_1)(x_2 - x_1)$ for all $x_1, x_2$.
+    \item \textbf{2nd-order (non-negative curvature):} $f''(x) \geq 0$ for all $x$.
+\end{enumerate}
+}
+
+\thm{Three Convexity Tests --- Multivariate}{
+For $f: \R^n \to \R$ with convex domain, each of the following is equivalent to convexity:
+\begin{enumerate}
+    \item \textbf{0th-order:} $f(\lambda\vect{x} + (1-\lambda)\vect{y}) \leq \lambda f(\vect{x}) + (1-\lambda)f(\vect{y})$.
+    \item \textbf{1st-order (tangent hyperplane below):} $f(\vect{y}) \geq f(\vect{x}) + (\nabla f(\vect{x}))^\top(\vect{y} - \vect{x})$ for all $\vect{x}, \vect{y}$.
+    \item \textbf{2nd-order (Hessian PSD):} $\nabla^2_{\vect{x}} f(\vect{x}) \succeq 0$ for all $\vect{x}$.
+\end{enumerate}
+Equivalently: $f$ is convex iff its restriction to every line is convex.
+}
+
+\ex{
+$f(\vect{x}) = 2x_1^2 + x_2^2$ has $H = \begin{pmatrix}4&0\\0&2\end{pmatrix}$. Eigenvalues $4, 2 > 0$, so $H \succ 0$ and $f$ is strictly convex.
+
+$f(\vect{x}) = 2x_1^2 - x_2^2$ has $H = \begin{pmatrix}4&0\\0&-2\end{pmatrix}$. Eigenvalue $-2 < 0$, so $H \not\succeq 0$ and $f$ is not convex.
+
+$f(\vect{x}) = x_1 + 2x_1^2 + x_2^2 - x_1 x_2 - 2$ has $H = \begin{pmatrix}4&-1\\-1&2\end{pmatrix}$. Eigenvalues $3 \pm \sqrt{2} > 0$, so $f$ is strictly convex.
+}
+
+\section{Gradient Descent}
+
+\defn{Gradient Descent}{
+To minimize $f(\vect{w})$, initialize $\vect{w}_0$ and iterate:
+\[
+\vect{w}_{t+1} = \vect{w}_t - \eta\,\nabla f(\vect{w}_t), \quad t = 0, 1, 2, \ldots
+\]
+until $\|\nabla f(\vect{w}_t)\| < \varepsilon$ or max iterations reached. The scalar $\eta > 0$ is the \textbf{learning rate}.
+}
+
+\rmkb{
+\textbf{Choosing $\eta$}: too small $\Rightarrow$ slow convergence; too large $\Rightarrow$ oscillation or divergence. For an $L$-smooth function (Lipschitz gradient constant $L$), the theoretically safe step size is $\eta = 1/L$.
+}
+
+\thm{GD Convergence for Convex Functions}{
+Let $f$ be convex and $L$-smooth ($\|\nabla f(\vect{x}) - \nabla f(\vect{y})\| \leq L\|\vect{x}-\vect{y}\|$). With step size $\eta = 1/L$ and global minimizer $\vect{w}^*$:
+\[
+f(\vect{w}_t) - f(\vect{w}^*) \leq \frac{L\|\vect{w}_0 - \vect{w}^*\|^2}{2t} = O\!\left(\frac{1}{t}\right).
+\]
+For $\mu$-strongly convex $f$, the rate improves to $O\!\left(\left(1 - \frac{\mu}{L}\right)^t\right)$ (linear/geometric convergence).
+}
+
+\section{Stochastic Gradient Descent}
+
+When $f(\vect{w}) = \frac{1}{N}\sum_{i=1}^N \ell_i(\vect{w})$ (ERM), computing $\nabla f$ requires $O(N)$ evaluations per step.
+
+\defn{SGD and Mini-Batch SGD}{
+\textbf{SGD} samples a single index $i_t \sim \mathrm{Uniform}\{1,\ldots,N\}$ per step:
+\[
+\vect{w}_{t+1} = \vect{w}_t - \eta\,\nabla\ell_{i_t}(\vect{w}_t).
+\]
+\textbf{Mini-batch SGD} averages over a batch $\mathcal{B} \subset \{1,\ldots,N\}$ of size $B$:
+\[
+\vect{w}_{t+1} = \vect{w}_t - \frac{\eta}{B}\sum_{i \in \mathcal{B}} \nabla\ell_i(\vect{w}_t).
+\]
+}
+
+The key property: $E_{i_t}[\nabla\ell_{i_t}(\vect{w})] = \nabla f(\vect{w})$. SGD uses an \textbf{unbiased estimator} of the true gradient, enabling progress while spending only $O(B)$ per update.
+
+% ------------------------------------------------------------------------------
+\chapter{Model Evaluation}
+\label{ch:eval}
+% ------------------------------------------------------------------------------
+
+\section{The Bias-Variance Decomposition}
+
+Suppose the true relationship is $y = f(\vect{x}) + \varepsilon$ with $\varepsilon \sim \mathcal{N}(0, \sigma^2_\varepsilon)$. Let $\hat{f}$ be a model trained on a random dataset $\mathcal{D}$.
+
+\thm{Bias-Variance-Noise Decomposition}{
+The expected squared error at a fixed point $\vect{x}$ decomposes as:
+\[
+E_{\mathcal{D},\varepsilon}\!\left[(y - \hat{f}(\vect{x}))^2\right]
+= \underbrace{\Bigl(f(\vect{x}) - E_\mathcal{D}[\hat{f}(\vect{x})]\Bigr)^2}_{\mathrm{Bias}^2}
++ \underbrace{E_\mathcal{D}\!\left[\Bigl(\hat{f}(\vect{x}) - E_\mathcal{D}[\hat{f}(\vect{x})]\Bigr)^2\right]}_{\mathrm{Variance}}
++ \underbrace{\sigma^2_\varepsilon}_{\mathrm{Noise}}.
+\]
+}
+
+\pf{
+Let $\bar{f} = E_\mathcal{D}[\hat{f}(\vect{x})]$. First isolate the noise:
+\begin{align*}
+E\!\left[(y - \hat{f})^2\right]
+&= E\!\left[(f + \varepsilon - \hat{f})^2\right] \\
+&= E\!\left[(f - \hat{f})^2\right] + 2\underbrace{E[\varepsilon]}_{=\,0}\,E[f - \hat{f}] + E[\varepsilon^2] \\
+&= E\!\left[(f - \hat{f})^2\right] + \sigma^2_\varepsilon.
+\end{align*}
+Now add and subtract $\bar{f}$:
+\begin{align*}
+E\!\left[(f - \hat{f})^2\right]
+&= E\!\left[(f - \bar{f} + \bar{f} - \hat{f})^2\right] \\
+&= (f - \bar{f})^2 + 2(f - \bar{f})\underbrace{E[\bar{f} - \hat{f}]}_{=\,0} + E\!\left[(\bar{f} - \hat{f})^2\right] \\
+&= \mathrm{Bias}^2[\hat{f}] + \mathrm{Var}[\hat{f}]. \qquad\square
+\end{align*}
+}
+
+The decomposition reveals a fundamental tradeoff:
+\begin{itemize}
+    \item \textbf{High bias, low variance} (underfitting): model too simple; increase capacity.
+    \item \textbf{Low bias, high variance} (overfitting): model too complex; regularize or collect more data.
+    \item \textbf{Noise $\sigma^2_\varepsilon$}: irreducible; no model can eliminate it.
+\end{itemize}
+
+\section{Cross-Validation}
+
+\defn{$k$-Fold Cross-Validation}{
+Partition training data into $k$ equal folds. For each fold $j = 1,\ldots,k$: train on the remaining $k-1$ folds, evaluate on fold $j$. Report the average metric over all $k$ folds.
+}
+
+$k$-fold CV provides a lower-variance estimate of $R(h)$ than a single split, especially for small $N$. Common choices: $k = 5$ or $k = 10$. Special case $k = N$: \textbf{leave-one-out CV (LOOCV)}.
+
+\section{Classification Metrics}
+
+For binary classification with predictions $\hat{y} \in \{0,1\}$ and true labels $y \in \{0,1\}$:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{l|cc}
+& Predicted Positive & Predicted Negative \\
+\hline
+Actual Positive & TP & FN \\
+Actual Negative & FP & TN \\
+\end{tabular}
+\end{center}
+
+\defn{Precision, Recall, and F1}{
+\[
+\text{Accuracy} = \frac{TP + TN}{TP + FP + TN + FN}, \qquad
+\text{Precision} = \frac{TP}{TP + FP}, \qquad
+\text{Recall} = \frac{TP}{TP + FN}.
+\]
+\[
+\text{F1} = \frac{2 \cdot \text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}.
+\]
+}
+
+\rmkb{
+Accuracy is misleading on imbalanced datasets. A classifier that predicts ``always negative'' on a 99\%-negative dataset gets 99\% accuracy while detecting nothing. Use Precision, Recall, or F1.
+
+The \textbf{ROC curve} plots True Positive Rate (Recall) vs.\ False Positive Rate $\frac{FP}{FP+TN}$ as the decision threshold varies. The \textbf{AUC} (area under the ROC curve) summarizes performance across all thresholds; $\text{AUC} = 1$ is perfect, $\text{AUC} = 0.5$ is random.
+}
 
 % ==============================================================================
-% Part III: Unsupervised Learning
-%
-% Learning from unlabeled data.
-% Clustering, dimensionality reduction, and density estimation.
+% PART II: SUPERVISED LEARNING
 % ==============================================================================
+
+\part{Supervised Learning}
+
+% ------------------------------------------------------------------------------
+\chapter{Linear Regression}
+% ------------------------------------------------------------------------------
+
+\section{The Linear Model}
+
+\defn{Linear Regression}{
+Given input $\vect{x} = (x_1, \ldots, x_d)^T \in \R^d$, the linear model predicts a real-valued output via
+\[
+f(\vect{x}; \vect{w}) = w_0 + \sum_{j=1}^{d} w_j x_j = \vect{w}^T \vect{x},
+\]
+where the bias $w_0$ is absorbed by prepending a constant 1 to $\vect{x}$, so $\vect{w} \in \R^{d+1}$.
+}
+
+We stack $n$ training examples into a design matrix $X \in \R^{n \times (d+1)}$ (rows are data points) and label vector $\vect{y} \in \R^n$. The predicted output vector is $\hat{\vect{y}} = X\vect{w}$.
+
+\section{Loss Functions}
+
+\defn{Mean Squared Error}{
+\[
+L_{\mathrm{MSE}}(\vect{w}) = \frac{1}{n}\sum_{i=1}^n \bigl(y_i - \vect{w}^T\vect{x}_i\bigr)^2 = \frac{1}{n}\norm{X\vect{w} - \vect{y}}^2.
+\]
+MSE penalizes large errors quadratically and is differentiable everywhere. It is sensitive to outliers.
+}
+
+\defn{Mean Absolute Error}{
+\[
+L_{\mathrm{MAE}}(\vect{w}) = \frac{1}{n}\sum_{i=1}^n |y_i - \vect{w}^T \vect{x}_i|.
+\]
+Robust to outliers but not differentiable at zero; requires subgradient methods.
+}
+
+\defn{Huber Loss}{
+A smooth compromise between MSE and MAE, controlled by $\delta > 0$:
+\[
+H_\delta(r) = \begin{cases} \tfrac{1}{2}r^2 & |r| \leq \delta, \\ \delta\bigl(|r| - \tfrac{1}{2}\delta\bigr) & |r| > \delta. \end{cases}
+\]
+Quadratic near zero (differentiable), linear in the tails (robust).
+}
+
+\rmkb{The loss choice encodes a noise assumption. MSE corresponds to Gaussian noise $\epsilon \sim \mathcal{N}(0, \sigma^2)$; MAE to Laplacian noise; Huber to a robust mixture. For high-leverage points or outliers, MAE or Huber is preferred.}
+
+\section{Ordinary Least Squares}
+
+\thm{Normal Equations}{
+The unique minimizer of $L_{\mathrm{MSE}}$ satisfies
+\[
+X^T X\, \hat{\vect{w}} = X^T \vect{y},
+\]
+and when $X$ has full column rank, $\hat{\vect{w}} = (X^T X)^{-1} X^T \vect{y}$.
+}
+
+\pf{
+Expanding $L(\vect{w}) = \frac{1}{n}(X\vect{w}-\vect{y})^T(X\vect{w}-\vect{y})$ and differentiating:
+\[
+\grad_{\vect{w}} L = \frac{2}{n} X^T(X\vect{w} - \vect{y}) = \vect{0}
+\quad\Longrightarrow\quad
+X^T X \vect{w} = X^T \vect{y}.
+\]
+The matrix $X^T X$ is positive semi-definite. Full column rank of $X$ implies $X^T X \succ 0$, giving a unique solution via matrix inversion.
+}
+
+\fact{The level set $\{\vect{w} \mid (\vect{w}-\hat{\vect{w}})^T X^T X (\vect{w}-\hat{\vect{w}}) = C\}$ is an ellipsoid whose axis lengths scale with the eigenvalues of $(X^T X)^{-1}$. The gradient descent trajectory descends perpendicular to these contours.}
+
+Gradient descent iterates $\vect{w} \leftarrow \vect{w} - \eta\,\grad L$, which expands to the per-weight update:
+\[
+w_j \leftarrow w_j + \frac{2\eta}{n}\sum_{i=1}^n \bigl[y_i - f(\vect{x}_i; \vect{w})\bigr]\, x_{i,j}.
+\]
+
+\section{Probabilistic Interpretation}
+\label{sec:linreg_mle}
+
+Assume $y_i = \vect{w}^T\vect{x}_i + \epsilon_i$ with $\epsilon_i \overset{\mathrm{iid}}{\sim} \mathcal{N}(0, \sigma^2)$. Then
+\[
+P(y_i \mid \vect{x}_i; \vect{w}) = \frac{1}{\sqrt{2\pi}\sigma}\exp\!\left(-\frac{(y_i - \vect{w}^T\vect{x}_i)^2}{2\sigma^2}\right).
+\]
+
+\prop{MLE $\equiv$ OLS under Gaussian Noise}{
+\[
+\hat{\vect{w}}_{\mathrm{MLE}}
+= \arg\max_{\vect{w}}\sum_{i=1}^n \log P(y_i|\vect{x}_i;\vect{w})
+= \arg\min_{\vect{w}} \frac{1}{n}\sum_{i=1}^n (y_i - \vect{w}^T\vect{x}_i)^2
+= \hat{\vect{w}}_{\mathrm{OLS}}.
+\]
+The negative log-likelihood of i.i.d.\ Gaussian noise is exactly the MSE.
+}
+
+\section{Collinearity}
+
+\defn{Collinearity}{
+Two predictors $x_j$ and $x_k$ are \textbf{collinear} (or multicollinear in a group) if they are approximately linearly dependent. Perfectly collinear predictors make $X^T X$ singular.
+}
+
+\fact{When predictors are highly correlated, the MSE contours form a very elongated ellipsoid: the eigenvalues of $X^T X$ differ by orders of magnitude. The OLS estimate $\hat{\vect{w}} = (X^T X)^{-1} X^T \vect{y}$ is extremely sensitive to small perturbations in the data. Ridge regression (Chapter~\ref{ch:regularization}) resolves this by replacing $X^T X$ with $X^T X + \lambda I$, which is always invertible.}
+
+\ex{Suppose $x_2 = 2x_1$ exactly. Then the $2 \times 2$ matrix $X^T X$ for $(x_1, x_2)$ has a zero eigenvalue, and infinitely many $\hat{\vect{w}}$ achieve the same MSE. Any combination $w_1 + 2w_2 = \text{const}$ lies in the null space.}
+
+% ------------------------------------------------------------------------------
+\chapter{Logistic Regression}
+% ------------------------------------------------------------------------------
+
+\section{From Regression to Classification}
+
+For binary classification $y \in \{0, 1\}$, we want to model $P(Y=1 \mid X=\vect{x})$. Applying a linear model directly is problematic: outputs can fall outside $[0,1]$. We instead compose the linear function with the \textbf{sigmoid}:
+
+\defn{Sigmoid (Logistic) Function}{
+\[
+\sigma(z) = \frac{1}{1+e^{-z}} = \frac{e^z}{e^z + 1}, \quad z \in \R,\quad \sigma(z) \in (0,1).
+\]
+Properties: $\sigma'(z) = \sigma(z)(1-\sigma(z))$; symmetric about 0; $\sigma(z) \to 1$ as $z \to +\infty$.
+}
+
+The logistic regression model is:
+\[
+p(\vect{x}) = P(Y=1 \mid X=\vect{x}) = \sigma(\vect{w}^T\vect{x}) = \frac{1}{1+e^{-\vect{w}^T\vect{x}}}.
+\]
+The decision rule is $\hat{y} = \mathbf{1}[p(\vect{x}) > 0.5]$, equivalently $\hat{y} = \mathbf{1}[\vect{w}^T\vect{x} > 0]$. The \textbf{decision boundary} is the hyperplane $\vect{w}^T\vect{x} = 0$.
+
+\section{Log-Odds and the Logit Link}
+
+\prop{Log-Odds Interpretation}{
+Rearranging the logistic model gives the \textbf{logit} (log-odds) function:
+\[
+\log\frac{p(\vect{x})}{1-p(\vect{x})} = \vect{w}^T\vect{x}.
+\]
+Logistic regression is a \emph{linear model for the log-odds}. Each weight $w_j$ shifts the log-odds by $w_j$ per unit increase in $x_j$.
+}
+
+\section{Learning via Maximum Likelihood}
+
+\defn{Cross-Entropy Loss}{
+Since $P(Y=y\mid X=\vect{x}) = p(\vect{x})^y [1-p(\vect{x})]^{1-y}$, the negative log-likelihood over the training set is the \textbf{binary cross-entropy}:
+\[
+L(\vect{w}) = -\sum_{i=1}^n \bigl\{y_i \log p(\vect{x}_i; \vect{w}) + (1-y_i)\log(1-p(\vect{x}_i;\vect{w}))\bigr\}.
+\]
+}
+
+\prop{Convexity of Cross-Entropy}{
+The cross-entropy loss is convex in $\vect{w}$, so gradient descent converges to the global minimum (if one exists). In contrast, using MSE on $p(\vect{x}) = \sigma(\vect{w}^T\vect{x})$ yields a non-convex objective with many local minima.
+}
+
+\pf{(Sketch) The Hessian of $L(\vect{w})$ equals $X^T D X$ where $D = \mathrm{diag}(p_i(1-p_i))$ is a diagonal matrix with non-negative entries. Hence the Hessian is positive semi-definite everywhere, confirming convexity.}
+
+\section{Gradient and Gradient Descent}
+
+The gradient of the cross-entropy loss is remarkably clean:
+\[
+\grad_{\vect{w}} L = -\sum_{i=1}^n \bigl[y_i - p(\vect{x}_i; \vect{w})\bigr]\,\vect{x}_i.
+\]
+The update rule for each weight $w_j$ is:
+\[
+w_j \leftarrow w_j - \eta \sum_{i=1}^n -\bigl[y_i - p(\vect{x}_i; \vect{w})\bigr]\,x_{i,j}.
+\]
+
+\rmkb{The gradient has the same form as in linear regression, with the prediction $p(\vect{x}_i;\vect{w}) = \sigma(\vect{w}^T\vect{x}_i)$ replacing $\vect{w}^T\vect{x}_i$. This structural similarity makes both models easy to unify in a single codebase.}
+
+\prop{Well-Calibration}{
+At the gradient optimum, setting $\grad L = 0$ and examining the intercept term yields $\sum_i y_i = \sum_i p(\vect{x}_i; \hat{\vect{w}})$: the model's average predicted probability equals the empirical class frequency. Logistic regression is \emph{well-calibrated} in this sense.
+}
+
+\section{Multiclass: Softmax Regression}
+
+For $K$ classes, we learn weight vectors $\vect{w}_1, \ldots, \vect{w}_K$ and compute class logits $z_k = w_{k0} + \vect{w}_k^T\vect{x}$. The \textbf{softmax} function converts logits to a probability distribution:
+
+\defn{Softmax}{
+\[
+P(Y=k \mid X=\vect{x}) = \frac{\exp(z_k)}{\sum_{k'=1}^{K}\exp(z_{k'})}, \quad k = 1, \ldots, K.
+\]
+The outputs are non-negative and sum to 1. As $\alpha \to \infty$, $\mathrm{softmax}(\alpha z)$ concentrates all mass on $\arg\max_k z_k$.
+}
+
+\fact{Softmax generalizes sigmoid: for $K=2$, $P(Y=1) = \exp(z_1)/(\exp(z_1)+\exp(z_2)) = \sigma(z_1 - z_2)$.}
+
+The loss is the multiclass cross-entropy:
+\[
+L = -\sum_{i=1}^n \sum_{k=1}^K y_{ik}\log\hat{y}_{ik},
+\]
+where $\vect{y}_i$ is a one-hot vector and $\hat{y}_{ik} = P(Y=k\mid\vect{x}_i)$.
+
+\section{Limitations}
+
+Logistic regression produces a \emph{linear} decision boundary $\vect{w}^T\vect{x} = 0$. For problems like XOR (where no hyperplane separates the classes), it fails. The natural remedy is to either: (a) engineer nonlinear features $\phi(\vect{x})$, or (b) cascade multiple logistic regression models --- which gives a multilayer neural network (Part~IV).
+
+% ------------------------------------------------------------------------------
+\chapter{Regularization}
+\label{ch:regularization}
+% ------------------------------------------------------------------------------
+
+\section{The Overfitting Problem}
+
+Without constraints, empirical risk minimization can fit training data perfectly while failing to generalize. The bias-variance decomposition (Chapter~\ref{ch:learnproblem}) shows that model complexity is the lever: increasing it reduces bias but raises variance. Regularization adds an explicit complexity penalty to the loss.
+
+\section{Ridge Regression ($\ell_2$ Regularization)}
+
+\defn{Ridge Regression}{
+Ridge regression augments the MSE objective with an $\ell_2$ penalty on the weights:
+\[
+L_{\mathrm{ridge}}(\vect{w}) = \frac{1}{n}\norm{X\vect{w} - \vect{y}}^2 + \lambda \norm{\vect{w}}^2, \quad \lambda > 0.
+\]
+The bias term $w_0$ is conventionally excluded from penalization.
+}
+
+\thm{Ridge Closed Form}{
+The unique minimizer is
+\[
+\hat{\vect{w}}_{\mathrm{ridge}} = (X^T X + \lambda I)^{-1} X^T \vect{y}.
+\]
+The matrix $X^T X + \lambda I$ is positive definite for any $\lambda > 0$, resolving collinearity.
+}
+
+\pf{
+$\grad L_{\mathrm{ridge}} = \frac{2}{n}X^T(X\vect{w}-\vect{y}) + 2\lambda\vect{w} = 0$ gives $(X^T X + n\lambda I)\vect{w} = X^T\vect{y}$, and absorbing the factor of $n$ into $\lambda$.
+}
+
+\prop{Bayesian Interpretation of Ridge}{
+Ridge is equivalent to MAP estimation with a Gaussian prior $\vect{w} \sim \mathcal{N}(\vect{0}, \frac{1}{2\lambda}I)$ on the weights. The $\ell_2$ penalty is the negative log-prior.
+}
+
+\rmkb{Geometrically, the Ridge constraint $\norm{\vect{w}}^2 \leq t$ defines a sphere. The solution is where the OLS contours first touch the sphere. All weights are shrunk toward zero, but none are exactly zero.}
+
+\section{Lasso ($\ell_1$ Regularization)}
+
+\defn{Lasso}{
+\[
+L_{\mathrm{lasso}}(\vect{w}) = \frac{1}{n}\norm{X\vect{w}-\vect{y}}^2 + \lambda \norm{\vect{w}}_1, \quad \norm{\vect{w}}_1 = \sum_{j=1}^d |w_j|.
+\]
+}
+
+\prop{Sparsity of Lasso}{
+The $\ell_1$ constraint region is a cross-polytope (diamond in 2D). Its corners lie on coordinate axes, so the OLS contours frequently touch the constraint boundary at a corner --- setting some weights to \emph{exactly zero}. Lasso performs automatic feature selection.
+}
+
+Unlike Ridge, Lasso has no closed-form solution (the $\ell_1$ norm is non-differentiable at 0). It is solved via coordinate descent or proximal gradient methods.
+
+\prop{Bayesian Interpretation of Lasso}{
+Lasso is equivalent to MAP estimation with a Laplace prior $p(w_j) \propto \exp(-\lambda|w_j|)$. The heavier tails of the Laplace distribution encourage sparsity.
+}
+
+\section{Elastic Net}
+
+\defn{Elastic Net}{
+Elastic Net combines $\ell_1$ and $\ell_2$ penalties:
+\[
+L_{\mathrm{EN}}(\vect{w}) = \frac{1}{n}\norm{X\vect{w}-\vect{y}}^2 + \lambda_1 \norm{\vect{w}}_1 + \lambda_2 \norm{\vect{w}}^2.
+\]
+It inherits sparsity from Lasso and the grouping effect (correlated features get similar weights) from Ridge.
+}
+
+\section{Regularization for Logistic Regression}
+
+The same penalties apply to classification. The regularized cross-entropy objectives are:
+\begin{align*}
+L_{\mathrm{L2}}(\vect{w}) &= -\sum_{i=1}^n \{y_i \log p_i + (1-y_i)\log(1-p_i)\} + \lambda\sum_{j=1}^d w_j^2, \\
+L_{\mathrm{L1}}(\vect{w}) &= -\sum_{i=1}^n \{y_i \log p_i + (1-y_i)\log(1-p_i)\} + \lambda\sum_{j=1}^d |w_j|.
+\end{align*}
+$\ell_2$ regularization prevents the weights from growing arbitrarily large when classes are linearly separable (which would push logistic outputs to 0/1 and cause numerical issues).
+
+\section{Effect on Bias and Variance}
+
+\prop{Bias-Variance Tradeoff in Ridge}{
+As $\lambda \to 0$, $\hat{\vect{w}}_{\mathrm{ridge}} \to \hat{\vect{w}}_{\mathrm{OLS}}$ (zero bias, full variance). As $\lambda \to \infty$, $\hat{\vect{w}}_{\mathrm{ridge}} \to \vect{0}$ (high bias, zero variance). The optimal $\lambda$ is chosen by cross-validation.
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Support Vector Machines}
+% ------------------------------------------------------------------------------
+
+\section{Hard-Margin SVM}
+
+For binary classification with labels $y_i \in \{+1, -1\}$ and a linearly separable dataset, we seek the hyperplane $\vect{w}^T\vect{x} + w_0 = 0$ with \emph{maximum margin}.
+
+\defn{Margin}{
+The \textbf{functional margin} of point $(\vect{x}_i, y_i)$ is $y_i(\vect{w}^T\vect{x}_i + w_0)$. The \textbf{geometric margin} (distance from the hyperplane) is $y_i(\vect{w}^T\vect{x}_i + w_0)/\norm{\vect{w}}$. The margin of the classifier is $\min_i y_i(\vect{w}^T\vect{x}_i + w_0)/\norm{\vect{w}}$.
+}
+
+By rescaling $\vect{w}$ so that $\min_i y_i(\vect{w}^T\vect{x}_i + w_0) = 1$, the margin becomes $1/\norm{\vect{w}}$. Maximizing the margin is equivalent to:
+
+\defn{Hard-Margin SVM (Primal)}{
+\[
+\min_{\vect{w}, w_0} \frac{1}{2}\norm{\vect{w}}^2 \quad \text{s.t.} \quad y_i(\vect{w}^T\vect{x}_i + w_0) \geq 1 \;\forall\, i.
+\]
+The points achieving equality, $y_i(\vect{w}^T\vect{x}_i + w_0) = 1$, are the \textbf{support vectors}.
+}
+
+\section{Dual Formulation}
+
+Introducing Lagrange multipliers $\alpha_i \geq 0$ for each constraint gives the dual problem:
+
+\defn{SVM Dual}{
+\[
+\max_{\boldsymbol{\alpha}} \sum_{i=1}^n \alpha_i - \frac{1}{2}\sum_{i,j} y_i y_j \alpha_i \alpha_j \langle\vect{x}_i, \vect{x}_j\rangle
+\quad\text{s.t.}\quad \alpha_i \geq 0,\; \sum_{i=1}^n \alpha_i y_i = 0.
+\]
+}
+
+\prop{KKT Complementary Slackness}{
+At optimality: $\alpha_i [y_i(\vect{w}^T\vect{x}_i + w_0) - 1] = 0$. Thus $\alpha_i > 0$ only for support vectors. The weight vector $\vect{w} = \sum_{i=1}^n \alpha_i y_i \vect{x}_i$ is a linear combination of support vectors alone.
+}
+
+Prediction uses only inner products with support vectors:
+\[
+f(\vect{x}) = w_0 + \sum_{(\vect{x}', y') \in \mathrm{SV}} y' \alpha' \langle \vect{x}', \vect{x} \rangle.
+\]
+
+\section{Soft-Margin SVM and Hinge Loss}
+
+When the data is not linearly separable, we allow margin violations via \textbf{slack variables} $\xi_i \geq 0$:
+
+\defn{Soft-Margin SVM}{
+\[
+\min_{\vect{w}, w_0, \boldsymbol{\xi}} \frac{1}{2}\norm{\vect{w}}^2 + C\sum_{i=1}^n \xi_i
+\quad\text{s.t.}\quad y_i(\vect{w}^T\vect{x}_i + w_0) \geq 1 - \xi_i,\; \xi_i \geq 0.
+\]
+$C > 0$ trades margin width against training error. Substituting $\xi_i = \max(1 - y_i(\vect{w}^T\vect{x}_i + w_0), 0)$ gives the unconstrained objective:
+}
+
+\prop{SVM as Regularized Hinge Loss}{
+\[
+\min_{\vect{w}, w_0}\; \frac{1}{2}\norm{\vect{w}}^2 + C\sum_{i=1}^n \max\!\bigl(1 - y_i(w_0 + \vect{w}^T\vect{x}_i),\, 0\bigr).
+\]
+The \textbf{hinge loss} $\ell_{\mathrm{hinge}}(y, f) = \max(1-yf, 0)$ is convex and zero when the point is correctly classified with margin $\geq 1$.
+}
+
+\section{The Kernel Trick}
+
+The dual SVM objective depends on the data only through inner products $\langle\vect{x}_i, \vect{x}_j\rangle$. If we apply a feature map $\phi: \R^d \to \R^m$ (possibly $m = \infty$), we can replace inner products with a \textbf{kernel function} $k(\vect{x}_i, \vect{x}_j) = \langle\phi(\vect{x}_i), \phi(\vect{x}_j)\rangle$, \emph{without ever computing $\phi(\vect{x})$ explicitly}.
+
+\defn{Common Kernels}{
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Kernel & Formula & Remark \\
+\midrule
+Linear & $k(\vect{u},\vect{v}) = \vect{u}^T\vect{v}$ & Standard SVM \\
+Polynomial & $k(\vect{u},\vect{v}) = (1 + \vect{u}^T\vect{v})^D$ & Degree-$D$ polynomial map \\
+RBF / Gaussian & $k(\vect{u},\vect{v}) = \exp(-\gamma\norm{\vect{u}-\vect{v}}^2)$ & Infinite-dimensional $\phi$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+}
+
+\prop{Mercer's Condition}{
+A symmetric function $k$ is a valid kernel (i.e., corresponds to some $\phi$) if and only if the Gram matrix $K_{ij} = k(\vect{x}_i, \vect{x}_j)$ is positive semi-definite for all data sets.
+}
+
+With a kernel, prediction becomes:
+\[
+f(\vect{x}) = w_0 + \sum_{(\vect{x}',y') \in \mathrm{SV}} \alpha' y'\, k(\vect{x}', \vect{x}).
+\]
+The RBF kernel is equivalent to an infinite Taylor expansion: $k(\vect{x}_i,\vect{x}_j) = C\sum_{n=0}^\infty \frac{\langle\vect{x}_i,\vect{x}_j\rangle^n}{n!}$, giving it universal approximation capability.
+
+% ------------------------------------------------------------------------------
+\chapter{\textit{K}-Nearest Neighbors}
+% ------------------------------------------------------------------------------
+
+\section{The Algorithm}
+
+\defn{$K$-Nearest Neighbors (KNN)}{
+Given a test point $\vect{x}$, find the $K$ training points $\mathcal{N}_K(\vect{x}) = \{\vect{x}_{(1)}, \ldots, \vect{x}_{(K)}\}$ closest under a distance metric $d(\cdot,\cdot)$.
+\begin{itemize}
+    \item \textbf{Classification:} $\hat{y} = \mathrm{mode}\{y_i : \vect{x}_i \in \mathcal{N}_K(\vect{x})\}$ (majority vote).
+    \item \textbf{Regression:} $\hat{y} = \frac{1}{K}\sum_{\vect{x}_i \in \mathcal{N}_K(\vect{x})} y_i$ (average).
+\end{itemize}
+KNN is a \textbf{lazy learner}: there is no training phase; all computation occurs at prediction time.
+}
+
+\section{Distance Metrics}
+
+The choice of distance metric critically affects KNN performance.
+
+\defn{Minkowski Distance}{
+For $p \geq 1$:
+\[
+d_p(\vect{u}, \vect{v}) = \left(\sum_{j=1}^d |u_j - v_j|^p\right)^{1/p}.
+\]
+\begin{itemize}
+    \item $p=2$: Euclidean distance (most common).
+    \item $p=1$: Manhattan (taxicab) distance. More robust to outliers.
+    \item $p \to \infty$: Chebyshev distance $\max_j |u_j - v_j|$.
+\end{itemize}
+}
+
+\rmkb{Features should be normalized before applying KNN. If one feature has range $[0, 1000]$ and another $[0, 1]$, the first will dominate the distance computation.}
+
+\section{Choosing $K$ and the Bias-Variance Tradeoff}
+
+\prop{Effect of $K$}{
+Small $K$ (e.g., $K=1$): the decision boundary follows every training point, yielding low bias but high variance (overfitting). Large $K$: smoother boundary, higher bias, lower variance. The optimal $K$ is selected by cross-validation.
+}
+
+\prop{Asymptotic Optimality}{
+As $n \to \infty$ with $K \to \infty$ and $K/n \to 0$, the 1-NN error rate converges to at most $2R^*$ where $R^*$ is the Bayes error rate. For $K \geq 1$, KNN is universally consistent.
+}
+
+\section{Curse of Dimensionality}
+
+\fact{In $d$ dimensions, to capture a fraction $f$ of the data volume in a neighborhood, the side length of the neighborhood must be $f^{1/d}$. For $f = 0.01$ and $d = 10$, this is $0.01^{0.1} \approx 0.63$ --- nearly the full feature range. Nearest neighbors cease to be meaningfully ``near'' in high dimensions.}
+
+\prop{Computational Complexity}{
+Naïve KNN requires $O(nd)$ distance computations per query. With $n$ training points and $q$ test points, total cost is $O(qnd)$. Data structures such as $k$-d trees reduce average-case query time to $O(d \log n)$ for low $d$, but lose their advantage as $d$ grows.
+}
+
+% ------------------------------------------------------------------------------
+\chapter{Na\"{i}ve Bayes}
+% ------------------------------------------------------------------------------
+
+\section{Generative vs.\ Discriminative Classifiers}
+
+\defn{Discriminative Model}{
+Directly models the posterior $P(Y \mid X)$. Examples: logistic regression, SVM.
+}
+
+\defn{Generative Model}{
+Models the joint distribution $P(X, Y) = P(X \mid Y)P(Y)$, then applies Bayes' rule to obtain $P(Y \mid X)$.
+}
+
+\section{Bayes' Rule for Classification}
+
+\defn{Bayes Classifier}{
+Given a new point $\vect{x}$, predict:
+\[
+\hat{y} = \arg\max_y P(Y=y \mid X=\vect{x}) = \arg\max_y \frac{P(X=\vect{x} \mid Y=y)\, P(Y=y)}{P(X=\vect{x})}.
+\]
+Since $P(X=\vect{x})$ is constant across classes:
+\[
+\hat{y} = \arg\max_y P(X=\vect{x} \mid Y=y)\, P(Y=y).
+\]
+$P(Y=y)$ is the \textbf{prior} (estimated from class frequencies in training data); $P(X \mid Y=y)$ is the \textbf{class-conditional likelihood}.
+}
+
+\fact{The Bayes classifier minimizes the probability of misclassification given perfect knowledge of $P(Y \mid X)$. The resulting error is the \textbf{Bayes error rate} $R^* = \mathbb{E}[1 - \max_y P(Y=y \mid X)]$, a fundamental lower bound on classification error.}
+
+\section{The Na\"{i}ve Bayes Assumption}
+
+The class-conditional $P(X \mid Y=y)$ is a $d$-dimensional distribution. Estimating it directly requires exponentially many parameters (e.g., a table with $2^d$ entries for binary features). The key simplification:
+
+\defn{Na\"{i}ve Bayes (Conditional Independence) Assumption}{
+Features are assumed conditionally independent given the class label:
+\[
+P(X_1, \ldots, X_d \mid Y=y) = \prod_{j=1}^d P(X_j \mid Y=y).
+\]
+This reduces estimation to $d$ separate 1-D problems.
+}
+
+The full prediction rule becomes:
+\[
+\hat{y} = \arg\max_y P(Y=y) \prod_{j=1}^d P(X_j = x_j \mid Y=y).
+\]
+
+\rmkb{The ``na\"{i}ve'' assumption is almost always violated in practice --- (``likes cats'' and ``likes dogs'' are surely correlated). Yet Na\"{i}ve Bayes remains surprisingly effective, especially for text classification, because the decision boundary is more robust than the probabilities themselves.}
+
+\section{Parameter Estimation}
+
+\textbf{Categorical features:} Estimate $P(X_j = v \mid Y = y) = \frac{\#\{i : x_{ij} = v, y_i = y\}}{\#\{i : y_i = y\}}$ by counting.
+
+\textbf{Gaussian Na\"{i}ve Bayes:} Assume $P(X_j \mid Y=y) = \mathcal{N}(\mu_{jy}, \sigma_{jy}^2)$ for continuous features. Estimate $\mu_{jy}$ and $\sigma_{jy}^2$ by class-conditional sample mean and variance.
+
+\section{Laplace Smoothing}
+
+\defn{Laplace Smoothing}{
+If a feature value never appears in class $y$, the estimate $P(X_j = v \mid Y=y) = 0$ zeros out the entire product. Laplace smoothing adds a pseudocount $\alpha > 0$:
+\[
+P(X_j = v \mid Y=y) = \frac{\#\{i : x_{ij}=v, y_i=y\} + \alpha}{\#\{i : y_i=y\} + \alpha\,|\mathcal{V}_j|},
+\]
+where $|\mathcal{V}_j|$ is the number of distinct values of feature $j$. For $\alpha=1$ this is called \textbf{add-one smoothing}.
+}
+
+In practice, computations are done in log-space to avoid numerical underflow from multiplying many probabilities:
+\[
+\hat{y} = \arg\max_y \left[\log P(Y=y) + \sum_{j=1}^d \log P(X_j = x_j \mid Y=y)\right].
+\]
+
+% ------------------------------------------------------------------------------
+\chapter{Decision Trees and Ensembles}
+% ------------------------------------------------------------------------------
+
+\section{Decision Trees}
+
+\defn{Decision Tree}{
+A decision tree is a hierarchical model that recursively partitions the feature space using axis-aligned binary splits. Each internal node tests a feature $x_j$ against a threshold $t$; each leaf stores a predicted value (majority class or mean target).
+}
+
+A tree with $M$ leaves partitions $\R^d$ into $M$ rectangular regions $R_1, \ldots, R_M$. Predictions are constant within each region:
+\[
+f(\vect{x}) = \sum_{m=1}^M c_m\, \mathbf{1}[\vect{x} \in R_m].
+\]
+
+\section{Splitting Criteria}
+
+Greedy tree learning chooses the split $(j, t)$ that maximizes the decrease in impurity.
+
+\defn{Entropy and Information Gain}{
+For a set $S$ with class proportions $p_1, \ldots, p_K$, the \textbf{Shannon entropy} is:
+\[
+H(S) = -\sum_{k=1}^K p_k \log_2 p_k.
+\]
+The \textbf{information gain} of splitting $S$ on feature $j$ at threshold $t$ is:
+\[
+\mathrm{IG}(S, j, t) = H(S) - \frac{|S_L|}{|S|} H(S_L) - \frac{|S_R|}{|S|} H(S_R),
+\]
+where $S_L, S_R$ are the left and right subsets after the split. The ID3/C4.5 algorithm greedily maximizes information gain.
+}
+
+\defn{Gini Impurity}{
+\[
+G(S) = 1 - \sum_{k=1}^K p_k^2 = \sum_{k \neq k'} p_k p_{k'}.
+\]
+$G(S) = 0$ for a pure node (one class); $G(S) = 1 - 1/K$ for maximum impurity. CART uses Gini impurity.
+}
+
+\prop{For regression trees, the splitting criterion minimizes the weighted sum of within-region MSE:
+\[
+\frac{1}{|S_L|}\sum_{\vect{x}_i \in S_L}(y_i - \bar{y}_{S_L})^2 + \frac{1}{|S_R|}\sum_{\vect{x}_i \in S_R}(y_i - \bar{y}_{S_R})^2.
+\]}
+
+\section{Overfitting and Pruning}
+
+A fully-grown tree (one leaf per training point) memorizes training data. \textbf{Cost-complexity pruning} replaces subtrees with leaves while the gain is below a threshold. Alternatively, restrict tree depth, minimum leaf size, or minimum impurity decrease.
+
+\section{Random Forests}
+
+\defn{Bagging (Bootstrap Aggregating)}{
+Train $B$ trees on independently bootstrapped datasets $\mathcal{D}_1^*, \ldots, \mathcal{D}_B^*$ (each drawn with replacement from $\mathcal{D}$). Average their predictions (regression) or take majority vote (classification):
+\[
+f_{\mathrm{bag}}(\vect{x}) = \frac{1}{B}\sum_{b=1}^B f_b(\vect{x}).
+\]
+Bagging reduces variance without increasing bias.
+}
+
+\defn{Random Forest}{
+Extend bagging by also randomly subsampling $m \approx \sqrt{d}$ features at each split. This decorrelates the trees, further reducing variance. Random forests are robust, parallelizable, and provide out-of-bag error estimates.
+}
+
+\section{Boosting}
+
+Boosting constructs an additive model $f(x) = \sum_{k=1}^K \alpha_k g(x; \gamma_k)$ by \textbf{sequentially} fitting weak learners $g$ (typically shallow trees), each one correcting the errors of its predecessors.
+
+\defn{Forward Stagewise Additive Modeling}{
+Initialize $f_0(x) = 0$. At each step $k = 1, \ldots, K$:
+\begin{enumerate}
+    \item Fit: $(\alpha_k, \gamma_k) = \arg\min_{\alpha, \gamma} \sum_{i=1}^n L\bigl(y_i,\, f_{k-1}(x_i) + \alpha g(x_i; \gamma)\bigr)$.
+    \item Update: $f_k(x) = f_{k-1}(x) + \alpha_k g(x; \gamma_k)$.
+\end{enumerate}
+}
+
+\defn{AdaBoost}{
+For binary classification $y_i \in \{+1,-1\}$ with exponential loss $L(y, f) = \exp(-yf)$, the forward stagewise procedure reduces to AdaBoost:
+\begin{enumerate}
+    \item Initialize sample weights $u_i^{(1)} = 1$.
+    \item For $k=1,\ldots,K$: train $g_k$ on reweighted data, compute weighted error $\varepsilon_k = \frac{\sum_i u_i^{(k)} \mathbf{1}[y_i \neq g_k(x_i)]}{\sum_i u_i^{(k)}}$, set $\alpha_k = \frac{1}{2}\log\frac{1-\varepsilon_k}{\varepsilon_k}$, then update $u_i^{(k+1)} = u_i^{(k)} \exp(-\alpha_k y_i g_k(x_i))$.
+    \item Output $f(x) = \mathrm{sign}\!\left(\sum_k \alpha_k g_k(x)\right)$.
+\end{enumerate}
+Misclassified points receive higher weight in the next iteration; correctly classified points receive lower weight.
+}
+
+\prop{Under exponential loss, the stagewise procedure exactly corresponds to fitting each weak learner $g_k$ on the reweighted training set, with weights $u_i^{(k)} = \exp(-y_i f_{k-1}(x_i))$.}
+
+\defn{Gradient Boosting}{
+For a general differentiable loss $L$, at step $k$ compute the \textbf{pseudo-residuals}
+\[
+r_i = -\left.\frac{\pd{L(y_i, f(x_i))}{f(x_i)}}{}\right|_{f=f_{k-1}},
+\]
+and fit $g_k$ to the pseudo-residuals. For squared error loss, this is exactly fitting the residuals $r_i = y_i - f_{k-1}(x_i)$.
+}
+
+\rmkb{XGBoost and LightGBM are highly optimized gradient boosting implementations that dominate tabular data competitions. They add second-order Taylor expansions of the loss, regularization on leaf weights, and efficient histogram-based split finding.}
+
+% ==============================================================================
+% PART III: UNSUPERVISED LEARNING
+% ==============================================================================
+
 \part{Unsupervised Learning}
 
 % ==============================================================================
-% Part IV: Deep Learning
-%
-% Neural networks from first principles through modern architectures.
-% Backpropagation, training dynamics, CNNs, RNNs,
-% Transformers, and GNNs.
+\chapter{Clustering}
 % ==============================================================================
+
+\section{The Unsupervised Setting}
+
+In supervised learning we are given labeled pairs $(x_i, y_i)$.  In the
+\textit{unsupervised} setting we observe only $\{x_1,\dots,x_n\}$ and must
+discover structure without any target signal.  Clustering is the task of
+grouping examples so that points within the same cluster are similar and
+points in different clusters are dissimilar.
+
+\defn{Clustering}{
+Given data $\{x_1,\dots,x_n\} \subset \R^d$ and a number of clusters $k$,
+find a partition $\{S_1,\dots,S_k\}$ of the data and representative
+centroids $\{c_1,\dots,c_k\}$ such that the \textbf{intra-cluster distortion}
+is minimised:
+\[
+    \min_{\{S_j\},\,\{c_j\}}
+    \sum_{j=1}^{k}\sum_{x\in S_j} \norm{x - c_j}^2.
+\]
+}
+
+\section{K-Means Algorithm}
+
+K-means (Steinhaus 1950 / Lloyd 1957) is an iterative algorithm that
+alternates between two steps.
+
+\fact{
+\textbf{K-Means Algorithm.}  Input: $\{x_1,\dots,x_n\}$, $k$.\\[2pt]
+\textbf{Initialise:} choose $c_1,\dots,c_k$ (e.g.\ random sample or
+K-means++ — see below).\\[2pt]
+\textbf{Repeat until centroids do not change:}
+\begin{enumerate}
+  \item \emph{Assignment step.} For every $x_i$ set
+        $j^* = \arg\min_{j=1:k} \norm{x_i - c_j}^2$ and assign
+        $S_{j^*} \leftarrow S_{j^*} \cup \{x_i\}$.
+  \item \emph{Update step.} For $j = 1,\dots,k$ recompute
+        $c_j \leftarrow \dfrac{1}{|S_j|}\displaystyle\sum_{x\in S_j} x$.
+\end{enumerate}
+}
+
+An equivalent continuous objective reformulates the problem as:
+\[
+    \min_{c_1,\dots,c_k}\; f(c_1,\dots,c_k)
+    = \frac{1}{2}\sum_{i=1}^{n} \min_{j=1:k} \norm{x_i - c_j}^2.
+\]
+The gradient update on centroid $c_j$ with learning rate $\eta$ gives the
+SGD K-means rule:
+\[
+    c_j \;\leftarrow\; (1-\eta)\,c_j + \eta\,x_i
+    \quad (\text{for }x_i\text{ whose closest centroid is }c_j).
+\]
+
+\section{Convergence}
+
+\thm{K-Means Convergence}{
+K-means always terminates.  At every iteration the objective
+$\sum_j\sum_{x\in S_j}\norm{x-c_j}^2$ is non-increasing:
+\begin{itemize}
+  \item The assignment step only moves each $x$ to a closer (or equally
+        close) centroid.
+  \item The update step sets $c_j$ to the (unique) minimiser of
+        $\sum_{x\in S_j}\norm{x-c_j}^2$, namely the mean.
+\end{itemize}
+Since there are finitely many possible partitions, the algorithm must stop.
+}
+
+K-means converges to a \emph{local} optimum; the global optimum is NP-hard
+in general.  Running the algorithm multiple times with different
+initialisations mitigates this.
+
+\section{Initialisation: K-Means++}
+
+\defn{K-Means++ Initialisation}{
+Let $d_j(x)$ be the distance from $x$ to the closest of the $j$ centroids
+already chosen.
+\begin{enumerate}
+  \item Choose $c_1$ uniformly at random from $\{x_1,\dots,x_n\}$.
+  \item For $j = 2,\dots,k$: choose $c_j$ with probability proportional to
+        $d_{j-1}(x)^2$, i.e.\
+        \[
+            P(x = c_j)
+            = \frac{d_{j-1}(x)^2}{\sum_{i=1}^{n} d_{j-1}(x_i)^2}.
+        \]
+\end{enumerate}
+This ensures each new centroid is likely to be far from all previous ones,
+providing better coverage of the data.
+}
+
+\section{Connection to Gaussian Mixture Models}
+
+Consider a uniform mixture of $k$ spherical Gaussians with means at the
+K-means centroids:
+\[
+    P(x) \propto \frac{1}{k}\sum_{j=1}^{k} \exp\!\bigl(-\norm{x-c_j}^2\bigr).
+\]
+Because of exponential decay, only the closest centroid $z(x)
+= \arg\min_{c_j}\norm{x-c_j}^2$ contributes appreciably:
+\[
+    P(X) \approx \mathrm{const}\times
+    \exp\!\Bigl(-\sum_{i=1}^{n}\norm{x_i - z(x_i)}^2\Bigr).
+\]
+Hence maximising the likelihood under this model is equivalent to minimising
+the K-means objective — K-means performs \emph{hard} EM on a Gaussian
+mixture (vs.\ soft EM which maintains probabilistic assignments).
+
+\section{Limitations of K-Means}
+
+\rmkb{
+\begin{itemize}
+  \item K-means assumes \textbf{spherical clusters} of similar size and
+        density.  It fails on elongated, non-convex, or heterogeneous
+        clusters.
+  \item The number of clusters $k$ must be specified in advance.  A common
+        heuristic is the \emph{elbow method}: plot the objective vs.\ $k$
+        and pick the ``knee'' of the curve.
+  \item Because the partitioning space is discrete but large, a greedy
+        algorithm may find a poor local minimum; running with multiple
+        random restarts or K-means++ is recommended.
+\end{itemize}
+}
+
+% ==============================================================================
+\chapter{Dimensionality Reduction}
+\label{ch:dimred}
+% ==============================================================================
+
+\section{Motivation}
+
+High-dimensional data often lies near a lower-dimensional manifold.
+Dimensionality reduction finds a mapping $x \in \R^d \to z \in \R^q$ with
+$q \ll d$ that preserves as much information as possible.  Uses include
+visualisation, removing redundant/correlated features, and reducing
+computational cost.
+
+\section{Principal Component Analysis}
+
+\defn{PCA}{
+\textbf{Principal Component Analysis (PCA)} finds the $q$ orthonormal
+directions (principal components) in $\R^d$ that capture the most variance
+in the data.  Equivalently, the projection onto these $q$ directions
+minimises the mean reconstruction error.
+}
+
+The two interpretations are equivalent:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Maximum variance} & maximise variance of projections \\
+\textbf{Minimum reconstruction error} & minimise $\sum_i \norm{x_i - \hat x_i}^2$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Procedure (Variance View)}
+
+\begin{enumerate}
+  \item \textbf{Centre the data:} $X \leftarrow X - \bar{X}$ where
+        $\bar{X} = \frac{1}{n}\sum_{i=1}^n x_i$.
+  \item Find the $q$ eigenvectors of $X^\top X$ with the $q$ largest
+        eigenvalues; call them $v_1,\dots,v_q$.
+  \item Project: $z_i = [v_1^\top x_i,\dots,v_q^\top x_i]^\top\in\R^q$.
+\end{enumerate}
+
+\subsection*{Derivation (First Principal Component)}
+
+For a unit vector $v$ ($\norm{v}_2 = 1$) the variance of the projections
+$Xv$ is (after centring, $\bar{Xv}=0$):
+\[
+    \mathrm{Var}(Xv)
+    = \sum_i (v^\top x_i)^2
+    = \norm{Xv}_2^2
+    = v^\top X^\top X\, v.
+\]
+We want:
+\[
+    \max_{v:\,\norm{v}_2=1} v^\top X^\top X\, v.
+\]
+Introducing a Lagrange multiplier $\lambda$ and setting the gradient to zero:
+\[
+    \nabla\bigl[v^\top X^\top X v - \lambda\,v^\top v\bigr]
+    = 2(X^\top X - \lambda I)v = 0
+    \;\Longrightarrow\;
+    \boxed{X^\top X\, v = \lambda v.}
+\]
+The maximum is attained at the eigenvector with the \emph{largest}
+eigenvalue.  The $q$ principal components are the top-$q$ eigenvectors.
+
+\prop{Variance Explained}{
+If we keep the first $q$ principal components with eigenvalues
+$\lambda_1 \ge \lambda_2 \ge \cdots$, the fraction of total variance
+retained is
+\[
+    \frac{\sum_{k=1}^{q}\lambda_k}{\sum_{k=1}^{p}\lambda_k}.
+\]
+Plot this vs.\ $q$ (a \emph{scree plot}) to choose $q$.
+}
+
+\section{PCA via Singular Value Decomposition}
+
+\defn{SVD}{
+Every matrix $M \in \R^{n\times d}$ admits a factorisation
+\[
+    M = U\,\Sigma\,V^\top
+\]
+where $U\in\R^{n\times n}$ (columns = eigenvectors of $MM^\top$),
+$\Sigma\in\R^{n\times d}$ (diagonal, singular values $\sigma_i = \sqrt{\lambda_i}$),
+and $V\in\R^{d\times d}$ (columns = eigenvectors of $M^\top M$).
+}
+
+For PCA with centred data matrix $X$: compute $X = U\Sigma V^\top$; the
+columns of $V$ are the principal directions, and $XV = U\Sigma$ are the
+principal component scores.
+
+\section{Autoencoders: Non-linear PCA}
+
+A linear autoencoder with tied weights ($W$ and $W^\top$) trained to
+minimise reconstruction error $\sum_{x\in D}\norm{x - \hat x}^2$ recovers
+the PCA subspace.  A \textbf{deep autoencoder} replaces the linear layers
+with non-linear networks (encoder $f_\theta$ and decoder $g_\phi$):
+
+\[
+    z = f_\theta(x) \in \R^k, \qquad
+    \hat x = g_\phi(z) \in \R^d, \qquad
+    \min_{\theta,\phi}\sum_{x\in D}\norm{x - g_\phi(f_\theta(x))}^2.
+\]
+
+The encoder maps $x\in\R^d$ to a low-dimensional code $z\in\R^k$ ($k\ll d$);
+the decoder reconstructs $\hat x$.  Deep autoencoders can capture
+non-linear manifold structure that PCA misses.
+
+\rmkb{
+\textbf{Autoencoder as pre-training.}  When labelled data is scarce, one
+can (1) train an autoencoder on the large unlabelled corpus to learn a rich
+latent representation, then (2) attach a classifier head to the encoder and
+fine-tune on the small labelled set.  This is an early form of
+\emph{self-supervised} pre-training.
+}
+
+\section{Limitations of PCA}
+
+\begin{itemize}
+  \item PCA is a \textbf{linear} projection; it fails when data lies on a
+        non-linear manifold.
+  \item It assumes approximately Gaussian-distributed features.
+  \item Sensitive to scale; features should be standardised before applying
+        PCA.
+\end{itemize}
+
+% ==============================================================================
+\chapter{Learning Paradigms}
+% ==============================================================================
+
+\section{A Taxonomy of Learning}
+
+Machine learning methods differ primarily in what supervision signal is
+available during training.
+
+\defn{Supervised Learning}{
+Training data consists of labeled pairs $\{(x_i, y_i)\}_{i=1}^n$.
+The goal is to learn a mapping $f: \mathcal{X} \to \mathcal{Y}$ that
+generalises to unseen inputs.  Examples: linear/logistic regression, SVMs,
+neural networks, decision trees.
+}
+
+\defn{Unsupervised Learning}{
+Only unlabeled examples $\{x_i\}_{i=1}^n$ are available.  Goals include
+discovering clusters, learning compact representations, estimating densities,
+and generating new samples.  Examples: K-means, PCA, autoencoders, GMMs,
+GANs.
+}
+
+\defn{Semi-Supervised Learning}{
+A small labelled set $\mathcal{L} = \{(x_i, y_i)\}$ is supplemented by a
+large unlabelled set $\mathcal{U} = \{x_j\}$.  The unlabelled data can
+reveal the structure of $P(X)$, which (under the manifold or cluster
+assumptions) helps improve decision boundaries learned from $\mathcal{L}$.
+}
+
+\defn{Self-Supervised Learning}{
+Labels are derived automatically from the data itself.  A \emph{pretext
+task} (e.g.\ predict a masked token, predict the next token, predict
+image rotation) provides a supervised training signal without human
+annotation.  The learned representations are then transferred to downstream
+tasks.  Modern large language models (GPT, BERT) are trained this way.
+}
+
+\defn{Few-Shot Learning}{
+At test time the model must generalise to new classes or tasks with only a
+handful of labelled examples (the \emph{support set}).  Meta-learning
+approaches (e.g.\ MAML, Prototypical Networks) aim to ``learn how to learn''
+from prior tasks so adaptation to a new task requires minimal data.
+}
+
+\section{Transfer Learning}
+
+In \textbf{transfer learning} a model pre-trained on a large source task is
+adapted to a target task.
+
+\begin{itemize}
+  \item \textbf{Feature extraction:} freeze pre-trained weights; train only
+        a new head on the target task.
+  \item \textbf{Fine-tuning:} initialise from pre-trained weights; continue
+        training all (or some) layers on the target task with a small
+        learning rate.
+\end{itemize}
+
+Transfer learning is especially powerful when source and target distributions
+overlap (e.g.\ ImageNet $\to$ medical imaging; GPT pre-training $\to$
+task-specific RLHF fine-tuning).
+
+\section{Reinforcement Learning}
+
+In \textbf{reinforcement learning} (RL) an agent interacts with an
+environment: at each step it observes a state $s_t$, takes an action $a_t$,
+receives a reward $r_t$, and transitions to $s_{t+1}$.  The goal is to
+learn a \emph{policy} $\pi(a|s)$ that maximises expected cumulative reward
+$\mathbb{E}[\sum_t \gamma^t r_t]$, where $\gamma\in[0,1)$ is a discount
+factor.  RL is covered in depth in Part~VIII.
+
+% ==============================================================================
+% PART IV: DEEP LEARNING
+% ==============================================================================
+
 \part{Deep Learning}
 
 % ==============================================================================
-% Part V: Generative Models
-%
-% Models that learn the data distribution.
-% VAEs, GANs, Normalizing Flows, and Diffusion Models.
+\chapter{Neural Network Foundations}
 % ==============================================================================
+
+\section{The Single Neuron}
+
+The basic computational unit is an artificial neuron.  Given input
+$x \in \R^d$, it computes
+\[
+    f(x) = g(w^\top x + b),
+\]
+where $w \in \R^d$ is the weight vector, $b \in \R$ is the bias, and
+$g:\R\to\R$ is a non-linear \emph{activation function}.  For the
+squared-loss training objective $L = \tfrac{1}{2}(y - w^\top x - b)^2$,
+the gradient with respect to $w$ is $\nabla_w L = -(y - w^\top x - b)\,x$.
+
+\section{Multi-Layer Perceptrons}
+
+\defn{Feedforward Neural Network}{
+A feedforward network with $L$ layers is defined by the forward pass:
+\[
+    z^{[l]} = W^{[l]} a^{[l-1]} + b^{[l]}, \qquad
+    a^{[l]} = g^{[l]}(z^{[l]}), \quad l = 1, \ldots, L,
+\]
+with $a^{[0]} = x$.  The network output is $\hat y = a^{[L]}$.
+}
+
+Stacking the layers, the full network computes
+\[
+    f(x) = g^{[L]}\!\bigl(W^{[L]}\,g^{[L-1]}\!\bigl(\cdots
+    g^{[1]}(W^{[1]} x + b^{[1]})\cdots\bigr) + b^{[L]}\bigr).
+\]
+
+\prop{Necessity of Non-Linearity}{
+If every $g^{[l]}$ is the identity, then
+$f(x) = (W^{[L]}\cdots W^{[1]})x + b'$,
+a single affine map.  Composing linear layers produces one linear layer;
+depth buys expressiveness only with non-linearities.
+}
+
+\section{Activation Functions}
+
+\begin{center}
+\begin{tabular}{llll}
+\hline
+Name & Formula $g(z)$ & $g'(z)$ & Notes \\
+\hline
+Sigmoid     & $1/(1+e^{-z})$     & $g(1-g)$          & saturates; not zero-centred \\
+Tanh        & $(e^z-e^{-z})/(e^z+e^{-z})$ & $1-g^2$ & zero-centred; still saturates \\
+ReLU        & $\max(0,z)$        & $\mathbf{1}[z>0]$ & fast; \emph{dying neuron} risk \\
+Leaky ReLU  & $\max(\varepsilon z,z)$ & $\varepsilon$ or $1$ & fixes dead neurons \\
+\hline
+\end{tabular}
+\end{center}
+
+\rmkb{
+\textbf{Vanishing gradients.}  With sigmoid, $|\sigma'(z)|\le 0.25$,
+so each layer multiplies the gradient by at most $0.25$.  For an $L$-layer
+network the gradient magnitude decays as $(0.25)^L$.  ReLU avoids saturation
+on the positive half-line and is the \textbf{default choice for hidden layers}.
+}
+
+\defn{Output Layer Design}{
+Choose the final activation and loss to match the task:
+\begin{itemize}
+  \item Binary classification: sigmoid output,
+        $L = -[y\log\hat y + (1-y)\log(1-\hat y)]$.
+  \item Multi-class ($C$ classes): softmax $\hat y_k = e^{z_k}/\sum_j e^{z_j}$,
+        cross-entropy loss.
+  \item Regression: linear output (no activation), squared loss.
+\end{itemize}
+}
+
+\fact{
+The \emph{Universal Approximation Theorem} (Cybenko 1989) states that a
+single hidden layer of sufficient width with a non-polynomial activation can
+approximate any continuous function on a compact domain to arbitrary
+accuracy.  Deeper networks achieve the same approximation with exponentially
+fewer neurons.
+}
+
+% ==============================================================================
+\chapter{Training Deep Networks}
+% ==============================================================================
+
+\section{Backpropagation}
+
+Training minimises a loss $L$ by gradient descent.  Gradients are computed
+via the chain rule in a single backward pass through the computation graph.
+
+\defn{Backpropagation (Matrix Form)}{
+Given the forward pass $z^{[l]} = W^{[l]} a^{[l-1]} + b^{[l]}$,
+$a^{[l]} = g^{[l]}(z^{[l]})$, the backward pass from $l = L$ down to $1$:
+\begin{align*}
+    \nabla_{z^{[l]}} L &= \nabla_{a^{[l]}} L \odot (g^{[l]})'(z^{[l]}), \\
+    \nabla_{W^{[l]}} L &= \nabla_{z^{[l]}} L \cdot (a^{[l-1]})^\top, \\
+    \nabla_{a^{[l-1]}} L &= (W^{[l]})^\top \nabla_{z^{[l]}} L.
+\end{align*}
+Modern frameworks (PyTorch, JAX) implement this via \emph{automatic
+differentiation}: they record a computation graph during the forward pass
+and apply the chain rule in reverse automatically.
+}
+
+\section{Weight Initialisation}
+
+\defn{Initialisation Schemes}{
+\begin{itemize}
+  \item \textbf{Xavier (Glorot)}: $W_{ij} \sim \mathcal{U}\!\left(
+        -\sqrt{\tfrac{6}{n_\text{in}+n_\text{out}}},\;
+        \sqrt{\tfrac{6}{n_\text{in}+n_\text{out}}}\right)$.  Designed for
+        tanh/sigmoid to preserve gradient variance.
+  \item \textbf{He}: $W_{ij} \sim \mathcal{N}(0,\,2/n_\text{in})$.
+        Designed for ReLU.
+\end{itemize}
+}
+
+\section{Batch Normalisation}
+
+\defn{Batch Normalisation (Ioffe \& Szegedy 2015)}{
+For mini-batch $\{x^{(i)}\}_{i=1}^m$ and feature $k$, let
+$\mu_k = \tfrac{1}{m}\sum_i x_k^{(i)}$,
+$\sigma_k^2 = \tfrac{1}{m}\sum_i (x_k^{(i)}-\mu_k)^2$.  Batch norm:
+\[
+    \hat x_k^{(i)} = \frac{x_k^{(i)}-\mu_k}{\sqrt{\sigma_k^2+\varepsilon}},
+    \qquad y_k^{(i)} = \gamma_k \hat x_k^{(i)} + \beta_k,
+\]
+where $\gamma_k, \beta_k$ are learned per-feature scale and shift.
+}
+
+Batch norm keeps activation distributions stable across layers, allowing
+higher learning rates and faster convergence.  It also acts as a regulariser.
+
+\section{Dropout}
+
+\defn{Dropout (Srivastava et al.\ 2014)}{
+During training, independently zero each neuron with probability $p$;
+scale surviving activations by $\tfrac{1}{1-p}$ (\emph{inverted dropout}).
+At inference, use all neurons without scaling.
+}
+
+Dropout prevents co-adaptation of neurons and acts as implicit ensemble
+averaging, reducing overfitting.  Typical values: $p = 0.2$--$0.5$.
+
+\section{Optimisation}
+
+\textbf{SGD with Momentum}:
+\[
+    v \leftarrow \beta v - \eta \nabla_\theta L, \quad
+    \theta \leftarrow \theta + v.
+\]
+
+\defn{Adam (Kingma \& Ba 2015)}{
+Maintains exponential moving averages of gradients $m_t$ and squared
+gradients $v_t$:
+\[
+    m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t, \quad
+    v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2.
+\]
+Bias-corrected estimates $\hat m_t = m_t/(1-\beta_1^t)$,
+$\hat v_t = v_t/(1-\beta_2^t)$.  Update:
+\[
+    \theta_t = \theta_{t-1} - \eta\,\frac{\hat m_t}{\sqrt{\hat v_t}+\varepsilon}.
+\]
+Defaults: $\beta_1=0.9$, $\beta_2=0.999$, $\varepsilon=10^{-8}$.
+}
+
+\section{Learning Rate Schedules}
+
+The non-convex DNN loss surface benefits from a large $\eta$ early
+(escape saddle points) and small $\eta$ later (fine convergence).
+
+\begin{itemize}
+  \item \textbf{Step decay}: multiply $\eta$ by $\gamma < 1$ every $k$ epochs.
+  \item \textbf{Cosine annealing}:
+        $\eta_t = \eta_{\min} + \tfrac{1}{2}(\eta_{\max}-\eta_{\min})
+        (1+\cos(\pi t/T))$.
+  \item \textbf{Warmup}: linearly increase $\eta$ for the first few steps to
+        stabilise early training (used in Transformers).
+\end{itemize}
+
+\section{Data Augmentation and Mixup}
+
+\textbf{Data augmentation} enlarges the effective training set by applying
+label-preserving transformations (random crop, horizontal flip, colour
+jitter, rotation for images).
+
+\textbf{Mixup} (Zhang et al.\ 2018) interpolates both inputs and soft labels:
+\[
+    \hat x = \lambda x_i + (1-\lambda) x_j, \quad
+    \hat y = \lambda y_i + (1-\lambda) y_j, \quad
+    \lambda \sim \mathrm{Beta}(\alpha,\alpha).
+\]
+Mixup improves generalisation and reduces overconfident predictions.
+
+% ==============================================================================
+\chapter{Convolutional Neural Networks}
+% ==============================================================================
+
+\section{The Convolution Operation}
+
+\defn{2-D Convolution Layer}{
+Given input volume $H \times W \times C_\text{in}$, a filter bank of $K$
+filters each of size $F \times F \times C_\text{in}$ produces an output
+volume of size $H' \times W' \times K$:
+\[
+    H' = \frac{H - F + 2P}{S} + 1, \qquad W' = \frac{W - F + 2P}{S} + 1,
+\]
+with padding $P$ and stride $S$.
+}
+
+Key properties:
+\begin{itemize}
+  \item \textbf{Weight sharing}: the same filter applies at every spatial
+        location — a strong inductive bias for translation equivariance.
+  \item \textbf{Local connectivity}: each output neuron depends only on an
+        $F \times F$ region, giving sparse connections vs.\ fully-connected.
+  \item \textbf{Depth stacking}: $n$ conv layers of size $F$ give effective
+        receptive field of $n(F-1)+1$.
+\end{itemize}
+
+\section{Pooling}
+
+\defn{Max Pooling}{
+Partitions the spatial dimensions into non-overlapping $F \times F$ cells
+and outputs the maximum in each cell.  Reduces spatial resolution by $F$,
+providing translational invariance and reducing computation.
+}
+
+\section{Typical CNN Architecture}
+
+\[
+    [\mathrm{Conv} \to \mathrm{ReLU} \to \mathrm{Pool}]^{\times N}
+    \to \mathrm{Flatten}
+    \to [\mathrm{FC} \to \mathrm{ReLU}]^{\times M}
+    \to \mathrm{FC} \to \mathrm{Softmax}.
+\]
+
+Early layers detect low-level features (edges, colours); deeper layers
+compose these into high-level semantic concepts.
+
+\section{Classic Architectures}
+
+\textbf{LeNet-5} (LeCun 1998): earliest successful deep CNN for digit
+recognition.  Architecture on 32$\times$32 input:
+$\mathrm{C1}(6@28^2) \to \mathrm{S2}(6@14^2) \to \mathrm{C3}(16@10^2)
+\to \mathrm{S4}(16@5^2) \to \mathrm{C5}(120) \to \mathrm{F6}(84)
+\to \mathrm{Output}(10)$.
+
+\textbf{VGGNet} (Simonyan \& Zisserman 2014): stacks of $3\times3$
+convolutions and $2\times2$ max-pooling.  Three $3\times3$ layers give the
+same $7\times7$ receptive field as one $7\times7$ filter but with fewer
+parameters and more non-linearities.  VGG-16 has 138M parameters.
+
+\textbf{GoogLeNet / InceptionNet} (Szegedy et al.\ 2014): \emph{Inception
+modules} apply $1\times1$, $3\times3$, and $5\times5$ convolutions and
+$3\times3$ max-pooling in parallel and concatenate along the channel
+dimension.  $1\times1$ convolutions reduce channel dimensions cheaply
+(\emph{bottleneck}).  Only 5M parameters.
+
+\textbf{ResNet} (He et al.\ 2016): introduces \emph{residual (skip)
+connections} to solve the degradation problem — deeper plain networks
+having higher training error than shallower ones.
+
+\defn{Residual Block}{
+\[
+    H(x) = F(x) + x,
+\]
+where $F(x)$ is the residual to be learned.  If the identity mapping is
+optimal, $F$ is driven to zero.  The skip connection provides a gradient
+highway to earlier layers, enabling networks of 50--152+ layers.
+}
+
+\prop{Bottleneck Residual Block}{
+For ResNet-50/101/152 the block uses: $1\times1$ conv (reduce channels)
+$\to$ $3\times3$ conv $\to$ $1\times1$ conv (restore channels), achieving
+similar complexity to a $3\times3$ two-layer block but at greater depth.
+}
+
+% ==============================================================================
+\chapter{Object Detection and Segmentation}
+% ==============================================================================
+
+\section{From Classification to Localisation}
+
+Image classification assigns one label to the whole image.
+\textbf{Object detection} simultaneously localises all objects with
+\emph{bounding boxes} and classifies each one.
+
+\defn{Bounding Box and IoU}{
+A bounding box is parametrised as $(x_c, y_c, w, h)$.  Detection quality is
+measured by Intersection over Union:
+\[
+    \mathrm{IoU}(\hat B, B^*) = \frac{|\hat B \cap B^*|}{|\hat B \cup B^*|}.
+\]
+A prediction is a true positive when $\mathrm{IoU} \geq 0.5$ (PASCAL VOC)
+or averaged over thresholds 0.5--0.95 (COCO mAP).
+}
+
+\section{Two-Stage Detectors: Faster R-CNN}
+
+A \textbf{Region Proposal Network (RPN)} slides a small convolutional head
+over the backbone feature map, predicting objectness scores and bounding-box
+offsets for a set of \emph{anchors} (fixed-scale, fixed-ratio boxes).
+Proposals with high objectness are passed to an ROI-pooling layer that
+extracts fixed-size feature vectors, which are then classified and refined
+by detection heads.  Faster R-CNN achieves high accuracy but requires two
+forward passes (RPN + detection).
+
+\section{One-Stage Detectors: YOLO}
+
+\textbf{YOLO} (Redmon et al.\ 2016) divides the image into an $S \times S$
+grid; each cell predicts $B$ bounding boxes with confidence scores and $C$
+class probabilities in a single forward pass, enabling real-time detection.
+
+\section{Semantic Segmentation}
+
+\defn{Encoder--Decoder Segmentation}{
+Full per-pixel classification.  An encoder (convolutional backbone)
+downsamples the feature map; a decoder upsamples via transposed convolutions
+to the original resolution.  \emph{Skip connections} from encoder to decoder
+preserve fine spatial detail.  U-Net is the canonical example.
+}
+
+% ==============================================================================
+\chapter{Recurrent Neural Networks}
+% ==============================================================================
+
+\section{Sequence Modelling}
+
+Many tasks involve variable-length sequential inputs and outputs.  Standard
+feedforward networks require fixed-size inputs; RNNs process sequences by
+maintaining a \emph{hidden state} that summarises the history.
+
+\defn{Sequence Topologies}{
+\begin{itemize}
+  \item \textbf{Many-to-one}: whole sequence $\to$ single output
+        (e.g.\ sentiment classification).
+  \item \textbf{One-to-many}: single input $\to$ sequence (e.g.\ image captioning).
+  \item \textbf{Many-to-many (aligned)}: per-step prediction (e.g.\ video labelling).
+  \item \textbf{Seq2seq}: many-to-one encoder compresses input; one-to-many
+        decoder generates output (e.g.\ machine translation).
+\end{itemize}
+}
+
+\section{Vanilla RNN}
+
+\defn{Elman RNN}{
+At each time step $t$, with input $x_t \in \R^{d}$ and previous hidden state
+$h_{t-1} \in \R^{h}$:
+\begin{align*}
+    h_t &= \tanh(W_{hh}\,h_{t-1} + W_{xh}\,x_t + b_h), \\
+    y_t &= W_{hy}\,h_t + b_y.
+\end{align*}
+The \textbf{same} weight matrices $W_{hh}, W_{xh}, W_{hy}$ are reused at
+every step (\emph{weight sharing across time}).
+}
+
+\section{Backpropagation Through Time}
+
+\defn{BPTT}{
+The gradient of the total loss $J_T = \sum_{t=1}^T L_t$ with respect to
+shared weights is summed over time steps:
+\[
+    \frac{\partial J_T}{\partial W}
+    = \sum_{i=1}^{T} \left.\frac{\partial J_T}{\partial W}\right|_{(i)}.
+\]
+The gradient at step $T$ with respect to an earlier hidden state $h_t$
+requires the product
+\[
+    \frac{\partial J_T}{\partial h_t}
+    = \frac{\partial J_T}{\partial h_T}\,W_{hh}^{T-t}
+      \prod_{t < i \leq T}
+      \mathrm{diag}\bigl[\tanh'(W_{hh} h_{i-1} + W_{xh} x_i)\bigr].
+\]
+}
+
+\prop{Vanishing and Exploding Gradients}{
+The factor $W_{hh}^{T-t}$ causes the gradient to:
+\begin{itemize}
+  \item \textbf{Vanish}: when singular values of $W_{hh}$ are $< 1$ —
+        early time steps receive negligible gradient; no long-range learning.
+  \item \textbf{Explode}: when singular values of $W_{hh}$ are $> 1$ —
+        training diverges.
+\end{itemize}
+Fix for exploding gradients: \textbf{gradient clipping} — if
+$\norm{g} \geq \tau$, set $g \leftarrow (\tau/\norm{g})\,g$.  Fix for
+vanishing gradients: \textbf{gated architectures} (LSTM, GRU).
+}
+
+\section{Long Short-Term Memory}
+
+\defn{LSTM (Hochreiter \& Schmidhuber 1997)}{
+An LSTM maintains a \emph{cell state} $C_t$ (long-term memory) and a
+\emph{hidden state} $H_t$ (short-term memory).  At each step, given the
+concatenation $[H_{t-1}; X_t]$:
+\begin{align*}
+    F_t &= \sigma\!\bigl(W_F [H_{t-1}; X_t] + b_F\bigr) & &\text{(forget gate)} \\
+    I_t &= \sigma\!\bigl(W_I [H_{t-1}; X_t] + b_I\bigr) & &\text{(input gate)} \\
+    \tilde C_t &= \tanh\!\bigl(W_C [H_{t-1}; X_t] + b_C\bigr) & &\text{(candidate cell)} \\
+    C_t &= F_t \odot C_{t-1} + I_t \odot \tilde C_t & &\text{(cell update)} \\
+    O_t &= \sigma\!\bigl(W_O [H_{t-1}; X_t] + b_O\bigr) & &\text{(output gate)} \\
+    H_t &= O_t \odot \tanh(C_t) & &\text{(hidden state)}
+\end{align*}
+}
+
+The cell state flows through time with only element-wise operations
+(forget + add), providing a gradient highway and enabling learning of
+dependencies across hundreds of steps.
+
+\rmkb{
+\textbf{GRU} (Cho et al.\ 2014) merges cell and hidden state into one vector
+and uses two gates (update gate $z_t$, reset gate $r_t$), matching LSTM
+performance with fewer parameters.
+}
+
+\section{Bidirectional and Multi-Layer RNNs}
+
+\defn{Bidirectional RNN}{
+Two RNNs process the sequence in forward and backward directions; hidden
+states are concatenated at each step:
+\[
+    \vec h_t = \mathrm{RNN}_{\mathrm{FW}}(\vec h_{t-1},\, x_t), \quad
+    \overleftarrow{h}_t = \mathrm{RNN}_{\mathrm{BW}}(\overleftarrow{h}_{t+1},\, x_t), \quad
+    h_t = [\vec h_t;\, \overleftarrow{h}_t].
+\]
+Each position's representation incorporates both past and future context.
+Transformers largely supersede bidirectional RNNs due to parallelism.
+}
+
+\textbf{Multi-layer RNNs} feed the hidden states of layer $\ell$ as inputs
+to layer $\ell+1$, enabling hierarchical temporal feature extraction.
+
+% ==============================================================================
+\chapter{Attention and Transformers}
+% ==============================================================================
+
+\section{Scaled Dot-Product Attention}
+
+\defn{Attention}{
+Given a query $q \in \R^{d_k}$, keys $K \in \R^{n \times d_k}$, and values
+$V \in \R^{n \times d_v}$:
+\[
+    \mathrm{Attention}(q, K, V)
+    = \mathrm{softmax}\!\left(\frac{q K^\top}{\sqrt{d_k}}\right) V.
+\]
+The factor $1/\sqrt{d_k}$ prevents dot products from saturating the softmax.
+}
+
+In \textbf{self-attention}, queries, keys, and values are all derived from
+the same input sequence $X$ via learned projections:
+\[
+    Q = X W_Q, \quad K = X W_K, \quad V = X W_V.
+\]
+Every token attends to every other token simultaneously in $O(1)$ layers,
+unlike RNNs which require $O(T)$ sequential steps.
+
+\section{Multi-Head Attention}
+
+\defn{Multi-Head Attention}{
+Run $h$ independent attention heads in parallel, each with projections
+$W_Q^i, W_K^i, W_V^i \in \R^{d_\text{model} \times d_k}$, then concatenate
+and project:
+\[
+    \mathrm{MultiHead}(Q,K,V)
+    = \mathrm{Concat}(\mathrm{head}_1, \ldots, \mathrm{head}_h)\,W_O,
+    \quad
+    \mathrm{head}_i = \mathrm{Attention}(QW_Q^i,\,KW_K^i,\,VW_V^i).
+\]
+Different heads can capture syntactic, semantic, and positional relationships
+simultaneously.
+}
+
+\section{The Transformer Architecture}
+
+\defn{Transformer (Vaswani et al.\ 2017)}{
+An encoder--decoder architecture without recurrence.
+
+\textbf{Encoder block} (repeated $N$ times):
+\begin{enumerate}
+  \item Multi-head self-attention $\to$ Add \& LayerNorm.
+  \item Position-wise FFN $\to$ Add \& LayerNorm.
+\end{enumerate}
+
+\textbf{Decoder block} (repeated $N$ times):
+\begin{enumerate}
+  \item Masked multi-head self-attention (causal; prevents attending to future)
+        $\to$ Add \& LayerNorm.
+  \item Multi-head cross-attention (queries from decoder; keys, values from
+        encoder) $\to$ Add \& LayerNorm.
+  \item Position-wise FFN $\to$ Add \& LayerNorm.
+\end{enumerate}
+}
+
+\textbf{Feed-Forward sublayer}:
+\[
+    \mathrm{FFN}(x) = \max(0,\, x W_1 + b_1)\,W_2 + b_2.
+\]
+
+\textbf{Layer Normalisation}: for each token $h_k$ normalise over the feature
+dimension, then apply learned scale $\gamma$ and bias $\beta$:
+\[
+    \mathrm{LN}(h_k)
+    = \frac{h_k - \mu_k}{\sqrt{\sigma_k + \varepsilon}} \cdot \gamma + \beta.
+\]
+
+\defn{Positional Encoding}{
+Since Transformers have no recurrence, token order is injected by adding
+sinusoidal positional embeddings to the input:
+\[
+    \mathrm{PE}_{(pos,\,2i)}   = \sin\!\left(\frac{pos}{10000^{2i/d}}\right),
+    \quad
+    \mathrm{PE}_{(pos,\,2i+1)} = \cos\!\left(\frac{pos}{10000^{2i/d}}\right).
+\]
+Alternatively, learned positional embeddings are used in BERT/GPT.
+}
+
+\section{Pre-Trained Transformers}
+
+\textbf{BERT} (Devlin et al.\ 2019) is a bidirectional Transformer encoder
+pre-trained with two self-supervised tasks:
+\begin{itemize}
+  \item \textbf{Masked Language Modelling (MLM)}: randomly mask 15\% of
+        tokens; predict the masked tokens.
+  \item \textbf{Next Sentence Prediction (NSP)}: binary prediction of whether
+        two sentences are consecutive.
+\end{itemize}
+BERT-base: 12 layers, hidden size 768, 12 attention heads, 110M parameters.
+BERT-large: 24 layers, hidden size 1024, 16 heads, 340M parameters.
+Training corpus: Wikipedia (2.5B words) + BookCorpus (0.8B words).
+Fine-tuning: attach a task head to the pre-trained encoder; update all
+parameters on labelled downstream data (\emph{pretrain once, fine-tune many
+times}).
+
+\textbf{GPT} (Radford et al.\ 2018) uses a causal (left-to-right) Transformer
+\emph{decoder} pre-trained with standard language modelling:
+\[
+    L = \frac{1}{T}\sum_{t=1}^{T} L_{\mathrm{CE}}(y_t,\,\hat y_t).
+\]
+GPT-3 (Brown et al.\ 2020): 175B parameters, trained on 300B tokens.
+It exhibits \textbf{in-context learning}: given task demonstrations in the
+prompt, it generalises with no gradient updates (a purely forward-pass
+phenomenon).
+
+\rmkb{
+\textbf{Transformer family.}
+Encoder-only (BERT, RoBERTa): bidirectional context; excel at classification
+and NLU. \\
+Decoder-only (GPT, PaLM): auto-regressive; natural language generation. \\
+Encoder-decoder (T5, BART): seq2seq tasks (translation, summarisation).
+}
+
+% ==============================================================================
+% PART V: GENERATIVE MODELS
+% ==============================================================================
+
 \part{Generative Models}
 
 % ==============================================================================
-% Part VI: Large Language Models
-%
-% The modern LLM stack end-to-end:
-% pretraining, post-training alignment, inference efficiency,
-% retrieval-augmented generation, and agentic systems.
+\chapter{Variational Autoencoders}
 % ==============================================================================
+
+\section{The Generative Modelling Goal}
+
+A \textbf{generative model} learns the data distribution $p(x)$ so that one
+can (i) evaluate likelihood and (ii) draw new samples $x \sim p(x)$.
+Standard autoencoders compress data but impose no structure on the latent
+space, making the generative direction unreliable.
+
+\section{Evidence Lower Bound}
+
+\defn{VAE (Kingma \& Welling 2014)}{
+Assume a latent variable model $p_\theta(x,z)=p_\theta(x|z)\,p(z)$ with
+Gaussian prior $p(z)=\mathcal{N}(0,I)$.  The marginal
+$p_\theta(x)=\int p_\theta(x|z)\,p(z)\,dz$ is intractable.  Introducing an
+approximate posterior $q_\phi(z|x)$, the \emph{Evidence Lower Bound} is:
+\[
+    \log p_\theta(x) \;\geq\;
+    \mathcal{L}(\theta,\phi;\,x)
+    = \underbrace{\mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)]}_{\text{reconstruction}}
+    \;-\; \underbrace{D_{\mathrm{KL}}(q_\phi(z|x)\,\|\,p(z))}_{\text{regularisation}}.
+\]
+}
+
+\prop{ELBO Derivation}{
+By Jensen's inequality applied to the concave $\log$:
+\[
+    \log p_\theta(x)
+    = \log \mathbb{E}_{q_\phi}\!\left[\frac{p_\theta(x|z)\,p(z)}{q_\phi(z|x)}\right]
+    \geq \mathbb{E}_{q_\phi}\!\left[\log \frac{p_\theta(x|z)\,p(z)}{q_\phi(z|x)}\right]
+    = \mathcal{L}.
+\]
+The gap is $D_{\mathrm{KL}}(q_\phi(z|x)\|p_\theta(z|x)) \geq 0$.
+}
+
+\section{The Reparametrisation Trick}
+
+Sampling $z \sim q_\phi(z|x) = \mathcal{N}(\mu_\phi(x), \sigma_\phi^2(x)I)$
+is non-differentiable.  Reparametrise:
+\[
+    z = \mu_\phi(x) + \sigma_\phi(x) \odot \varepsilon,
+    \quad \varepsilon \sim \mathcal{N}(0,I).
+\]
+Randomness is now in $\varepsilon$ (no parameters), so gradients flow through
+$\mu_\phi$ and $\sigma_\phi$ via standard backpropagation.
+
+\rmkb{
+\textbf{Closed-form KL} (diagonal Gaussian):
+$D_{\mathrm{KL}}(\mathcal{N}(\mu,\sigma^2)\|\mathcal{N}(0,1))
+= -\tfrac{1}{2}\sum_j(1 + \log\sigma_j^2 - \mu_j^2 - \sigma_j^2)$.
+}
+
+% ==============================================================================
+\chapter{Generative Adversarial Networks}
+% ==============================================================================
+
+\section{The GAN Minimax Game}
+
+\defn{GAN (Goodfellow et al.\ 2014)}{
+Train two networks adversarially:
+\begin{itemize}
+  \item \textbf{Generator} $G_\theta:\mathcal{Z}\to\mathcal{X}$: maps noise
+        $z\sim p(z)$ to fake samples.
+  \item \textbf{Discriminator} $D_\phi:\mathcal{X}\to[0,1]$: classifies real
+        vs.\ generated.
+\end{itemize}
+Minimax objective:
+\[
+    \min_\theta\max_\phi\;
+    \mathbb{E}_{x\sim p_\text{data}}[\log D_\phi(x)]
+    + \mathbb{E}_{z\sim p(z)}[\log(1-D_\phi(G_\theta(z)))].
+\]
+}
+
+\prop{Optimal Discriminator and Equilibrium}{
+At fixed $G$, the optimal discriminator is
+$D^*(x) = p_\text{data}(x)/(p_\text{data}(x)+p_G(x))$.
+Substituting, the minimax problem reduces to minimising the
+Jensen--Shannon divergence:
+$\min_\theta 2\,D_{\mathrm{JS}}(p_\text{data}\|p_G)-\log 4$.
+Global minimum $p_G = p_\text{data}$.
+}
+
+\section{Practical Variants}
+
+Training alternates: update $D$ to distinguish real from fake, then update
+$G$ to fool $D$ (using the non-saturating loss $-\mathbb{E}[\log D_\phi(G_\theta(z))]$
+to avoid early vanishing gradients).
+
+\textbf{WGAN} (Arjovsky et al.\ 2017) uses the Wasserstein-1 distance and a
+1-Lipschitz critic.  With gradient penalty:
+\[
+    L_{\mathrm{GP}} = \mathbb{E}[D(\tilde x)] - \mathbb{E}[D(x)]
+    + \lambda\,\mathbb{E}[(\norm{\nabla_{\hat x} D(\hat x)}_2-1)^2].
+\]
+
+\textbf{Conditional GAN}: condition both $G$ and $D$ on auxiliary label $y$
+to control the class or attributes of generated samples.
+
+% ==============================================================================
+\chapter{Diffusion Models}
+% ==============================================================================
+
+\section{Forward Diffusion Process}
+
+\defn{DDPM (Ho et al.\ 2020)}{
+A fixed \emph{forward process} gradually adds Gaussian noise over $T$ steps:
+\[
+    q(x_t \mid x_{t-1})
+    = \mathcal{N}\!\bigl(\sqrt{1-\beta_t}\,x_{t-1},\;\beta_t I\bigr).
+\]
+Using $\bar\alpha_t = \prod_{s=1}^t(1-\beta_s)$, the marginal is:
+\[
+    q(x_t \mid x_0) = \mathcal{N}\!\bigl(\sqrt{\bar\alpha_t}\,x_0,\;(1-\bar\alpha_t)I\bigr),
+\]
+so $x_t = \sqrt{\bar\alpha_t}\,x_0 + \sqrt{1-\bar\alpha_t}\,\varepsilon$,
+$\varepsilon\sim\mathcal{N}(0,I)$.
+}
+
+\section{Reverse Process and Training}
+
+A neural network $\varepsilon_\theta(x_t,t)$ predicts the noise.  The
+simplified training loss is:
+\[
+    \mathcal{L}_\text{simple}
+    = \mathbb{E}_{t,\,x_0,\,\varepsilon}\!\left[
+      \norm{\varepsilon
+      - \varepsilon_\theta\!\bigl(\sqrt{\bar\alpha_t}\,x_0
+        + \sqrt{1-\bar\alpha_t}\,\varepsilon,\;t\bigr)}_2^2\right].
+\]
+
+To generate: start from $x_T\sim\mathcal{N}(0,I)$ and iterate
+\[
+    x_{t-1}
+    = \frac{1}{\sqrt{\alpha_t}}\!\left(x_t
+      - \frac{1-\alpha_t}{\sqrt{1-\bar\alpha_t}}\varepsilon_\theta(x_t,t)\right)
+    + \sigma_t z, \quad z\sim\mathcal{N}(0,I).
+\]
+
+\rmkb{
+\textbf{Classifier-Free Guidance}: train $\varepsilon_\theta(x_t,t,c)$
+jointly with the unconditional model (randomly drop $c$ during training).
+At inference, amplify the conditioning signal:
+$\tilde\varepsilon = \varepsilon_\theta(x_t,t) + w(\varepsilon_\theta(x_t,t,c)-\varepsilon_\theta(x_t,t))$
+with guidance scale $w>1$.  Higher $w$ trades sample diversity for
+prompt fidelity (used in Stable Diffusion, DALL-E 2).
+}
+
+% ==============================================================================
+% PART VI: LARGE LANGUAGE MODELS
+% ==============================================================================
+
 \part{Large Language Models}
 
 % ==============================================================================
-% Part VII: ML Engineering
-%
-% Turning models into products.
-% Data pipelines, experimentation, MLOps, system design,
-% and the interview questions that test all of the above.
+\chapter{Language Models and Pretraining}
 % ==============================================================================
+
+\section{Language Modelling}
+
+\defn{Language Model}{
+A language model assigns probabilities to token sequences via the chain rule:
+\[
+    P(x_1,\ldots,x_T) = \prod_{t=1}^T P(x_t \mid x_1,\ldots,x_{t-1}).
+\]
+Training minimises cross-entropy (equivalently, maximises log-likelihood):
+\[
+    L = -\frac{1}{|\mathcal{D}|}\sum_t \log P_\theta(x_t \mid x_{<t}).
+\]
+\emph{Perplexity}: $\mathrm{PPL} = \exp(L)$.  Lower is better.
+}
+
+\section{Subword Tokenisation}
+
+Raw text is mapped to integers via a subword tokeniser.
+\textbf{Byte-Pair Encoding (BPE)}: iteratively merge the most frequent
+adjacent byte/character pair, building a vocabulary of $|V|$ subword units
+(typically 30k--100k).
+
+\section{Transformer LM Architectures}
+
+\begin{itemize}
+  \item \textbf{Causal (decoder-only)} — GPT family: masked self-attention;
+        trained on next-token prediction; natural text generation.
+  \item \textbf{Masked (encoder-only)} — BERT family: bidirectional attention;
+        trained on masked token prediction; strong NLU representations.
+  \item \textbf{Encoder-decoder} — T5, BART: bidirectional encoder plus
+        causal decoder; suited to seq2seq tasks.
+\end{itemize}
+
+\section{Scaling Laws}
+
+\prop{Chinchilla Scaling Law (Hoffmann et al.\ 2022)}{
+Loss improves as a power law in model size $N$ and training tokens $D$:
+\[
+    L(N,D) \approx \frac{A}{N^\alpha} + \frac{B}{D^\beta} + L_\infty,
+    \quad \alpha\approx\beta\approx 0.5.
+\]
+For compute budget $C\approx 6ND$, the optimal allocation satisfies
+$N^*\approx D^*\propto\sqrt{C}$: a smaller model trained on more tokens
+outperforms a larger model trained on fewer.
+}
+
+% ==============================================================================
+\chapter{Instruction Finetuning and Alignment}
+% ==============================================================================
+
+\section{Supervised Fine-Tuning}
+
+Pre-trained LLMs predict the next token but do not inherently follow
+instructions.  \textbf{Instruction fine-tuning} trains on curated
+(prompt, response) pairs with standard cross-entropy, teaching the model
+to be helpful, harmless, and honest.
+
+\section{Reinforcement Learning from Human Feedback}
+
+\defn{RLHF (Christiano et al.\ 2017; Ouyang et al.\ 2022)}{
+\begin{enumerate}
+  \item \textbf{Reward model}: rank model outputs; train $r_\phi(x,y)$ via
+        \[
+            L_{\mathrm{RM}} = -\mathbb{E}_{(x,\,y_w \succ y_l)}
+            [\log\sigma(r_\phi(x,y_w)-r_\phi(x,y_l))].
+        \]
+  \item \textbf{RL fine-tuning} with PPO: maximise expected reward subject to
+        a KL penalty that keeps the policy close to the SFT reference:
+        \[
+            \max_\theta\;\mathbb{E}_{x,\,y\sim\pi_\theta}[r_\phi(x,y)]
+            - \beta\,D_{\mathrm{KL}}(\pi_\theta \| \pi_\mathrm{ref}).
+        \]
+\end{enumerate}
+}
+
+\section{Direct Preference Optimisation}
+
+\defn{DPO (Rafailov et al.\ 2023)}{
+Bypasses explicit reward model training.  The DPO loss:
+\[
+    L_{\mathrm{DPO}} = -\mathbb{E}_{(x,\,y_w,\,y_l)}\!\left[
+      \log\sigma\!\left(
+        \beta\log\frac{\pi_\theta(y_w|x)}{\pi_\mathrm{ref}(y_w|x)}
+        - \beta\log\frac{\pi_\theta(y_l|x)}{\pi_\mathrm{ref}(y_l|x)}
+      \right)
+    \right].
+\]
+DPO is simpler, more stable, and often matches or exceeds RLHF quality.
+}
+
+% ==============================================================================
+\chapter{In-Context Learning and Prompting}
+% ==============================================================================
+
+\section{In-Context Learning}
+
+\defn{In-Context Learning (Brown et al.\ 2020)}{
+Feed the model a prompt containing $k$ demonstrations
+$(x_1,y_1),\ldots,(x_k,y_k)$ then a query $x_{k+1}$; the model predicts
+$y_{k+1}$ via a \textbf{single forward pass} — no gradient updates.
+Zero-shot: no demonstrations.  Few-shot: $k \geq 1$.
+}
+
+\section{Chain-of-Thought Prompting}
+
+\textbf{Chain-of-Thought (CoT)} (Wei et al.\ 2022): include step-by-step
+reasoning in few-shot exemplars.  Dramatically improves performance on
+arithmetic, commonsense, and symbolic reasoning.
+
+\textbf{Zero-Shot CoT}: append ``Let's think step by step.'' to the prompt;
+elicits reasoning without examples.
+
+\textbf{Self-Consistency}: sample $k$ reasoning chains independently;
+take the majority-vote final answer.  Reduces variance and improves accuracy.
+
+\rmkb{
+\textbf{Least-to-Most Prompting}: decompose a complex problem into easier
+subproblems; solve each sequentially, passing prior solutions into the
+next context.  Enables compositional generalisation beyond training length.
+}
+
+% ==============================================================================
+\chapter{Decoding Strategies}
+% ==============================================================================
+
+\section{Deterministic Decoding}
+
+\defn{Greedy Decoding}{
+$x_t = \arg\max_v P_\theta(v\mid x_{<t})$.  Fast but locally optimal;
+can produce repetitive or suboptimal sequences.
+}
+
+\defn{Beam Search}{
+Maintain $B$ (\emph{beam width}) partial hypotheses; expand each by all
+vocabulary tokens; keep top-$B$ by cumulative log-probability.  Better for
+structured tasks (translation, summarisation); tends to produce generic text
+for open-ended generation.
+}
+
+\section{Stochastic Decoding}
+
+\defn{Temperature Sampling}{
+Sample from $P_T(v) \propto P(v)^{1/T}$.  $T<1$: peakier (more greedy);
+$T>1$: flatter (more random).
+}
+
+\defn{Top-$k$ Sampling}{
+Restrict to the $k$ highest-probability tokens, renormalise, sample.
+}
+
+\defn{Nucleus (Top-$p$) Sampling (Holtzman et al.\ 2020)}{
+Restrict to the smallest vocabulary subset whose cumulative probability
+$\geq p$ (e.g.\ $p=0.9$), renormalise, sample.  The set size adapts
+dynamically: large when the distribution is flat, small when peaked.
+}
+
+% ==============================================================================
+\chapter{Retrieval-Augmented Generation}
+% ==============================================================================
+
+\section{Motivation}
+
+LLM parameters encode knowledge frozen at training time and can hallucinate.
+\textbf{RAG} (Lewis et al.\ 2020) augments the LLM with a dynamically
+retrieved, up-to-date knowledge base.
+
+\defn{RAG Pipeline}{
+\begin{enumerate}
+  \item \textbf{Index}: encode all documents with a dense encoder;
+        store embeddings in a vector database (FAISS, HNSW).
+  \item \textbf{Retrieve}: embed the query $q$; find top-$k$ passages by
+        maximum inner product: $\mathrm{score}(q,d) = E_Q(q)^\top E_P(d)$.
+  \item \textbf{Generate}: concatenate query and retrieved passages as context;
+        generate the answer with the LLM.
+\end{enumerate}
+}
+
+\defn{Dense Passage Retrieval (Karpukhin et al.\ 2020)}{
+Train dual encoders $E_Q, E_P$ with in-batch negatives:
+\[
+    L = -\log\frac{\exp(E_Q(q)^\top E_P(d^+))}
+    {\exp(E_Q(q)^\top E_P(d^+)) + \sum_j\exp(E_Q(q)^\top E_P(d_j^-))}.
+\]
+}
+
+% ==============================================================================
+\chapter{LLM Agents}
+% ==============================================================================
+
+\section{Agent Architecture}
+
+An \textbf{LLM agent} uses a language model as a reasoning engine that
+perceives observations, maintains memory, plans, and executes actions via
+external tools (web search, code interpreter, databases, APIs).
+
+\defn{ReAct Framework (Yao et al.\ 2023)}{
+Interleave \emph{Reasoning} (Thought) and \emph{Acting} (Action) steps:
+\begin{enumerate}
+  \item \textbf{Thought}: the LLM generates a natural-language reasoning step.
+  \item \textbf{Action}: call a tool (search, calculator, code runner).
+  \item \textbf{Observation}: the tool returns a result.
+  \item Repeat until a final answer is produced.
+\end{enumerate}
+The reasoning trace makes the agent's decision process interpretable and
+debuggable.
+}
+
+\section{Memory Types}
+
+\begin{itemize}
+  \item \textbf{In-context}: past conversation and retrieved documents within
+        the prompt window.
+  \item \textbf{External}: vector database of past experiences retrieved by
+        embedding similarity.
+  \item \textbf{Parametric}: knowledge encoded in model weights at pretraining.
+\end{itemize}
+
+\section{Multi-Agent Systems}
+
+A \emph{planner} agent decomposes a task into subtasks; specialised
+\emph{worker} agents execute each; a \emph{critic} agent reviews and
+flags errors.  Communication is mediated through shared message queues or
+structured prompts (e.g.\ AutoGen, CrewAI frameworks).
+
+% ==============================================================================
+% PART VII: ML ENGINEERING
+% ==============================================================================
+
 \part{ML Engineering}
+
+% ==============================================================================
+\chapter{Transfer Learning and Fine-Tuning}
+% ==============================================================================
+
+\section{Transfer Learning}
+
+\defn{Transfer Learning}{
+Pre-train on a large source task; adapt to a target task with limited
+labelled data.
+\begin{itemize}
+  \item \textbf{Feature extraction}: freeze pre-trained weights; train only
+        a new task head.  Fast; best when source and target are similar.
+  \item \textbf{Full fine-tuning}: continue training all weights on the
+        target dataset with a small learning rate.  Better when sufficient
+        target data is available.
+\end{itemize}
+}
+
+\section{Parameter-Efficient Fine-Tuning}
+
+Fine-tuning billion-parameter models is expensive.  PEFT methods adapt a
+small parameter subset.
+
+\defn{LoRA (Hu et al.\ 2022)}{
+Constrain the weight update $\Delta W$ to a low-rank factorisation:
+\[
+    \Delta W = A B^\top,\quad A\in\R^{m\times r},\; B\in\R^{n\times r},
+    \quad r \ll \min(m,n).
+\]
+Only $A$ and $B$ are trained ($W_0$ frozen), reducing trainable parameters
+from $mn$ to $r(m+n)$.  LoRA adds negligible inference latency when
+merged: $W = W_0 + AB^\top$.
+}
+
+\textbf{Prompt tuning} (Lester et al.\ 2021): prepend a small set of
+learnable continuous ``soft prompt'' vectors to the input embeddings; freeze
+all other parameters.  Competitive with full fine-tuning at large model size.
+
+% ==============================================================================
+\chapter{Hyperparameter Optimization}
+% ==============================================================================
+
+\section{Problem Statement}
+
+\defn{HPO}{
+Find $\lambda^* = \arg\min_{\lambda\in\Lambda} f(\lambda)$ where
+$f(\lambda)$ is validation loss after training with hyperparameters $\lambda$
+(learning rate, architecture width/depth, regularisation, batch size).
+Each evaluation requires a complete training run — expensive black-box
+optimisation.
+}
+
+\section{Search Strategies}
+
+\textbf{Grid search}: exhaustive enumeration of a discrete grid.  Exponential
+in the number of hyperparameters; impractical beyond 3--4 dimensions.
+
+\textbf{Random search} (Bergstra \& Bengio 2012): sample $\lambda$ uniformly
+at random.  More efficient when only a few hyperparameters are important.
+
+\defn{Bayesian Optimisation}{
+Build a probabilistic surrogate model of $f$ (Gaussian process or Tree
+Parzen Estimator).  Select the next configuration by maximising an
+\emph{acquisition function}, e.g.\ Expected Improvement:
+\[
+    \mathrm{EI}(\lambda) = \mathbb{E}[\max(f^*-f(\lambda),\,0)].
+\]
+After each evaluation, update the surrogate.  Achieves sample efficiency
+superior to random search for moderate-dimensional, expensive objectives.
+}
+
+\section{Multi-Fidelity Methods}
+
+\textbf{Successive Halving}: run $n$ configurations for a small budget;
+keep the top half; double the budget; repeat until one remains.
+
+\textbf{Hyperband}: run successive halving with several different initial
+bracket sizes in parallel to balance exploration and exploitation.
+
+% ==============================================================================
+\chapter{Distributed Training}
+% ==============================================================================
+
+\section{Parallelism Strategies}
+
+\textbf{Data parallelism}: replicate the model on each device; partition
+the mini-batch across devices; synchronise gradients via all-reduce.
+Preferred when the model fits on one device.
+
+\textbf{Pipeline parallelism} (GPipe): split layers into stages across
+devices; pass micro-batches through the pipeline to keep all stages busy.
+
+\textbf{Tensor parallelism} (Megatron-LM): split individual weight matrices
+across devices; each computes a partial matrix product and results are
+summed by all-reduce.  Required for very large layers.
+
+\section{Gradient Synchronisation}
+
+\defn{Ring All-Reduce}{
+In a ring of $N$ workers, each sends and receives $1/N$ of the gradient
+tensor per step.  Total communication $2(N-1)/N\,|\theta|$.  Bandwidth-
+optimal: the bottleneck does not grow with $N$.
+}
+
+\section{Mixed-Precision Training}
+
+Store master weights in FP32 but compute forward/backward passes in
+FP16 or BF16.  Use \emph{loss scaling} to prevent gradient underflow.
+Halves memory and doubles throughput on Tensor Core hardware.
+
+% ==============================================================================
+\chapter{AutoML and Knowledge Distillation}
+% ==============================================================================
+
+\section{Neural Architecture Search}
+
+\defn{NAS}{
+Automatically search a discrete space of architectures (layer types, widths,
+skip connections) to maximise validation performance.
+\begin{itemize}
+  \item \textbf{RL-based}: a controller RNN proposes architectures as
+        actions; validation accuracy is the reward.
+  \item \textbf{DARTS} (Liu et al.\ 2019): relax discrete choices to a
+        softmax mixture; optimise mixing weights $\alpha$ by gradient
+        descent on validation loss; discretise at the end.
+\end{itemize}
+}
+
+\section{Knowledge Distillation}
+
+\defn{Knowledge Distillation (Hinton et al.\ 2015)}{
+Transfer knowledge from a large \emph{teacher} $T$ to a smaller
+\emph{student} $S$ by matching soft output distributions:
+\[
+    L_{\mathrm{KD}} = (1-\alpha)\,L_{\mathrm{CE}}(y,\hat y_S)
+    + \alpha\,\tau^2\,D_{\mathrm{KL}}\!\left(
+        \mathrm{softmax}\!\tfrac{z_T}{\tau}\;\Big\|\;
+        \mathrm{softmax}\!\tfrac{z_S}{\tau}
+    \right),
+\]
+where temperature $\tau>1$ softens the teacher's distribution, revealing
+inter-class similarity structure not present in hard labels.
+}
+
+% ==============================================================================
+% PART VIII: REINFORCEMENT LEARNING
+% ==============================================================================
+
+\part{Reinforcement Learning}
+
+% ==============================================================================
+\chapter{Multi-Armed Bandits}
+% ==============================================================================
+
+\section{The Bandit Problem}
+
+\defn{$K$-Armed Bandit}{
+At each round $t$, an agent selects arm $A_t\in\{1,\ldots,K\}$ and receives
+stochastic reward $R_t\sim\mathcal{D}_{A_t}$ with unknown mean $\mu_a$.
+Cumulative regret over $T$ rounds:
+\[
+    \mathrm{Regret}(T) = T\mu^* - \mathbb{E}\!\left[\sum_{t=1}^T R_t\right],
+    \quad \mu^* = \max_a\mu_a.
+\]
+}
+
+\section{Exploration--Exploitation Strategies}
+
+\textbf{$\varepsilon$-greedy}: with probability $\varepsilon$ pull a random
+arm; otherwise pull the empirically best arm.  Simple but suboptimal.
+
+\defn{UCB1 (Auer et al.\ 2002)}{
+\[
+    A_t = \arg\max_a\!\left(\hat\mu_a + \sqrt{\frac{2\ln t}{N_a}}\right),
+\]
+where $N_a$ is the pull count for arm $a$.  The confidence bonus drives
+exploration of under-tried arms.  UCB1 achieves $O(\ln T)$ regret.
+}
+
+\defn{Thompson Sampling}{
+Maintain posterior $P(\mu_a|\text{history})$.  Each round, sample
+$\tilde\mu_a\sim P(\mu_a|\cdot)$ and pull $\arg\max_a\tilde\mu_a$.  With
+Beta--Bernoulli conjugacy this achieves near-optimal expected regret and
+is empirically robust.
+}
+
+% ==============================================================================
+\chapter{Markov Decision Processes}
+% ==============================================================================
+
+\section{MDP Framework}
+
+\defn{Markov Decision Process}{
+A tuple $(\mathcal{S},\mathcal{A},P,R,\gamma)$: state space, action space,
+transition $P(s'|s,a)$, expected reward $R(s,a)$, discount $\gamma\in[0,1)$.
+The agent follows policy $\pi(a|s)$ maximising expected discounted return
+$G_t=\sum_{k\geq0}\gamma^k R_{t+k+1}$.
+}
+
+\defn{Value Functions}{
+\begin{align*}
+    V^\pi(s) &= \mathbb{E}_\pi\!\left[\sum_{k\geq0}\gamma^k R_{t+k+1}\mid S_t=s\right],\\
+    Q^\pi(s,a) &= \mathbb{E}_\pi\!\left[\sum_{k\geq0}\gamma^k R_{t+k+1}\mid S_t=s,A_t=a\right].
+\end{align*}
+}
+
+\section{Bellman Equations}
+
+\prop{Bellman Expectation Equations}{
+\[
+    V^\pi(s) = \sum_a\pi(a|s)\sum_{s'}P(s'|s,a)[R(s,a)+\gamma V^\pi(s')],
+\]
+\[
+    Q^\pi(s,a) = \sum_{s'}P(s'|s,a)\!\left[R(s,a)
+    +\gamma\sum_{a'}\pi(a'|s')Q^\pi(s',a')\right].
+\]
+}
+
+\prop{Bellman Optimality Equations}{
+\[
+    V^*(s) = \max_a\sum_{s'}P(s'|s,a)[R(s,a)+\gamma V^*(s')],
+\]
+\[
+    Q^*(s,a) = \sum_{s'}P(s'|s,a)[R(s,a)+\gamma\max_{a'}Q^*(s',a')].
+\]
+Optimal policy: $\pi^*(s)=\arg\max_a Q^*(s,a)$.
+}
+
+% ==============================================================================
+\chapter{Dynamic Programming}
+% ==============================================================================
+
+\section{Policy Evaluation and Improvement}
+
+\defn{Iterative Policy Evaluation}{
+Initialise $V_0\equiv0$.  Iterate:
+\[
+    V_{k+1}(s) = \sum_a\pi(a|s)\sum_{s'}P(s'|s,a)[R(s,a)+\gamma V_k(s')].
+\]
+Converges to $V^\pi$ (contraction mapping in $\ell_\infty$).
+}
+
+\defn{Policy Improvement}{
+The greedy policy $\pi'(s)=\arg\max_a Q^\pi(s,a)$ satisfies
+$V^{\pi'}(s)\geq V^\pi(s)$ for all $s$ (\emph{Policy Improvement Theorem}).
+}
+
+\defn{Policy Iteration}{
+Alternate policy evaluation and policy improvement until convergence.
+Terminates in finitely many steps for finite MDPs.
+}
+
+\defn{Value Iteration}{
+Directly apply the Bellman optimality operator:
+\[
+    V_{k+1}(s) = \max_a\sum_{s'}P(s'|s,a)[R(s,a)+\gamma V_k(s')].
+\]
+Converges to $V^*$ without a separate policy evaluation step.
+}
+
+% ==============================================================================
+\chapter{Temporal Difference Learning}
+% ==============================================================================
+
+\section{TD Prediction}
+
+\defn{TD(0)}{
+Update the value estimate after each transition $(S_t,A_t,R_{t+1},S_{t+1})$:
+\[
+    V(S_t) \leftarrow V(S_t) + \alpha\bigl[
+    \underbrace{R_{t+1}+\gamma V(S_{t+1})}_{\text{TD target}}
+    - V(S_t)\bigr].
+\]
+Bootstraps from current estimates (unlike Monte Carlo which waits for
+episode end); can learn online and in continuing tasks.
+}
+
+\section{Q-Learning and SARSA}
+
+\defn{Q-Learning (Watkins 1989)}{
+Off-policy TD control:
+\[
+    Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha\bigl[
+    R_{t+1}+\gamma\max_{a'}Q(S_{t+1},a') - Q(S_t,A_t)\bigr].
+\]
+Converges to $Q^*$ regardless of the behaviour policy (off-policy).
+}
+
+\defn{SARSA}{
+On-policy TD control using the \emph{actual} next action $A_{t+1}$:
+\[
+    Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha\bigl[
+    R_{t+1}+\gamma Q(S_{t+1},A_{t+1}) - Q(S_t,A_t)\bigr].
+\]
+Converges to $Q^{\pi_\varepsilon}$ (the $\varepsilon$-greedy policy).
+}
+
+\section{Deep Q-Network}
+
+\defn{DQN (Mnih et al.\ 2015)}{
+Approximate $Q^*$ with a deep network $Q_\theta(s,a)$.  Two stabilisation
+techniques:
+\begin{itemize}
+  \item \textbf{Experience replay}: store $(s,a,r,s')$ in a replay buffer;
+        sample random mini-batches to break temporal correlations.
+  \item \textbf{Target network}: a periodically-frozen copy $Q_{\theta^-}$
+        provides stable TD targets:
+        \[
+            L(\theta)=\mathbb{E}\!\left[
+            \bigl(R+\gamma\max_{a'}Q_{\theta^-}(S',a')
+            -Q_\theta(S,A)\bigr)^2\right].
+        \]
+\end{itemize}
+}
+
+% ==============================================================================
+\chapter{Policy Gradient Methods}
+% ==============================================================================
+
+\section{Policy Gradient Theorem}
+
+\defn{REINFORCE (Williams 1992)}{
+Parametrise $\pi_\theta(a|s)$ directly.  The policy gradient theorem:
+\[
+    \nabla_\theta J(\theta)
+    = \mathbb{E}_{\tau\sim\pi_\theta}\!\left[
+      \sum_{t=0}^T \nabla_\theta\log\pi_\theta(A_t|S_t)\cdot G_t
+    \right].
+\]
+Unbiased but high variance; reduces variance by subtracting a baseline $b$:
+$\hat A_t = G_t - b(S_t)$ (the \emph{advantage}).
+}
+
+\section{Actor-Critic}
+
+\defn{Actor-Critic}{
+Maintain two networks:
+\begin{itemize}
+  \item \textbf{Actor} $\pi_\theta$: updated by policy gradient using
+        the TD advantage $\hat A_t = R_{t+1}+\gamma V_\phi(S_{t+1})-V_\phi(S_t)$.
+  \item \textbf{Critic} $V_\phi$: updated by TD learning.
+\end{itemize}
+The critic's bootstrap estimate reduces variance vs.\ REINFORCE while
+remaining lower bias than using a fully-learned value function.
+}
+
+\section{Proximal Policy Optimisation}
+
+\defn{PPO (Schulman et al.\ 2017)}{
+Clip the policy ratio to prevent large policy updates:
+\[
+    L^{\mathrm{CLIP}}(\theta) = \mathbb{E}\!\left[\min\!\left(
+      r_t(\theta)\hat A_t,\;
+      \mathrm{clip}(r_t(\theta),1-\varepsilon,1+\varepsilon)\hat A_t
+    \right)\right],
+\]
+where $r_t(\theta)=\pi_\theta(A_t|S_t)/\pi_{\theta_\mathrm{old}}(A_t|S_t)$.
+Clipping prevents the new policy from deviating too far from the old one.
+PPO is the dominant RL algorithm used for RLHF alignment of LLMs.
+}
 
 \end{document}
